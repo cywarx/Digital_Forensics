@@ -1,0 +1,116 @@
+Mar 31 22:00:01 cywarx-server sshd[1100]: Accepted publickey for hexx from 192.168.1.10 port 51200 ssh2
+Mar 31 22:00:01 cywarx-server sshd[1100]: pam_unix(sshd:session): session opened for user hexx by (uid=0)
+Mar 31 22:15:00 cywarx-server sudo: hexx : TTY=pts/0 ; PWD=/home/hexx ; USER=root ; COMMAND=/usr/bin/apt update
+Mar 31 22:15:45 cywarx-server sudo: pam_unix(sudo:session): session opened for user root by hexx(uid=1001)
+Mar 31 22:16:10 cywarx-server sudo: pam_unix(sudo:session): session closed for user root
+Mar 31 22:45:00 cywarx-server sshd[1100]: pam_unix(sshd:session): session closed for user hexx
+Mar 31 23:00:01 cywarx-server sshd[1200]: Connection from 10.0.0.5 port 54000 on 192.168.1.105 port 22
+Mar 31 23:00:02 cywarx-server sshd[1200]: Accepted publickey for hexx from 10.0.0.5 port 54000 ssh2
+Mar 31 23:00:02 cywarx-server sshd[1200]: pam_unix(sshd:session): session opened for user hexx by (uid=0)
+Mar 31 23:30:00 cywarx-server sshd[1200]: pam_unix(sshd:session): session closed for user hexx
+Apr  1 00:00:01 cywarx-server CRON[1300]: pam_unix(cron:session): session opened for user root by (uid=0)
+Apr  1 00:00:01 cywarx-server CRON[1300]: pam_unix(cron:session): session closed for user root
+Apr  1 01:00:01 cywarx-server CRON[1400]: pam_unix(cron:session): session opened for user root by (uid=0)
+Apr  1 01:00:01 cywarx-server CRON[1400]: pam_unix(cron:session): session closed for user root
+Apr  1 01:30:10 cywarx-server sshd[1500]: Connection from 172.16.0.5 port 48100 on 192.168.1.105 port 22
+Apr  1 01:30:11 cywarx-server sshd[1500]: Failed password for invalid user oracle from 172.16.0.5 port 48100 ssh2
+Apr  1 01:30:12 cywarx-server sshd[1500]: Failed password for invalid user postgres from 172.16.0.5 port 48101 ssh2
+Apr  1 01:30:13 cywarx-server sshd[1500]: Connection closed by 172.16.0.5 port 48102
+Apr  1 02:00:01 cywarx-server sshd[2000]: Connection from 185.220.101.5 port 55100 on 192.168.1.105 port 22
+Apr  1 02:00:01 cywarx-server sshd[2000]: Failed password for root from 185.220.101.5 port 55100 ssh2
+Apr  1 02:00:02 cywarx-server sshd[2001]: Failed password for root from 185.220.101.5 port 55101 ssh2
+Apr  1 02:00:02 cywarx-server sshd[2002]: Failed password for root from 185.220.101.5 port 55102 ssh2
+Apr  1 02:00:03 cywarx-server sshd[2003]: Failed password for root from 185.220.101.5 port 55103 ssh2
+Apr  1 02:00:03 cywarx-server sshd[2004]: Failed password for root from 185.220.101.5 port 55104 ssh2
+Apr  1 02:00:04 cywarx-server sshd[2005]: Failed password for root from 185.220.101.5 port 55105 ssh2
+Apr  1 02:00:04 cywarx-server sshd[2006]: Failed password for admin from 185.220.101.5 port 55106 ssh2
+Apr  1 02:00:05 cywarx-server sshd[2007]: Failed password for admin from 185.220.101.5 port 55107 ssh2
+Apr  1 02:00:05 cywarx-server sshd[2008]: Failed password for admin from 185.220.101.5 port 55108 ssh2
+Apr  1 02:00:06 cywarx-server sshd[2009]: Failed password for admin from 185.220.101.5 port 55109 ssh2
+Apr  1 02:00:06 cywarx-server sshd[2010]: Failed password for admin from 185.220.101.5 port 55110 ssh2
+Apr  1 02:00:07 cywarx-server sshd[2011]: Failed password for admin from 185.220.101.5 port 55111 ssh2
+Apr  1 02:00:07 cywarx-server sshd[2012]: Failed password for admin from 185.220.101.5 port 55112 ssh2
+Apr  1 02:00:08 cywarx-server sshd[2013]: Failed password for admin from 185.220.101.5 port 55113 ssh2
+Apr  1 02:00:08 cywarx-server sshd[2014]: Failed password for admin from 185.220.101.5 port 55114 ssh2
+Apr  1 02:00:09 cywarx-server sshd[2015]: Failed password for admin from 185.220.101.5 port 55115 ssh2
+Apr  1 02:00:09 cywarx-server sshd[2016]: Failed password for admin from 185.220.101.5 port 55116 ssh2
+Apr  1 02:00:10 cywarx-server sshd[2017]: Failed password for admin from 185.220.101.5 port 55117 ssh2
+Apr  1 02:00:10 cywarx-server sshd[2018]: Failed password for admin from 185.220.101.5 port 55118 ssh2
+Apr  1 02:00:11 cywarx-server sshd[2019]: Failed password for admin from 185.220.101.5 port 55119 ssh2
+Apr  1 02:00:11 cywarx-server sshd[2020]: Failed password for admin from 185.220.101.5 port 55120 ssh2
+Apr  1 02:00:12 cywarx-server sshd[2021]: Failed password for admin from 185.220.101.5 port 55121 ssh2
+Apr  1 02:00:12 cywarx-server sshd[2022]: Failed password for admin from 185.220.101.5 port 55122 ssh2
+Apr  1 02:00:13 cywarx-server sshd[2023]: Failed password for admin from 185.220.101.5 port 55123 ssh2
+Apr  1 02:00:13 cywarx-server sshd[2024]: Failed password for admin from 185.220.101.5 port 55124 ssh2
+Apr  1 02:00:14 cywarx-server sshd[2025]: Failed password for admin from 185.220.101.5 port 55125 ssh2
+Apr  1 02:00:14 cywarx-server sshd[2026]: Failed password for admin from 185.220.101.5 port 55126 ssh2
+Apr  1 02:00:15 cywarx-server sshd[2027]: Failed password for admin from 185.220.101.5 port 55127 ssh2
+Apr  1 02:00:15 cywarx-server sshd[2028]: Failed password for admin from 185.220.101.5 port 55128 ssh2
+Apr  1 02:00:16 cywarx-server sshd[2029]: Failed password for admin from 185.220.101.5 port 55129 ssh2
+Apr  1 02:00:16 cywarx-server sshd[2030]: Failed password for admin from 185.220.101.5 port 55130 ssh2
+Apr  1 02:01:00 cywarx-server sshd[2031]: Failed password for admin from 185.220.101.5 port 55200 ssh2
+Apr  1 02:02:00 cywarx-server sshd[2032]: Failed password for admin from 185.220.101.5 port 55201 ssh2
+Apr  1 02:03:00 cywarx-server sshd[2033]: Failed password for admin from 185.220.101.5 port 55202 ssh2
+Apr  1 02:04:00 cywarx-server sshd[2034]: Failed password for admin from 185.220.101.5 port 55203 ssh2
+Apr  1 02:05:00 cywarx-server sshd[2035]: Failed password for admin from 185.220.101.5 port 55204 ssh2
+Apr  1 02:06:00 cywarx-server sshd[2036]: Failed password for admin from 185.220.101.5 port 55205 ssh2
+Apr  1 02:07:00 cywarx-server sshd[2037]: Failed password for admin from 185.220.101.5 port 55206 ssh2
+Apr  1 02:08:00 cywarx-server sshd[2038]: Failed password for admin from 185.220.101.5 port 55207 ssh2
+Apr  1 02:09:00 cywarx-server sshd[2039]: Failed password for admin from 185.220.101.5 port 55208 ssh2
+Apr  1 02:10:00 cywarx-server sshd[2040]: Failed password for admin from 185.220.101.5 port 55209 ssh2
+Apr  1 02:11:00 cywarx-server sshd[2041]: Failed password for admin from 185.220.101.5 port 55210 ssh2
+Apr  1 02:12:00 cywarx-server sshd[2042]: Failed password for admin from 185.220.101.5 port 55211 ssh2
+Apr  1 02:13:00 cywarx-server sshd[2043]: Failed password for admin from 185.220.101.5 port 55212 ssh2
+Apr  1 02:14:00 cywarx-server sshd[2044]: Failed password for admin from 185.220.101.5 port 55213 ssh2
+Apr  1 02:15:00 cywarx-server sshd[2045]: Failed password for admin from 185.220.101.5 port 55214 ssh2
+Apr  1 02:16:00 cywarx-server sshd[2046]: Failed password for admin from 185.220.101.5 port 55215 ssh2
+Apr  1 02:17:00 cywarx-server sshd[2047]: Failed password for admin from 185.220.101.5 port 55216 ssh2
+Apr  1 02:18:00 cywarx-server sshd[2048]: Failed password for admin from 185.220.101.5 port 55217 ssh2
+Apr  1 02:19:00 cywarx-server sshd[2049]: Failed password for admin from 185.220.101.5 port 55218 ssh2
+Apr  1 02:20:00 cywarx-server sshd[2050]: Failed password for admin from 185.220.101.5 port 55219 ssh2
+Apr  1 02:25:00 cywarx-server sshd[2060]: Failed password for invalid user administrator from 185.220.101.5 port 55300 ssh2
+Apr  1 02:25:01 cywarx-server sshd[2061]: Invalid user administrator from 185.220.101.5 port 55300
+Apr  1 02:25:05 cywarx-server sshd[2062]: Failed password for invalid user user from 185.220.101.5 port 55301 ssh2
+Apr  1 02:25:06 cywarx-server sshd[2063]: Invalid user user from 185.220.101.5 port 55301
+Apr  1 02:25:10 cywarx-server sshd[2064]: Failed password for invalid user test from 185.220.101.5 port 55302 ssh2
+Apr  1 02:25:11 cywarx-server sshd[2065]: Invalid user test from 185.220.101.5 port 55302
+Apr  1 02:45:00 cywarx-server sshd[2100]: Failed password for admin from 185.220.101.5 port 56000 ssh2
+Apr  1 02:45:01 cywarx-server sshd[2101]: Failed password for admin from 185.220.101.5 port 56001 ssh2
+Apr  1 02:45:02 cywarx-server sshd[2102]: Failed password for admin from 185.220.101.5 port 56002 ssh2
+Apr  1 02:45:03 cywarx-server sshd[2103]: Failed password for admin from 185.220.101.5 port 56003 ssh2
+Apr  1 02:45:04 cywarx-server sshd[2104]: Failed password for admin from 185.220.101.5 port 56004 ssh2
+Apr  1 02:45:05 cywarx-server sshd[2105]: Failed password for admin from 185.220.101.5 port 56005 ssh2
+Apr  1 02:45:06 cywarx-server sshd[2106]: Failed password for admin from 185.220.101.5 port 56006 ssh2
+Apr  1 02:45:07 cywarx-server sshd[2107]: Failed password for admin from 185.220.101.5 port 56007 ssh2
+Apr  1 02:47:13 cywarx-server sshd[2200]: Accepted password for admin from 185.220.101.5 port 56100 ssh2
+Apr  1 02:47:13 cywarx-server sshd[2200]: pam_unix(sshd:session): session opened for user admin by (uid=0)
+Apr  1 02:47:20 cywarx-server sudo: admin : TTY=pts/1 ; PWD=/home/admin ; USER=root ; COMMAND=/usr/bin/id
+Apr  1 02:47:25 cywarx-server sudo: pam_unix(sudo:session): session opened for user root by admin(uid=1002)
+Apr  1 02:48:00 cywarx-server sudo: admin : TTY=pts/1 ; PWD=/tmp ; USER=root ; COMMAND=/usr/bin/cat /etc/shadow
+Apr  1 02:48:30 cywarx-server sudo: admin : TTY=pts/1 ; PWD=/tmp ; USER=root ; COMMAND=/usr/sbin/useradd -m -s /bin/bash backdoor
+Apr  1 02:48:33 cywarx-server useradd[3300]: new user: name=backdoor, UID=1005, GID=1005, home=/home/backdoor, shell=/bin/bash
+Apr  1 02:48:35 cywarx-server sudo: admin : TTY=pts/1 ; PWD=/tmp ; USER=root ; COMMAND=/usr/sbin/usermod -aG sudo backdoor
+Apr  1 02:48:35 cywarx-server usermod[3301]: add 'backdoor' to group 'sudo'
+Apr  1 02:48:40 cywarx-server sudo: admin : TTY=pts/1 ; PWD=/tmp ; USER=root ; COMMAND=/bin/bash -c echo 'backdoor:Cywarx@2026!' | chpasswd
+Apr  1 02:49:00 cywarx-server sudo: admin : TTY=pts/1 ; PWD=/etc ; USER=root ; COMMAND=/bin/chmod 777 /tmp
+Apr  1 02:50:00 cywarx-server sshd[2300]: Accepted password for backdoor from 185.220.101.5 port 57000 ssh2
+Apr  1 02:50:00 cywarx-server sshd[2300]: pam_unix(sshd:session): session opened for user backdoor by (uid=0)
+Apr  1 02:50:10 cywarx-server sudo: backdoor : TTY=pts/2 ; PWD=/home/backdoor ; USER=root ; COMMAND=/bin/bash
+Apr  1 02:50:10 cywarx-server sudo: pam_unix(sudo:session): session opened for user root by backdoor(uid=1005)
+Apr  1 02:52:00 cywarx-server sudo: backdoor : TTY=pts/2 ; PWD=/root ; USER=root ; COMMAND=/bin/cat /etc/shadow
+Apr  1 02:55:00 cywarx-server su[3500]: FAILED su for root by hexx
+Apr  1 03:00:01 cywarx-server CRON[3600]: pam_unix(cron:session): session opened for user root by (uid=0)
+Apr  1 03:00:01 cywarx-server CRON[3600]: pam_unix(cron:session): session closed for user root
+Apr  1 03:01:01 cywarx-server CRON[3601]: pam_unix(cron:session): session opened for user root by (uid=0)
+Apr  1 03:01:01 cywarx-server CRON[3601]: pam_unix(cron:session): session closed for user root
+Apr  1 03:02:01 cywarx-server CRON[3602]: pam_unix(cron:session): session opened for user root by (uid=0)
+Apr  1 03:02:01 cywarx-server CRON[3602]: pam_unix(cron:session): session closed for user root
+Apr  1 03:15:00 cywarx-server sudo: backdoor : TTY=pts/2 ; PWD=/tmp ; USER=root ; COMMAND=/usr/bin/apt install -y netcat-traditional nmap john hydra proxychains4
+Apr  1 03:30:00 cywarx-server sshd[2200]: pam_unix(sshd:session): session closed for user admin
+Apr  1 04:00:00 cywarx-server sshd[2300]: pam_unix(sshd:session): session closed for user backdoor
+Apr  1 06:00:01 cywarx-server CRON[5000]: pam_unix(cron:session): session opened for user root by (uid=0)
+Apr  1 06:00:01 cywarx-server CRON[5000]: pam_unix(cron:session): session closed for user root
+Apr  1 08:00:00 cywarx-server sshd[5100]: Accepted publickey for hexx from 192.168.1.10 port 52000 ssh2
+Apr  1 08:00:00 cywarx-server sshd[5100]: pam_unix(sshd:session): session opened for user hexx by (uid=0)
+Apr  1 08:00:10 cywarx-server sudo: hexx : TTY=pts/0 ; PWD=/home/hexx ; USER=root ; COMMAND=/usr/bin/last
+Apr  1 08:00:20 cywarx-server sudo: hexx : TTY=pts/0 ; PWD=/home/hexx ; USER=root ; COMMAND=/usr/bin/cat /var/log/auth.log

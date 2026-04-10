@@ -1,0 +1,50 @@
+Mar 31 22:00:00 cywarx-server systemd[1]: Started OpenSSH Server Daemon.
+Mar 31 22:00:01 cywarx-server systemd[1]: Started Apache HTTP Server.
+Mar 31 22:00:02 cywarx-server systemd[1]: Started MySQL Community Server.
+Mar 31 22:00:03 cywarx-server dhclient[500]: bound to 192.168.1.105 -- renewal in 3600 seconds
+Mar 31 22:00:05 cywarx-server kernel: [    1.000000] Linux version 5.15.0-91-generic (buildd@Ubuntu) #101-Ubuntu
+Mar 31 22:00:05 cywarx-server kernel: [    1.200000] eth0: renamed from veth3a4b2c
+Mar 31 22:00:10 cywarx-server kernel: [    5.000000] audit: type=1400 audit(1711929610.000:1): apparmor=STATUS
+Mar 31 23:00:00 cywarx-server dhclient[500]: bound to 192.168.1.105 -- renewal in 3600 seconds
+Apr  1 00:00:01 cywarx-server systemd[1]: logrotate.service: Succeeded.
+Apr  1 01:00:00 cywarx-server dhclient[500]: bound to 192.168.1.105 -- renewal in 3600 seconds
+Apr  1 01:45:22 cywarx-server kernel: [45322.100000] usb 1-1: new high-speed USB device number 3 using xhci_hcd
+Apr  1 01:45:22 cywarx-server kernel: [45322.300000] usb 1-1: New USB device found, idVendor=0781, idProduct=5581, bcdDevice= 1.00
+Apr  1 01:45:22 cywarx-server kernel: [45322.300001] usb 1-1: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Apr  1 01:45:22 cywarx-server kernel: [45322.300002] usb 1-1: Product: Ultra USB 3.0
+Apr  1 01:45:22 cywarx-server kernel: [45322.300003] usb 1-1: Manufacturer: SanDisk
+Apr  1 01:45:22 cywarx-server kernel: [45322.300004] usb 1-1: SerialNumber: AA01012700155035
+Apr  1 01:45:22 cywarx-server kernel: [45322.400000] usb-storage 1-1:1.0: USB Mass Storage device detected
+Apr  1 01:45:22 cywarx-server kernel: [45322.500000] scsi host6: usb-storage 1-1:1.0
+Apr  1 01:45:23 cywarx-server kernel: [45323.000000] sd 6:0:0:0: [sdb] 15728640 512-byte logical blocks: (8.05 GB/7.50 GiB)
+Apr  1 01:45:23 cywarx-server kernel: [45323.100000] sd 6:0:0:0: [sdb] Write Protect is off
+Apr  1 01:45:23 cywarx-server kernel: [45323.200000] sdb: sdb1
+Apr  1 01:45:24 cywarx-server kernel: [45324.000000] EXT4-fs (sdb1): mounted filesystem with ordered data mode
+Apr  1 01:52:10 cywarx-server kernel: [45730.000000] usb 1-1: USB disconnect, device number 3
+Apr  1 02:00:00 cywarx-server dhclient[500]: bound to 192.168.1.105 -- renewal in 3600 seconds
+Apr  1 02:10:05 cywarx-server systemd[1]: apache2.service: Main process exited, code=killed, status=11/SEGV
+Apr  1 02:10:05 cywarx-server systemd[1]: apache2.service: Failed with result 'signal'.
+Apr  1 02:10:05 cywarx-server kernel: [52205.000000] apache2[2210]: segfault at 00007fff ip 00007fff7f3a2b10 sp 00007fff error 4 in libc-2.35.so
+Apr  1 02:10:06 cywarx-server systemd[1]: Restarting Apache HTTP Server...
+Apr  1 02:10:07 cywarx-server systemd[1]: Started Apache HTTP Server.
+Apr  1 02:45:00 cywarx-server kernel: [55500.100000] Out of memory: Kill process 4422 (cryptominer64) score 952 or sacrifice child
+Apr  1 02:45:00 cywarx-server kernel: [55500.200000] Killed process 4422 (cryptominer64) total-vm:2097152kB, anon-rss:1966080kB, file-rss:0kB
+Apr  1 02:45:01 cywarx-server kernel: [55501.000000] oom_reaper: reaped process 4422 (cryptominer64)
+Apr  1 02:48:33 cywarx-server useradd[3300]: new user: name=backdoor, UID=1005, GID=1005
+Apr  1 02:49:10 cywarx-server systemd[1]: session-12.scope: Succeeded.
+Apr  1 02:50:00 cywarx-server systemd[1]: Started Session 13 of User backdoor.
+Apr  1 02:50:05 cywarx-server kernel: [56005.000000] audit: type=1400 audit(1711944605.000:52): apparmor=ALLOWED operation=open profile=unconfined name=/etc/shadow
+Apr  1 02:55:10 cywarx-server kernel: [56310.000000] device eth0 entered promiscuous mode
+Apr  1 02:55:11 cywarx-server kernel: [56311.000000] device eth0 left promiscuous mode
+Apr  1 02:58:01 cywarx-server kernel: [56581.000000] nf_conntrack: table full, dropping packet
+Apr  1 03:00:00 cywarx-server dhclient[500]: bound to 192.168.1.105 -- renewal in 3600 seconds
+Apr  1 03:00:01 cywarx-server systemd[1]: Starting Daily apt upgrade and clean activities...
+Apr  1 03:00:01 cywarx-server kernel: [57601.000000] [UFW ALLOW] IN=eth0 OUT= MAC=00:0c:29:aa:bb:cc:00:50:56:11:22:33:08:00 SRC=185.220.101.5 DST=192.168.1.105 LEN=60 TTL=64 ID=12345 DF PROTO=TCP SPT=56100 DPT=22 WINDOW=65535 RES=0x00 SYN URGP=0
+Apr  1 03:15:22 cywarx-server systemd[1]: Started Session 14 of User root.
+Apr  1 03:16:00 cywarx-server systemd[1]: apt-daily-upgrade.service: Succeeded.
+Apr  1 03:30:00 cywarx-server kernel: [60600.000000] EXT4-fs error (device sda1): ext4_validate_block_bitmap:376: comm kworker/u4:2: bg 0: bad block bitmap checksum
+Apr  1 04:00:00 cywarx-server dhclient[500]: bound to 192.168.1.105 -- renewal in 3600 seconds
+Apr  1 05:00:01 cywarx-server systemd[1]: logrotate.service: Succeeded.
+Apr  1 06:00:00 cywarx-server dhclient[500]: bound to 192.168.1.105 -- renewal in 3600 seconds
+Apr  1 07:00:00 cywarx-server dhclient[500]: bound to 192.168.1.105 -- renewal in 3600 seconds
+Apr  1 08:00:00 cywarx-server systemd[1]: Started Session 20 of User hexx.

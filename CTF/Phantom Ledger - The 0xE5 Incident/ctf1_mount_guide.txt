@@ -1,0 +1,55 @@
+CYWARX CTF — ctf1.img Evidence Drive
+======================================
+Suspect: Rohan Mehta (Bank Fraud + Data Theft)
+Script : make_pendrive.py v6.0 (zero-mtools)
+SHA256 : 11a494b7366cbd2a1655bcf3a87bb3fdf10bd3d3f3caf48511006b06e45417a8
+Size   : 512 MiB
+
+PARTITION LAYOUT:
+  P1  FAT32  ROHAN    64 MiB  sector    2048  offset     1,048,576
+  P2  FAT32  BACKUP  400 MiB  sector  133120  offset    68,157,440
+  P3  ext4   private  40 MiB  sector  952320  offset   487,587,840
+
+MOUNT — METHOD A (kpartx):
+  sudo losetup -P /dev/loop0 ctf1.img
+  sudo kpartx -av /dev/loop0
+  sudo mkdir -p /mnt/p1 /mnt/p2 /mnt/p3
+  sudo mount /dev/mapper/loop0p1 /mnt/p1
+  sudo mount /dev/mapper/loop0p2 /mnt/p2
+  sudo mount /dev/mapper/loop0p3 /mnt/p3
+
+MOUNT — METHOD B (offset, no kpartx):
+  sudo mount -o loop,offset=1048576 ctf1.img /mnt/p1
+  sudo mount -o loop,offset=68157440 ctf1.img /mnt/p2
+  sudo mount -o loop,offset=487587840 ctf1.img /mnt/p3
+
+INVESTIGATION FLOW:
+  1.  sha256sum ctf1.img                  → verify integrity (matches hash above)
+  2.  mmls ctf1.img                       → discover all 3 partitions incl. hidden P3
+  3.  ls /mnt/p1/                         → personal files
+  4.  exiftool /mnt/p1/college_fest.jpg   → GPS + hidden UserComment (CH-02)
+  5.  ls /mnt/p2/                         → visible main drive files
+  6.  exiftool /mnt/p2/Photos/fest_2024.jpg | grep UserComment   → CH-02
+  7.  strings /mnt/p2/ntfs_evidence.img | grep -i flag           → CH-05
+  8.  fls -r -d -o 133120 ctf1.img         → list all 6 deleted files
+  9.  icat -o 133120 ctf1.img <inode>      → recover each deleted file
+  10. foremost -t jpg,zip -i ctf1.img -o /tmp/carved/            → CH-09
+  11. cat /mnt/p3/private.txt             → hidden partition (Bonus)
+  12. python3 -c "f=open('ctf1.img','rb');f.seek(256);print(f.read(13).decode())"  → CH-01
+
+FLAGS SUMMARY (instructor use only — keep private from students):
+  h3dd3n_m4rk3r            CH-01  MBR offset 0x100           python3 raw read / xxd
+  3x1f_k1ll5_4n0nym1ty     CH-02  JPEG EXIF UserComment       exiftool
+  s3ct0r_z3r0_n3v3r_li3s   CH-03  kl.log (deleted)           fls + icat
+  MZ_exe_h1dd3n_4s_txt      CH-04  invoice.exe (deleted)      fls + icat + xxd
+  t1m3st0mp_09              CH-05  ntfs_evidence.img          strings / istat
+  qu1ck_f0rm4t_15_n0t_w1p3  CH-06  winscp_session.log (del.) fls + icat
+  ph4nt0m_l3dg3r_cl0s3d     CH-07  private_note.txt (del.)   fls + icat
+  v0l4t1l3_k3y5_d1s4pp34r   CH-08  ram_capture.bin (del.)    fls + icat + strings
+  1102_ran_7_t1m3s           CH-08  ram_capture.bin (del.)    strings
+  c4rv1ng_f1nd5_th3_truth    CH-09  evidence.zip unallocated  foremost / binwalk
+
+CLEANUP:
+  sudo umount /mnt/p1 /mnt/p2 /mnt/p3 2>/dev/null
+  sudo kpartx -dv /dev/loop0 2>/dev/null
+  sudo losetup -d /dev/loop0 2>/dev/null

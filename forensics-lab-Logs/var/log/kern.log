@@ -1,0 +1,39 @@
+Mar 31 22:00:00 cywarx-server kernel: [    0.000000] Initializing cgroup subsys cpuset
+Mar 31 22:00:00 cywarx-server kernel: [    0.000000] Linux version 5.15.0-91-generic
+Mar 31 22:00:00 cywarx-server kernel: [    0.500000] ACPI: Core revision 20210730
+Mar 31 22:00:00 cywarx-server kernel: [    1.000000] PCI: Using configuration type 1 for base access
+Mar 31 22:00:00 cywarx-server kernel: [    2.000000] NET: Registered PF_INET protocol family
+Mar 31 22:00:00 cywarx-server kernel: [    3.000000] e1000: Intel(R) PRO/1000 Network Driver
+Mar 31 22:00:00 cywarx-server kernel: [    4.000000] SCSI subsystem initialized
+Mar 31 22:00:05 cywarx-server kernel: [    5.000000] audit: initializing netlink subsys
+Mar 31 22:00:10 cywarx-server kernel: [   10.000000] EXT4-fs (sda1): mounted filesystem with ordered data mode
+Apr  1 01:45:22 cywarx-server kernel: [45322.100000] usb 1-1: new high-speed USB device number 3 using xhci_hcd
+Apr  1 01:45:22 cywarx-server kernel: [45322.300002] usb 1-1: Product: Ultra USB 3.0
+Apr  1 01:45:22 cywarx-server kernel: [45322.400000] usb-storage 1-1:1.0: USB Mass Storage device detected
+Apr  1 01:45:23 cywarx-server kernel: [45323.000000] sd 6:0:0:0: [sdb] 15728640 512-byte logical blocks: (8.05 GB/7.50 GiB)
+Apr  1 02:00:01 cywarx-server kernel: [50401.000000] [UFW BLOCK] IN=eth0 OUT= SRC=185.220.101.5 DST=192.168.1.105 LEN=44 TTL=52 ID=0 PROTO=TCP SPT=44100 DPT=21 WINDOW=1024 RES=0x00 SYN URGP=0
+Apr  1 02:00:01 cywarx-server kernel: [50401.001000] [UFW BLOCK] IN=eth0 OUT= SRC=185.220.101.5 DST=192.168.1.105 LEN=44 TTL=52 ID=0 PROTO=TCP SPT=44101 DPT=23 WINDOW=1024 RES=0x00 SYN URGP=0
+Apr  1 02:00:01 cywarx-server kernel: [50401.002000] [UFW BLOCK] IN=eth0 OUT= SRC=185.220.101.5 DST=192.168.1.105 LEN=44 TTL=52 ID=0 PROTO=TCP SPT=44102 DPT=25 WINDOW=1024 RES=0x00 SYN URGP=0
+Apr  1 02:00:01 cywarx-server kernel: [50401.003000] [UFW BLOCK] IN=eth0 OUT= SRC=185.220.101.5 DST=192.168.1.105 LEN=44 TTL=52 ID=0 PROTO=TCP SPT=44103 DPT=80 WINDOW=1024 RES=0x00 SYN URGP=0
+Apr  1 02:00:01 cywarx-server kernel: [50401.004000] [UFW BLOCK] IN=eth0 OUT= SRC=185.220.101.5 DST=192.168.1.105 LEN=44 TTL=52 ID=0 PROTO=TCP SPT=44104 DPT=110 WINDOW=1024 RES=0x00 SYN URGP=0
+Apr  1 02:00:01 cywarx-server kernel: [50401.005000] [UFW BLOCK] IN=eth0 OUT= SRC=185.220.101.5 DST=192.168.1.105 LEN=44 TTL=52 ID=0 PROTO=TCP SPT=44105 DPT=443 WINDOW=1024 RES=0x00 SYN URGP=0
+Apr  1 02:00:01 cywarx-server kernel: [50401.006000] [UFW BLOCK] IN=eth0 OUT= SRC=185.220.101.5 DST=192.168.1.105 LEN=44 TTL=52 ID=0 PROTO=TCP SPT=44106 DPT=3306 WINDOW=1024 RES=0x00 SYN URGP=0
+Apr  1 02:00:01 cywarx-server kernel: [50401.007000] [UFW BLOCK] IN=eth0 OUT= SRC=185.220.101.5 DST=192.168.1.105 LEN=44 TTL=52 ID=0 PROTO=TCP SPT=44107 DPT=3389 WINDOW=1024 RES=0x00 SYN URGP=0
+Apr  1 02:00:01 cywarx-server kernel: [50401.008000] [UFW BLOCK] IN=eth0 OUT= SRC=185.220.101.5 DST=192.168.1.105 LEN=44 TTL=52 ID=0 PROTO=TCP SPT=44108 DPT=5900 WINDOW=1024 RES=0x00 SYN URGP=0
+Apr  1 02:00:01 cywarx-server kernel: [50401.009000] [UFW BLOCK] IN=eth0 OUT= SRC=185.220.101.5 DST=192.168.1.105 LEN=44 TTL=52 ID=0 PROTO=TCP SPT=44109 DPT=6379 WINDOW=1024 RES=0x00 SYN URGP=0
+Apr  1 02:00:01 cywarx-server kernel: [50401.010000] [UFW BLOCK] IN=eth0 OUT= SRC=185.220.101.5 DST=192.168.1.105 LEN=44 TTL=52 ID=0 PROTO=TCP SPT=44110 DPT=8080 WINDOW=1024 RES=0x00 SYN URGP=0
+Apr  1 02:00:01 cywarx-server kernel: [50401.011000] [UFW BLOCK] IN=eth0 OUT= SRC=185.220.101.5 DST=192.168.1.105 LEN=44 TTL=52 ID=0 PROTO=TCP SPT=44111 DPT=8443 WINDOW=1024 RES=0x00 SYN URGP=0
+Apr  1 02:00:02 cywarx-server kernel: [50402.000000] [UFW BLOCK] IN=eth0 OUT= SRC=185.220.101.5 DST=192.168.1.105 LEN=44 TTL=52 ID=0 PROTO=TCP SPT=44200 DPT=27017 WINDOW=1024 RES=0x00 SYN URGP=0
+Apr  1 02:00:02 cywarx-server kernel: [50402.001000] [UFW BLOCK] IN=eth0 OUT= SRC=185.220.101.5 DST=192.168.1.105 LEN=44 TTL=52 ID=0 PROTO=TCP SPT=44201 DPT=5432 WINDOW=1024 RES=0x00 SYN URGP=0
+Apr  1 02:00:02 cywarx-server kernel: [50402.002000] [UFW BLOCK] IN=eth0 OUT= SRC=185.220.101.5 DST=192.168.1.105 LEN=44 TTL=52 ID=0 PROTO=ICMP SPT=0 DPT=0 PROTO=ICMP
+Apr  1 02:10:05 cywarx-server kernel: [52205.000000] apache2[2210]: segfault at 00007fff ip 00007fff7f3a2b10 sp 00007fffdc3ab4e0 error 4 in libc-2.35.so[7fff7f200000+1e4000]
+Apr  1 02:45:00 cywarx-server kernel: [55500.100000] Out of memory: Kill process 4422 (cryptominer64) score 952 or sacrifice child
+Apr  1 02:51:00 cywarx-server kernel: [56460.000000] request_module: module loaded: hide_procs
+Apr  1 02:51:01 cywarx-server kernel: [56461.000000] request_module: module loaded: hide_files
+Apr  1 02:51:02 cywarx-server kernel: [56462.000000] request_module: module loaded: net_backdoor
+Apr  1 02:59:00 cywarx-server kernel: [57540.000000] [UFW ALLOW] IN= OUT=eth0 MAC= SRC=192.168.1.105 DST=185.220.101.5 LEN=60 TTL=64 ID=12345 DF PROTO=TCP SPT=44321 DPT=4444 WINDOW=65535 RES=0x00 SYN URGP=0
+Apr  1 03:00:01 cywarx-server kernel: [57601.000000] [UFW ALLOW] IN= OUT=eth0 MAC= SRC=192.168.1.105 DST=185.220.101.5 LEN=60 TTL=64 PROTO=TCP SPT=44322 DPT=4444 WINDOW=65535 RES=0x00 ACK URGP=0
+Apr  1 03:01:01 cywarx-server kernel: [57661.000000] [UFW ALLOW] IN= OUT=eth0 MAC= SRC=192.168.1.105 DST=185.220.101.5 LEN=60 TTL=64 PROTO=TCP SPT=44323 DPT=4444 WINDOW=65535 RES=0x00 SYN URGP=0
+Apr  1 03:02:01 cywarx-server kernel: [57721.000000] [UFW ALLOW] IN= OUT=eth0 MAC= SRC=192.168.1.105 DST=185.220.101.5 LEN=60 TTL=64 PROTO=TCP SPT=44324 DPT=4444 WINDOW=65535 RES=0x00 SYN URGP=0
+Apr  1 03:30:00 cywarx-server kernel: [59400.000000] EXT4-fs error (device sda1): ext4_validate_block_bitmap:376: comm kworker/u4:2: bg 0: bad block bitmap checksum
+Apr  1 07:00:00 cywarx-server kernel: [82800.000000] audit: type=1400 audit(1711980000.000:99): apparmor=ALLOWED

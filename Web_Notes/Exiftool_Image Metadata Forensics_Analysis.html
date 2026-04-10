@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Image Forensics – Lab Showcase</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d;
+    --green: #3fb950; --red: #f85149; --yellow: #d29922;
+    --blue: #58a6ff; --purple: #bc8cff; --cyan: #39d353;
+    --text: #c9d1d9; --muted: #8b949e;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'Courier New',monospace; font-size:13px; }
+
+  /* ── HEADER ── */
+  header {
+    background:linear-gradient(135deg,#1a1f2e,#0d1117);
+    border-bottom:2px solid var(--red);
+    padding:20px 32px; display:flex; align-items:center; gap:20px;
+  }
+  .badge {
+    background:var(--red); color:#fff; font-weight:700;
+    padding:6px 14px; border-radius:4px; font-size:11px; letter-spacing:1px;
+  }
+  header h1 { font-size:20px; color:#fff; }
+  header p  { color:var(--muted); font-size:11px; margin-top:3px; }
+
+  /* ── LAYOUT ── */
+  .container { display:grid; grid-template-columns:340px 1fr; gap:0; height:calc(100vh - 72px); overflow:hidden; }
+  .left-col  { border-right:1px solid var(--border); overflow-y:auto; background:var(--panel); }
+  .right-col { overflow-y:auto; padding:20px; }
+
+  /* ── EVIDENCE IMAGE ── */
+  .img-box {
+    border-bottom:1px solid var(--border); padding:16px; text-align:center;
+  }
+  .img-box img { width:100%; border-radius:6px; border:2px solid var(--border); display:block; }
+  .img-label {
+    margin-top:8px; font-size:10px; color:var(--yellow); letter-spacing:1px;
+    text-transform:uppercase;
+  }
+  .hash-box {
+    background:#0d1117; border:1px solid var(--border); border-radius:4px;
+    padding:8px; margin-top:8px; font-size:10px; color:var(--muted);
+    word-break:break-all;
+  }
+  .hash-box span { color:var(--cyan); }
+
+  /* ── TOOL OUTPUT ── */
+  .tool-run {
+    padding:12px 16px; border-bottom:1px solid var(--border);
+  }
+  .tool-cmd {
+    color:var(--green); font-size:11px; margin-bottom:6px;
+  }
+  .tool-cmd::before { content:"$ "; color:var(--muted); }
+  .tool-output {
+    background:#0d1117; border-radius:4px; padding:10px;
+    font-size:11px; color:var(--text); line-height:1.7;
+    border-left:3px solid var(--green);
+  }
+  .key   { color:var(--blue); }
+  .val   { color:var(--text); }
+  .warn  { color:var(--yellow); }
+  .crit  { color:var(--red); font-weight:700; }
+  .ok    { color:var(--green); }
+
+  /* ── RIGHT PANELS ── */
+  .section-title {
+    font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+    color:var(--muted); margin-bottom:12px; border-bottom:1px solid var(--border);
+    padding-bottom:6px;
+  }
+  .section-title span { color:var(--blue); margin-right:8px; }
+
+  /* GPS MAP ── */
+  .gps-card {
+    background:var(--panel); border:1px solid var(--border); border-radius:8px;
+    padding:16px; margin-bottom:18px;
+  }
+  .map-placeholder {
+    background:#0d1117;
+    border:1px solid var(--border);
+    border-radius:6px;
+    height:200px; position:relative; overflow:hidden; margin-bottom:12px;
+  }
+  /* Fake map grid */
+  .map-grid {
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(rgba(48,54,61,0.5) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(48,54,61,0.5) 1px, transparent 1px);
+    background-size:30px 30px;
+  }
+  /* Roads */
+  .road-h { position:absolute; background:rgba(88,166,255,0.15); height:3px; width:100%; }
+  .road-v { position:absolute; background:rgba(88,166,255,0.15); width:3px; height:100%; }
+  /* Pin */
+  .pin-wrap { position:absolute; top:50%; left:50%; transform:translate(-50%,-100%); }
+  .pin {
+    width:24px; height:24px; background:var(--red); border-radius:50% 50% 50% 0;
+    transform:rotate(-45deg); border:3px solid #fff; box-shadow:0 0 12px rgba(248,81,73,0.8);
+    animation:pulse 1.5s infinite;
+  }
+  @keyframes pulse {
+    0%,100%{ box-shadow:0 0 12px rgba(248,81,73,0.8); }
+    50%    { box-shadow:0 0 24px rgba(248,81,73,1); }
+  }
+  .pin-label {
+    position:absolute; top:30px; left:50%; transform:translateX(-50%);
+    background:rgba(0,0,0,0.85); color:#fff; font-size:10px; white-space:nowrap;
+    padding:3px 8px; border-radius:3px; border:1px solid var(--red);
+  }
+  .coord-row { display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px; }
+  .coord-key { color:var(--muted); }
+  .coord-val { color:var(--yellow); font-weight:700; }
+
+  /* METADATA TABLE ── */
+  .meta-grid {
+    background:var(--panel); border:1px solid var(--border); border-radius:8px;
+    overflow:hidden; margin-bottom:18px;
+  }
+  .meta-row {
+    display:grid; grid-template-columns:180px 1fr;
+    border-bottom:1px solid var(--border); padding:7px 14px;
+    transition:background 0.15s;
+  }
+  .meta-row:hover { background:rgba(88,166,255,0.04); }
+  .meta-row:last-child { border-bottom:none; }
+  .meta-tag  { color:var(--muted); font-size:11px; }
+  .meta-val  { color:var(--text);  font-size:11px; }
+  .meta-val.alert { color:var(--red); font-weight:700; }
+  .meta-val.warn  { color:var(--yellow); }
+  .meta-val.ok    { color:var(--green); }
+
+  /* TIMELINE ── */
+  .timeline { margin-bottom:18px; }
+  .tl-item {
+    display:flex; gap:14px; padding:10px 0;
+    border-left:2px solid var(--border); padding-left:16px; margin-left:8px;
+    position:relative;
+  }
+  .tl-dot {
+    position:absolute; left:-7px; top:14px;
+    width:12px; height:12px; border-radius:50%; border:2px solid var(--bg);
+  }
+  .tl-time { color:var(--muted); font-size:10px; min-width:130px; }
+  .tl-event { font-size:11px; }
+  .tl-sub   { color:var(--muted); font-size:10px; margin-top:2px; }
+
+  /* FLAGS ── */
+  .flags { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px; }
+  .flag {
+    display:flex; align-items:center; gap:6px;
+    border-radius:5px; padding:8px 12px; font-size:11px; font-weight:700;
+  }
+  .flag.critical { background:rgba(248,81,73,0.12); border:1px solid var(--red); color:var(--red); }
+  .flag.warning  { background:rgba(210,153,34,0.12); border:1px solid var(--yellow); color:var(--yellow); }
+  .flag.info     { background:rgba(88,166,255,0.10); border:1px solid var(--blue); color:var(--blue); }
+  .flag.ok       { background:rgba(63,185,80,0.10); border:1px solid var(--green); color:var(--green); }
+
+  /* STEGANOGRAPHY CHECK ── */
+  .steg-card {
+    background:var(--panel); border:1px solid var(--border); border-radius:8px;
+    padding:14px; margin-bottom:18px;
+  }
+  .steg-row { display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid var(--border); font-size:11px; }
+  .steg-row:last-child { border-bottom:none; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width:6px; }
+  ::-webkit-scrollbar-track { background:var(--bg); }
+  ::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="badge">🔍 FORENSIC LAB</div>
+  <div>
+    <h1>Image Metadata Forensics — Scenario GOA_NIGHT_001</h1>
+    <p>Tool chain: ExifTool · binwalk · strings · Python-PIL · GPS Decoder &nbsp;|&nbsp; Evidence Hash: SHA-256 verified</p>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ══ LEFT COLUMN ══════════════════════════════════════════════════════ -->
+  <div class="left-col">
+
+    <!-- Evidence Image -->
+    <div class="img-box">
+      <img src="forensic_scenario.jpg" alt="Forensic Scenario Image" id="evidenceImg">
+      <div class="img-label">📁 Evidence File: GOA_NIGHT_001.jpg</div>
+      <div class="hash-box">
+        MD5 &nbsp; <span id="md5hash">Computing…</span><br>
+        SHA1 &nbsp;<span id="sha1hash">Computing…</span>
+      </div>
+    </div>
+
+    <!-- ExifTool simulation -->
+    <div class="tool-run">
+      <div class="tool-cmd">exiftool -a -u -g forensic_scenario.jpg</div>
+      <div class="tool-output">
+<span class="key">File Name</span>         : <span class="val">forensic_scenario.jpg</span><br>
+<span class="key">File Size</span>         : <span class="val">44.8 kB</span><br>
+<span class="key">File Type</span>         : <span class="val">JPEG</span><br>
+<span class="key">MIME Type</span>         : <span class="val">image/jpeg</span><br>
+<span class="key">JFIF Version</span>     : <span class="val">1.01</span><br>
+<span class="key">Image Width</span>      : <span class="val">4000 px</span><br>
+<span class="key">Image Height</span>     : <span class="val">3000 px</span><br>
+<span class="crit">GPS Latitude</span>     : <span class="warn">15°29'40.56"N</span><br>
+<span class="crit">GPS Longitude</span>    : <span class="warn">73°49'22.14"E</span><br>
+<span class="key">GPS Altitude</span>     : <span class="val">12.5 m Above Sea Level</span><br>
+<span class="key">GPS Measure Mode</span> : <span class="val">3-Dimensional</span><br>
+<span class="key">GPS Map Datum</span>    : <span class="val">WGS-84</span><br>
+<span class="key">Make</span>             : <span class="warn">Samsung</span><br>
+<span class="key">Model</span>            : <span class="warn">SM-G998B (Galaxy S21 Ultra)</span><br>
+<span class="key">Software</span>         : <span class="val">Android 13 / One UI 5.1</span><br>
+<span class="key">Date/Time Orig</span>   : <span class="crit">2024:11:15 14:32:07</span><br>
+<span class="key">Artist</span>           : <span class="crit">Rahul Sharma</span><br>
+<span class="key">Copyright</span>        : <span class="val">© 2024 Rahul Sharma</span><br>
+<span class="key">User Comment</span>     : <span class="crit">Meeting with client – confidential</span><br>
+<span class="key">Lens Model</span>       : <span class="val">Samsung 108MP f/1.8</span><br>
+<span class="key">Focal Length</span>     : <span class="val">23.0 mm</span><br>
+<span class="key">Exposure Time</span>    : <span class="val">1/120 sec</span><br>
+<span class="key">ISO Speed</span>        : <span class="val">200</span><br>
+<span class="key">Flash</span>            : <span class="ok">No Flash</span><br>
+<span class="key">Body Serial No.</span>  : <span class="crit">R5CR403NXYZ</span>
+      </div>
+    </div>
+
+    <!-- strings output -->
+    <div class="tool-run">
+      <div class="tool-cmd">strings forensic_scenario.jpg | grep -i "whatsapp\|phone\|sent"</div>
+      <div class="tool-output">
+<span class="crit">Sent via WhatsApp to +91-98XXXXXXXX</span><br>
+<span class="warn">ASCII GPS</span><br>
+<span class="val">WGS-84</span>
+      </div>
+    </div>
+
+    <!-- binwalk -->
+    <div class="tool-run">
+      <div class="tool-cmd">binwalk forensic_scenario.jpg</div>
+      <div class="tool-output">
+<span class="key">DECIMAL</span>    <span class="key">HEX</span>       <span class="key">DESCRIPTION</span><br>
+<span class="ok">0</span>         <span class="ok">0x0</span>       JPEG image data<br>
+<span class="ok">2</span>         <span class="ok">0x2</span>       JFIF format<br>
+<span class="ok">378</span>       <span class="ok">0x17A</span>     EXIF data, big-endian<br>
+<span class="ok">2974</span>      <span class="ok">0xB9E</span>     GPS IFD block<br>
+<span class="ok">3812</span>      <span class="ok">0xEE4</span>     JPEG image data<br>
+<span class="ok">---</span> No hidden archives detected
+      </div>
+    </div>
+
+  </div><!-- /left-col -->
+
+  <!-- ══ RIGHT COLUMN ═════════════════════════════════════════════════════ -->
+  <div class="right-col">
+
+    <!-- FORENSIC FLAGS -->
+    <div class="section-title"><span>⚑</span> Forensic Intelligence Flags</div>
+    <div class="flags">
+      <div class="flag critical">📍 GPS Location Exposed</div>
+      <div class="flag critical">👤 Owner Identity Leaked</div>
+      <div class="flag critical">📱 Device Serial Embedded</div>
+      <div class="flag critical">💬 Private Note in Comment</div>
+      <div class="flag warning">⏱ Exact Timestamp Recorded</div>
+      <div class="flag warning">📡 Communication Platform Tagged</div>
+      <div class="flag info">🔬 3D GPS Fix (Altitude Included)</div>
+      <div class="flag info">📷 Camera Model Identified</div>
+      <div class="flag ok">🔒 No Steganographic Payload</div>
+      <div class="flag ok">✅ File Integrity Intact</div>
+    </div>
+
+    <!-- GPS LOCATION CARD -->
+    <div class="section-title"><span>🌐</span> GPS Location Analysis</div>
+    <div class="gps-card">
+      <div class="map-placeholder">
+        <div class="map-grid"></div>
+        <!-- fake roads -->
+        <div class="road-h" style="top:40%"></div>
+        <div class="road-h" style="top:65%"></div>
+        <div class="road-v" style="left:35%"></div>
+        <div class="road-v" style="left:70%"></div>
+        <!-- pin -->
+        <div class="pin-wrap">
+          <div class="pin"></div>
+          <div class="pin-label">📍 15.4946°N, 73.8228°E</div>
+        </div>
+        <!-- scale -->
+        <div style="position:absolute;bottom:8px;right:10px;font-size:9px;color:var(--muted)">
+          ●── 500m ──●
+        </div>
+        <div style="position:absolute;top:8px;left:10px;font-size:10px;color:var(--yellow)">
+          📌 Panaji Area, Goa, India
+        </div>
+      </div>
+      <div class="coord-row"><span class="coord-key">Latitude (DMS)</span><span class="coord-val">15° 29' 40.56" N</span></div>
+      <div class="coord-row"><span class="coord-key">Longitude (DMS)</span><span class="coord-val">73° 49' 22.14" E</span></div>
+      <div class="coord-row"><span class="coord-key">Decimal Degrees</span><span class="coord-val">15.4946°N, 73.8228°E</span></div>
+      <div class="coord-row"><span class="coord-key">Altitude (MSL)</span><span class="coord-val">12.5 metres</span></div>
+      <div class="coord-row"><span class="coord-key">Fix Type</span><span class="coord-val">3D (Lat + Lon + Alt)</span></div>
+      <div class="coord-row"><span class="coord-key">Datum</span><span class="coord-val">WGS-84 (standard GPS)</span></div>
+      <div class="coord-row"><span class="coord-key">DOP Value</span><span class="coord-val">1.2 (Excellent Accuracy)</span></div>
+      <div class="coord-row"><span class="coord-key">⇒ Google Maps</span>
+        <span class="coord-val" style="color:var(--blue)">maps.google.com/?q=15.4946,73.8228</span>
+      </div>
+    </div>
+
+    <!-- DEVICE PROFILE -->
+    <div class="section-title"><span>📱</span> Device Fingerprint</div>
+    <div class="meta-grid">
+      <div class="meta-row"><span class="meta-tag">Manufacturer</span><span class="meta-val warn">Samsung Electronics</span></div>
+      <div class="meta-row"><span class="meta-tag">Model</span><span class="meta-val warn">SM-G998B – Galaxy S21 Ultra 5G</span></div>
+      <div class="meta-row"><span class="meta-tag">OS / Firmware</span><span class="meta-val">Android 13, One UI 5.1</span></div>
+      <div class="meta-row"><span class="meta-tag">Body Serial No.</span><span class="meta-val alert">R5CR403NXYZ &nbsp;⚠ Unique Device ID</span></div>
+      <div class="meta-row"><span class="meta-tag">Camera Sensor</span><span class="meta-val">108 MP Wide, f/1.8</span></div>
+      <div class="meta-row"><span class="meta-tag">Focal Length</span><span class="meta-val">23 mm (equivalent)</span></div>
+      <div class="meta-row"><span class="meta-tag">Exposure</span><span class="meta-val">1/120 sec · ISO 200 · No Flash</span></div>
+      <div class="meta-row"><span class="meta-tag">Color Space</span><span class="meta-val">sRGB</span></div>
+      <div class="meta-row"><span class="meta-tag">Image Dimensions</span><span class="meta-val">4000 × 3000 px (12 MP exported)</span></div>
+    </div>
+
+    <!-- OWNER IDENTITY -->
+    <div class="section-title"><span>👤</span> Identity & Ownership Data</div>
+    <div class="meta-grid">
+      <div class="meta-row"><span class="meta-tag">Artist / Author</span><span class="meta-val alert">Rahul Sharma &nbsp;— Full name embedded</span></div>
+      <div class="meta-row"><span class="meta-tag">Copyright Tag</span><span class="meta-val">© 2024 Rahul Sharma – Private</span></div>
+      <div class="meta-row"><span class="meta-tag">User Comment</span><span class="meta-val alert">Meeting with client – confidential</span></div>
+      <div class="meta-row"><span class="meta-tag">XP Comment</span><span class="meta-val alert">Sent via WhatsApp to +91-98XXXXXXXX</span></div>
+    </div>
+
+    <!-- EVENT TIMELINE -->
+    <div class="section-title"><span>🕐</span> Forensic Timeline Reconstruction</div>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot" style="background:var(--blue)"></div>
+        <div>
+          <div class="tl-time">2024-11-15 14:32:07 IST</div>
+          <div class="tl-event" style="color:var(--blue)">📸 Photo Captured</div>
+          <div class="tl-sub">Samsung Galaxy S21 Ultra · GPS locked · Goa, India</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot" style="background:var(--yellow)"></div>
+        <div>
+          <div class="tl-time">2024-11-15 14:32:07 IST</div>
+          <div class="tl-event" style="color:var(--yellow)">📝 EXIF Written to File</div>
+          <div class="tl-sub">DateTimeOriginal = DateTimeDigitized → same second (no edit detected)</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot" style="background:var(--purple)"></div>
+        <div>
+          <div class="tl-time">Inferred – Same Day</div>
+          <div class="tl-event" style="color:var(--purple)">📤 Shared via WhatsApp</div>
+          <div class="tl-sub">XP Comment field preserved — platform did NOT strip metadata</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot" style="background:var(--red)"></div>
+        <div>
+          <div class="tl-time">Forensic Examination</div>
+          <div class="tl-event" style="color:var(--red)">🔍 Evidence Acquired &amp; Hashed</div>
+          <div class="tl-sub">Chain of custody established · No tampering detected</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEG CHECK -->
+    <div class="section-title"><span>🔬</span> Steganography &amp; Anomaly Check</div>
+    <div class="steg-card">
+      <div class="steg-row"><span>LSB Steganography (zsteg)</span><span class="ok">✔ Clean</span></div>
+      <div class="steg-row"><span>Appended Data after EOI (binwalk)</span><span class="ok">✔ None</span></div>
+      <div class="steg-row"><span>Hidden ZIP / RAR inside JPEG</span><span class="ok">✔ Not Found</span></div>
+      <div class="steg-row"><span>EXIF Thumbnail vs Full Image Match</span><span class="ok">✔ Consistent</span></div>
+      <div class="steg-row"><span>Double JFIF Header</span><span class="ok">✔ Single Header</span></div>
+      <div class="steg-row"><span>Comment Block (JFIF APP12)</span><span class="warn">⚠ Contains custom text</span></div>
+      <div class="steg-row"><span>Unusual APP Segments</span><span class="ok">✔ Standard Only</span></div>
+    </div>
+
+    <!-- KEY LEARNING POINTS -->
+    <div class="section-title"><span>📚</span> Key Learning Points for Students</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
+      <div style="background:rgba(248,81,73,0.08);border:1px solid var(--red);border-radius:6px;padding:12px;">
+        <div style="color:var(--red);font-weight:700;margin-bottom:6px;font-size:11px;">⚠ WHAT GPS DATA REVEALS</div>
+        <div style="font-size:11px;line-height:1.7;color:var(--text)">
+          Exact coordinates allow real-world location mapping.<br>
+          3D fix includes altitude → floor identification possible.<br>
+          Timestamp + GPS = precise movement log.<br>
+          WGS-84 datum maps directly to Google Maps.
+        </div>
+      </div>
+      <div style="background:rgba(88,166,255,0.08);border:1px solid var(--blue);border-radius:6px;padding:12px;">
+        <div style="color:var(--blue);font-weight:700;margin-bottom:6px;font-size:11px;">📱 DEVICE FINGERPRINTING</div>
+        <div style="font-size:11px;line-height:1.7;color:var(--text)">
+          Make + Model narrows suspect's device pool.<br>
+          Body Serial No. uniquely identifies one device.<br>
+          Firmware version reveals security patch level.<br>
+          Lens/sensor data confirms original vs screenshot.
+        </div>
+      </div>
+      <div style="background:rgba(63,185,80,0.08);border:1px solid var(--green);border-radius:6px;padding:12px;">
+        <div style="color:var(--green);font-weight:700;margin-bottom:6px;font-size:11px;">🔐 METADATA STRIPPING TOOLS</div>
+        <div style="font-size:11px;line-height:1.7;color:var(--text)">
+          <code>exiftool -all= file.jpg</code> — strips all EXIF.<br>
+          <code>mat2 file.jpg</code> — privacy-oriented cleaner.<br>
+          Signal app auto-strips GPS before sending.<br>
+          WhatsApp/Telegram may retain EXIF on some versions.
+        </div>
+      </div>
+      <div style="background:rgba(188,140,255,0.08);border:1px solid var(--purple);border-radius:6px;padding:12px;">
+        <div style="color:var(--purple);font-weight:700;margin-bottom:6px;font-size:11px;">🕵 INVESTIGATIVE USE CASES</div>
+        <div style="font-size:11px;line-height:1.7;color:var(--text)">
+          Verify if photo was taken where claimed.<br>
+          Timeline reconstruction for alibi checking.<br>
+          Attribution: identify anonymous leakers.<br>
+          Evidence authentication in court proceedings.
+        </div>
+      </div>
+    </div>
+
+    <!-- TOOL COMMANDS REFERENCE -->
+    <div class="section-title"><span>⌨</span> Lab Commands Reference</div>
+    <div style="background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:11px;line-height:2;">
+      <span style="color:var(--muted)"># Extract all metadata</span><br>
+      <span class="ok">$</span> <span style="color:var(--cyan)">exiftool -a -u -g1 forensic_scenario.jpg</span><br>
+      <span style="color:var(--muted)"># Show only GPS fields</span><br>
+      <span class="ok">$</span> <span style="color:var(--cyan)">exiftool -GPS:all forensic_scenario.jpg</span><br>
+      <span style="color:var(--muted)"># Check for hidden data</span><br>
+      <span class="ok">$</span> <span style="color:var(--cyan)">binwalk --extract forensic_scenario.jpg</span><br>
+      <span style="color:var(--muted)"># Dump strings from binary</span><br>
+      <span class="ok">$</span> <span style="color:var(--cyan)">strings forensic_scenario.jpg | grep -Ei "gps|lat|lon|phone|user|comment"</span><br>
+      <span style="color:var(--muted)"># Python: read GPS in code</span><br>
+      <span class="ok">$</span> <span style="color:var(--cyan)">python3 -c "import piexif; d=piexif.load('forensic_scenario.jpg'); print(d['GPS'])"</span><br>
+      <span style="color:var(--muted)"># Strip all metadata (privacy)</span><br>
+      <span class="ok">$</span> <span style="color:var(--cyan)">exiftool -all= -overwrite_original forensic_scenario.jpg</span>
+    </div>
+
+  </div><!-- /right-col -->
+</div><!-- /container -->
+
+<script>
+// Simulated hashes for demonstration
+document.getElementById('md5hash').textContent  = 'a3f8c2d1...e4b70912  (simulated)';
+document.getElementById('sha1hash').textContent = '7d3e9a14f...0c85b (simulated)';
+</script>
+</body>
+</html>

@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>dc3dd – Forensic Acquisition Report | Cywarx Unit IV</title>
+<style>
+  :root {
+    --bg:#0b0f14; --panel:#111820; --panel2:#141c26;
+    --border:#1e2d3d; --border2:#2a3f55;
+    --green:#00ff88; --red:#ff4757; --yellow:#ffc312;
+    --blue:#00b4d8; --cyan:#48cae4; --purple:#a78bfa;
+    --orange:#ff6b35; --text:#cdd9e5; --muted:#546e7a;
+    --success:#00c853;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'Courier New',monospace;font-size:13px;}
+
+  /* ── TOP BAR ── */
+  .topbar{
+    background:linear-gradient(90deg,#0d1b2a,#1a2744);
+    border-bottom:2px solid var(--blue);
+    padding:0 28px; height:52px; display:flex; align-items:center; justify-content:space-between;
+  }
+  .topbar-left{display:flex;align-items:center;gap:14px;}
+  .logo{font-size:17px;font-weight:700;color:var(--blue);letter-spacing:2px;}
+  .logo span{color:var(--green);}
+  .unit-tag{background:rgba(0,180,216,0.12);border:1px solid var(--blue);
+    color:var(--blue);font-size:10px;padding:3px 10px;border-radius:3px;letter-spacing:1px;}
+  .status-ok{display:flex;align-items:center;gap:6px;color:var(--green);font-size:11px;font-weight:700;}
+  .status-dot{width:8px;height:8px;background:var(--green);border-radius:50%;animation:blink 1.4s infinite;}
+  @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
+
+  /* ── LAYOUT ── */
+  .wrap{max-width:1200px;margin:0 auto;padding:24px 20px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+
+  /* ── CARDS ── */
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+  .card-head{
+    padding:10px 16px; font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+    display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);
+  }
+  .card-body{padding:14px 16px;}
+
+  /* head colours */
+  .ch-blue  {background:rgba(0,180,216,0.08);  color:var(--blue);}
+  .ch-green {background:rgba(0,255,136,0.08);  color:var(--green);}
+  .ch-red   {background:rgba(255,71,87,0.08);  color:var(--red);}
+  .ch-yellow{background:rgba(255,195,18,0.08); color:var(--yellow);}
+  .ch-purple{background:rgba(167,139,250,0.08);color:var(--purple);}
+  .ch-orange{background:rgba(255,107,53,0.08); color:var(--orange);}
+
+  /* ── TERMINAL ── */
+  .terminal{
+    background:#060a0f; border:1px solid var(--border2);
+    border-radius:6px; padding:14px; font-size:11.5px; line-height:1.9;
+    position:relative; overflow:hidden;
+  }
+  .terminal::before{
+    content:""; position:absolute; top:0; left:0; right:0; height:2px;
+    background:linear-gradient(90deg,var(--green),var(--blue));
+  }
+  .t-prompt{color:var(--muted);}
+  .t-cmd   {color:var(--cyan);}
+  .t-key   {color:var(--blue);}
+  .t-val   {color:var(--text);}
+  .t-ok    {color:var(--green);font-weight:700;}
+  .t-warn  {color:var(--yellow);}
+  .t-err   {color:var(--red);}
+  .t-hash  {color:var(--purple);}
+  .t-head  {color:var(--orange);font-weight:700;}
+
+  /* ── HASH COMPARE ── */
+  .hash-compare{margin-top:12px;}
+  .hc-row{display:grid;grid-template-columns:80px 1fr;gap:8px;margin-bottom:8px;align-items:start;}
+  .hc-label{font-size:10px;color:var(--muted);padding-top:3px;}
+  .hc-pair{display:flex;flex-direction:column;gap:3px;}
+  .hc-src{background:rgba(0,180,216,0.06);border:1px solid rgba(0,180,216,0.2);
+    border-radius:4px;padding:5px 9px;font-size:10.5px;color:var(--cyan);word-break:break-all;}
+  .hc-img{background:rgba(0,255,136,0.06);border:1px solid rgba(0,255,136,0.2);
+    border-radius:4px;padding:5px 9px;font-size:10.5px;color:var(--green);word-break:break-all;}
+  .hc-match{display:flex;align-items:center;gap:6px;margin-top:4px;font-size:11px;
+    color:var(--success);font-weight:700;}
+
+  /* ── INFO TABLE ── */
+  .info-table{width:100%;border-collapse:collapse;}
+  .info-table tr{border-bottom:1px solid var(--border);}
+  .info-table tr:last-child{border-bottom:none;}
+  .info-table td{padding:7px 4px;font-size:11.5px;vertical-align:top;}
+  .info-table td:first-child{color:var(--muted);width:160px;white-space:nowrap;}
+  .info-table td:last-child{color:var(--text);}
+  .info-table td .hl{color:var(--yellow);}
+  .info-table td .ok{color:var(--green);}
+  .info-table td .warn{color:var(--orange);}
+
+  /* ── FILESYSTEM TREE ── */
+  .fs-tree{font-size:11.5px;line-height:2;}
+  .fs-tree .dir {color:var(--blue);font-weight:700;}
+  .fs-tree .file{color:var(--text);}
+  .fs-tree .del {color:var(--red);text-decoration:line-through;}
+  .fs-tree .del-note{color:var(--muted);font-size:10px;margin-left:6px;}
+  .fs-tree .sz  {color:var(--muted);font-size:10px;margin-left:8px;}
+
+  /* ── TIMELINE ── */
+  .timeline{position:relative;padding-left:20px;}
+  .timeline::before{content:"";position:absolute;left:7px;top:8px;bottom:8px;width:2px;background:var(--border2);}
+  .tl-item{position:relative;margin-bottom:16px;}
+  .tl-dot{position:absolute;left:-17px;top:4px;width:12px;height:12px;
+    border-radius:50%;border:2px solid var(--bg);}
+  .tl-time{font-size:10px;color:var(--muted);margin-bottom:2px;}
+  .tl-title{font-size:12px;font-weight:700;margin-bottom:2px;}
+  .tl-sub{font-size:10.5px;color:var(--muted);line-height:1.5;}
+
+  /* ── EVIDENCE BADGE ── */
+  .evidence-header{
+    background:linear-gradient(135deg,#0d1b2a,#0a1520);
+    border:1px solid var(--border2); border-radius:8px;
+    padding:20px 24px; margin-bottom:20px;
+    display:flex; justify-content:space-between; align-items:center;
+    flex-wrap:wrap; gap:16px;
+  }
+  .ev-title{font-size:18px;font-weight:700;color:#fff;letter-spacing:1px;}
+  .ev-sub{color:var(--muted);font-size:11px;margin-top:4px;}
+  .ev-badges{display:flex;gap:8px;flex-wrap:wrap;}
+  .badge{padding:5px 12px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1px;}
+  .badge-blue  {background:rgba(0,180,216,0.15);border:1px solid var(--blue);  color:var(--blue);}
+  .badge-green {background:rgba(0,255,136,0.15);border:1px solid var(--green); color:var(--green);}
+  .badge-yellow{background:rgba(255,195,18,0.15);border:1px solid var(--yellow);color:var(--yellow);}
+
+  /* ── SECTION TITLE ── */
+  .section{margin:22px 0 12px;}
+  .section-title{font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;
+    color:var(--muted);padding-bottom:7px;border-bottom:1px solid var(--border);
+    display:flex;align-items:center;gap:8px;}
+  .section-title span{font-size:14px;}
+
+  /* ── COMMAND REFERENCE ── */
+  .cmd-block{background:#060a0f;border:1px solid var(--border2);border-radius:6px;
+    padding:12px 14px;font-size:11px;line-height:2.2;margin-bottom:10px;}
+  .cmd-comment{color:var(--muted);}
+  .cmd-prompt{color:var(--green);}
+  .cmd-text  {color:var(--cyan);}
+  .cmd-flag  {color:var(--yellow);}
+  .cmd-path  {color:var(--purple);}
+
+  /* ── FOOTER ── */
+  footer{
+    border-top:1px solid var(--border);margin-top:30px;padding:14px 28px;
+    display:flex;justify-content:space-between;font-size:10px;color:var(--muted);
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar{width:5px;}
+  ::-webkit-scrollbar-track{background:var(--bg);}
+  ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="logo">CY<span>WARX</span></div>
+    <div class="unit-tag">UNIT IV — DIGITAL FORENSICS</div>
+    <div class="unit-tag">LAB: USB FORENSIC IMAGING</div>
+  </div>
+  <div class="status-ok">
+    <div class="status-dot"></div>
+    ACQUISITION VERIFIED — HASH MATCH [OK]
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- EVIDENCE HEADER -->
+  <div class="evidence-header">
+    <div>
+      <div class="ev-title">🔍 dc3dd Forensic Acquisition Report</div>
+      <div class="ev-sub">Evidence: Seized USB Pendrive (25 MB) &nbsp;|&nbsp; Case: CYWARX-2024-GOA-001 &nbsp;|&nbsp; Examiner: Cywarx Lab</div>
+    </div>
+    <div class="ev-badges">
+      <div class="badge badge-blue">dc3dd v7.2.646</div>
+      <div class="badge badge-green">✔ MD5 VERIFIED</div>
+      <div class="badge badge-green">✔ SHA-256 VERIFIED</div>
+      <div class="badge badge-yellow">51200 SECTORS</div>
+    </div>
+  </div>
+
+  <!-- ── STEP 1: Identify Source ────────────────────────────────────────── -->
+  <div class="section"><div class="section-title"><span>①</span> Source Device Identification</div></div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head ch-blue">📟 Device Profile (simulated /dev/sdb)</div>
+      <div class="card-body">
+        <table class="info-table">
+          <tr><td>Device Node</td><td><span class="hl">/dev/sdb</span> (USB mass storage)</td></tr>
+          <tr><td>Label</td><td><span class="hl">CYWARX_USB</span></td></tr>
+          <tr><td>Filesystem</td><td>FAT32 (VFAT)</td></tr>
+          <tr><td>Volume Serial</td><td><span class="hl">247F-D6EA</span></td></tr>
+          <tr><td>Total Size</td><td>25 MiB (26,214,400 bytes)</td></tr>
+          <tr><td>Sectors</td><td>51,200 × 512 bytes</td></tr>
+          <tr><td>Write Blocked</td><td><span class="ok">✔ Hardware write blocker applied</span></td></tr>
+          <tr><td>Acquisition Date</td><td>2026-03-28 10:30:32 UTC</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head ch-yellow">🔐 Pre-Acquisition Hashes (Source)</div>
+      <div class="card-body">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">
+          Computed BEFORE imaging to establish baseline integrity
+        </div>
+        <div class="terminal">
+<span class="t-prompt">root@kali</span>:<span class="t-cmd">~#</span> md5sum /dev/sdb<br>
+<span class="t-hash">fda5c3c69a3e0de34e753625372b06f3</span>  /dev/sdb<br>
+<br>
+<span class="t-prompt">root@kali</span>:<span class="t-cmd">~#</span> sha256sum /dev/sdb<br>
+<span class="t-hash">b12f57848bc79263...025ec355</span>  /dev/sdb
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP 2: dc3dd Command ──────────────────────────────────────────── -->
+  <div class="section"><div class="section-title"><span>②</span> dc3dd Acquisition Command</div></div>
+  <div class="card">
+    <div class="card-head ch-green">⌨ Full dc3dd Command Used</div>
+    <div class="card-body">
+      <div class="cmd-block">
+<span class="cmd-comment"># Forensic imaging with simultaneous hash verification</span><br>
+<span class="cmd-prompt">root@kali:~#</span> <span class="cmd-text">dc3dd</span> \<br>
+&nbsp;&nbsp;<span class="cmd-flag">if=</span><span class="cmd-path">/dev/sdb</span> \<br>
+&nbsp;&nbsp;<span class="cmd-flag">hof=</span><span class="cmd-path">/mnt/evidence/cywarx_usb_evidence.img</span> \<br>
+&nbsp;&nbsp;<span class="cmd-flag">hash=</span>sha256 \<br>
+&nbsp;&nbsp;<span class="cmd-flag">hash=</span>md5 \<br>
+&nbsp;&nbsp;<span class="cmd-flag">hlog=</span><span class="cmd-path">cywarx_usb_hashes.log</span> \<br>
+&nbsp;&nbsp;<span class="cmd-flag">log=</span><span class="cmd-path">cywarx_usb_dc3dd.log</span> \<br>
+&nbsp;&nbsp;<span class="cmd-flag">verb=</span>on
+      </div>
+      <div class="grid3" style="margin-top:12px;gap:10px;">
+        <div style="background:rgba(0,255,136,0.05);border:1px solid rgba(0,255,136,0.15);border-radius:5px;padding:10px;">
+          <div style="color:var(--green);font-size:10px;font-weight:700;margin-bottom:4px;">hof= (hash output)</div>
+          <div style="font-size:10.5px;color:var(--muted);">Writes image AND simultaneously hashes output — verifies source ↔ image integrity in one pass</div>
+        </div>
+        <div style="background:rgba(255,195,18,0.05);border:1px solid rgba(255,195,18,0.15);border-radius:5px;padding:10px;">
+          <div style="color:var(--yellow);font-size:10px;font-weight:700;margin-bottom:4px;">hlog= / log=</div>
+          <div style="font-size:10.5px;color:var(--muted);">Saves hash results and operation log to separate files for chain-of-custody documentation</div>
+        </div>
+        <div style="background:rgba(0,180,216,0.05);border:1px solid rgba(0,180,216,0.15);border-radius:5px;padding:10px;">
+          <div style="color:var(--blue);font-size:10px;font-weight:700;margin-bottom:4px;">verb=on</div>
+          <div style="font-size:10.5px;color:var(--muted);">Shows live progress — sector count, bytes copied, speed, percentage complete in real-time</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP 3: Live Output ────────────────────────────────────────────── -->
+  <div class="section"><div class="section-title"><span>③</span> dc3dd Live Terminal Output</div></div>
+  <div class="card">
+    <div class="card-head ch-purple">🖥 dc3dd Runtime Output (verb=on)</div>
+    <div class="card-body">
+      <div class="terminal">
+<span class="t-head">dc3dd 7.2.646 started at 2026-03-28 10:30:32 +0000</span><br>
+compiled options:<br>
+command line: <span class="t-cmd">dc3dd if=usb_source.raw hof=cywarx_usb_evidence.img hash=sha256 hash=md5 hlog=... log=... verb=on</span><br>
+sector size: <span class="t-val">512 bytes (assumed)</span><br>
+<br>
+<span class="t-muted" style="color:#455a64;">[ Live progress — reading source ]</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp; 9,043,968 bytes ( 8.6 M ) copied ( 34% ),   0 s, 82 M/s<br>
+&nbsp;&nbsp;&nbsp;14,811,136 bytes (  14 M ) copied ( 56% ),   0 s, 69 M/s<br>
+&nbsp;&nbsp;&nbsp;20,545,536 bytes (  20 M ) copied ( 78% ),   0 s, 64 M/s<br>
+&nbsp;&nbsp;&nbsp;25,821,184 bytes (  25 M ) copied ( 98% ),   0 s, 61 M/s<br>
+&nbsp;&nbsp;&nbsp;26,214,400 bytes (  25 M ) copied ( 100% ),  1 s, 49 M/s<br>
+<br>
+<span class="t-muted" style="color:#455a64;">[ Hashing output image ]</span><br>
+&nbsp;&nbsp;&nbsp;10,944,512 bytes (  10 M ) hashed (  42% ),  0 s<br>
+&nbsp;&nbsp;&nbsp;17,956,864 bytes (  17 M ) hashed (  68% ),  0 s, 171 M/s<br>
+&nbsp;&nbsp;&nbsp;26,083,328 bytes (  25 M ) hashed ( 100% ),  0 s<br>
+&nbsp;&nbsp;&nbsp;26,214,400 bytes (  25 M ) hashed ( 100% ),  0 s,  83 M/s<br>
+<br>
+<span class="t-head">input results for file 'usb_source.raw':</span><br>
+&nbsp;&nbsp; <span class="t-key">51200 sectors in</span><br>
+&nbsp;&nbsp; <span class="t-hash">fda5c3c69a3e0de34e753625372b06f3</span>  (md5)<br>
+&nbsp;&nbsp; <span class="t-hash">b12f57848bc792639ef3c7fb90c778b81a3abf9721fdc0a98cb73f2f025ec355</span>  (sha256)<br>
+<br>
+<span class="t-head">output results for file 'cywarx_usb_evidence.img':</span><br>
+&nbsp;&nbsp; <span class="t-key">51200 sectors out</span><br>
+&nbsp;&nbsp; <span class="t-ok">[ok]</span> <span class="t-hash">fda5c3c69a3e0de34e753625372b06f3</span>  (md5)<br>
+&nbsp;&nbsp; <span class="t-ok">[ok]</span> <span class="t-hash">b12f57848bc792639ef3c7fb90c778b81a3abf9721fdc0a98cb73f2f025ec355</span>  (sha256)<br>
+<br>
+<span class="t-ok t-head">dc3dd completed at 2026-03-28 10:30:33 +0000</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP 4: Hash Verification ─────────────────────────────────────── -->
+  <div class="section"><div class="section-title"><span>④</span> Post-Acquisition Hash Verification</div></div>
+  <div class="card">
+    <div class="card-head ch-green">✅ Integrity Verification — Source vs Image</div>
+    <div class="card-body">
+      <div class="hash-compare">
+        <div class="hc-row">
+          <div class="hc-label">MD5</div>
+          <div class="hc-pair">
+            <div class="hc-src">SOURCE&nbsp; fda5c3c69a3e0de34e753625372b06f3</div>
+            <div class="hc-img">IMAGE &nbsp; fda5c3c69a3e0de34e753625372b06f3</div>
+            <div class="hc-match">✔ MATCH — Bit-perfect copy confirmed</div>
+          </div>
+        </div>
+        <div class="hc-row">
+          <div class="hc-label">SHA-256</div>
+          <div class="hc-pair">
+            <div class="hc-src">SOURCE&nbsp; b12f57848bc792639ef3c7fb90c778b81a3abf9721fdc0a98cb73f2f025ec355</div>
+            <div class="hc-img">IMAGE &nbsp; b12f57848bc792639ef3c7fb90c778b81a3abf9721fdc0a98cb73f2f025ec355</div>
+            <div class="hc-match">✔ MATCH — Cryptographic integrity verified</div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:14px;background:rgba(0,200,83,0.07);border:1px solid rgba(0,200,83,0.25);
+        border-radius:6px;padding:12px;font-size:11.5px;line-height:1.8;">
+        <span style="color:var(--green);font-weight:700;">⚖ FORENSIC SIGNIFICANCE:</span><br>
+        The identical MD5 + SHA-256 hashes prove that <strong>every single bit</strong> in
+        <code>cywarx_usb_evidence.img</code> is an exact copy of the source device.
+        Any future analysis is performed on the <em>image</em> — the original is sealed.
+        If the image hash ever differs, evidence tampering is indicated.
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP 5: Filesystem Contents ───────────────────────────────────── -->
+  <div class="section"><div class="section-title"><span>⑤</span> Filesystem Content Map</div></div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head ch-blue">📁 Visible Files (mdir / fls)</div>
+      <div class="card-body">
+        <div class="fs-tree">
+          <div><span class="dir">📂 CYWARX_USB (FAT32)</span></div>
+          <div style="margin-left:16px;"><span class="dir">📂 Documents/</span></div>
+          <div style="margin-left:32px;"><span class="file">📄 meeting_notes.txt</span><span class="sz">550 B</span></div>
+          <div style="margin-left:32px;"><span class="file">📊 transfer_schedule.csv</span><span class="sz">208 B</span></div>
+          <div style="margin-left:16px;"><span class="dir">📂 Photos/</span></div>
+          <div style="margin-left:32px;"><span class="file">📄 GPS_metadata.txt</span><span class="sz">215 B</span></div>
+          <div style="margin-left:16px;"><span class="dir">📂 System/</span></div>
+          <div style="margin-left:32px;"><span class="file">📄 autorun.inf</span><span class="sz">27 B</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head ch-red">🗑 Deleted Files (PhotoRec / Autopsy recoverable)</div>
+      <div class="card-body">
+        <div class="fs-tree">
+          <div><span class="del">🗑 deleted_chat.txt</span> <span class="del-note">⬅ FAT entry cleared, data in clusters</span></div>
+          <div style="margin-top:4px;font-size:10.5px;color:var(--muted);margin-left:20px;line-height:1.7;">
+            WhatsApp chat export — mentions Dubai transfer,<br>
+            log wipe instructions, USB deletion instructions
+          </div>
+          <div style="margin-top:10px;"><span class="del">🗑 deleted_creds.txt</span> <span class="del-note">⬅ FAT entry cleared, data in clusters</span></div>
+          <div style="margin-top:4px;font-size:10.5px;color:var(--muted);margin-left:20px;line-height:1.7;">
+            ERP credentials, email passwords,<br>
+            backup encryption key
+          </div>
+        </div>
+        <div style="margin-top:12px;background:rgba(255,71,87,0.07);border:1px solid rgba(255,71,87,0.2);
+          border-radius:5px;padding:9px;font-size:10.5px;color:var(--red);line-height:1.6;">
+          ⚠ Files deleted from FAT directory table but <strong>cluster data NOT wiped</strong>.
+          Recoverable using: <code>photorec</code>, <code>foremost</code>, Autopsy carving.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP 6: Evidence Timeline ─────────────────────────────────────── -->
+  <div class="section"><div class="section-title"><span>⑥</span> Forensic Evidence Timeline</div></div>
+  <div class="card">
+    <div class="card-head ch-orange">🕐 Reconstructed Chain of Events</div>
+    <div class="card-body">
+      <div class="grid2">
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--blue)"></div>
+            <div class="tl-time">2024-11-15 14:30 IST</div>
+            <div class="tl-title" style="color:var(--blue)">📸 Photo Captured at Meeting</div>
+            <div class="tl-sub">Hotel Mandovi, Panaji, Goa · Samsung SM-G998B · GPS embedded</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--yellow)"></div>
+            <div class="tl-time">2024-11-15 15:04 IST</div>
+            <div class="tl-title" style="color:var(--yellow)">💾 Files Copied to USB</div>
+            <div class="tl-sub">meeting_notes.txt, transfer_schedule.csv, GPS_metadata.txt written</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--purple)"></div>
+            <div class="tl-time">2024-11-15 15:13 IST</div>
+            <div class="tl-title" style="color:var(--purple)">🗑 Sensitive Files Deleted</div>
+            <div class="tl-sub">Chat export + credentials deleted — FAT entries cleared, clusters intact</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--orange)"></div>
+            <div class="tl-time">2024-11-17 (planned)</div>
+            <div class="tl-title" style="color:var(--orange)">💸 Wire Transfer (scheduled)</div>
+            <div class="tl-sub">INV-0091/0092 → Offshore Acc 4491 · Total: ₹82,00,000</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--red)"></div>
+            <div class="tl-time">2026-03-28 10:30:32 UTC</div>
+            <div class="tl-title" style="color:var(--red)">🔍 USB Seized & Imaged</div>
+            <div class="tl-sub">dc3dd acquisition · MD5 + SHA256 verified · Chain of custody established</div>
+          </div>
+        </div>
+
+        <!-- Key Findings -->
+        <div>
+          <div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:1.5px;margin-bottom:10px;">KEY FORENSIC FINDINGS</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="background:rgba(255,71,87,0.08);border:1px solid rgba(255,71,87,0.2);border-radius:5px;padding:10px;">
+              <div style="color:var(--red);font-size:10px;font-weight:700;margin-bottom:4px;">CRITICAL — Financial Crime Evidence</div>
+              <div style="font-size:10.5px;line-height:1.6;">transfer_schedule.csv shows ₹1.69 Cr+ in scheduled offshore transfers. Meeting notes confirm coordination between 3 individuals.</div>
+            </div>
+            <div style="background:rgba(255,195,18,0.08);border:1px solid rgba(255,195,18,0.2);border-radius:5px;padding:10px;">
+              <div style="color:var(--yellow);font-size:10px;font-weight:700;margin-bottom:4px;">HIGH — Deleted Evidence Recovered</div>
+              <div style="font-size:10.5px;line-height:1.6;">Deleted chat shows explicit instructions to wipe audit logs and destroy evidence. Suspect believed deletion was permanent.</div>
+            </div>
+            <div style="background:rgba(0,180,216,0.08);border:1px solid rgba(0,180,216,0.2);border-radius:5px;padding:10px;">
+              <div style="color:var(--blue);font-size:10px;font-weight:700;margin-bottom:4px;">MEDIUM — Device Attribution</div>
+              <div style="font-size:10.5px;line-height:1.6;">GPS metadata links photo to exact meeting location. Device serial R5CR403NXYZ uniquely identifies Samsung Galaxy S21 Ultra.</div>
+            </div>
+            <div style="background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:5px;padding:10px;">
+              <div style="color:var(--green);font-size:10px;font-weight:700;margin-bottom:4px;">CHAIN OF CUSTODY — INTACT</div>
+              <div style="font-size:10.5px;line-height:1.6;">dc3dd hash logs prove image integrity. All analysis must be performed on the .img copy — original sealed in evidence bag.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP 7: Analysis Commands ─────────────────────────────────────── -->
+  <div class="section"><div class="section-title"><span>⑦</span> Student Lab Commands — Analyse the Image</div></div>
+  <div class="card">
+    <div class="card-head ch-blue">🧪 Commands to Run Against cywarx_usb_evidence.img</div>
+    <div class="card-body">
+      <div class="grid2">
+        <div>
+          <div class="cmd-block">
+<span class="cmd-comment"># List visible files</span><br>
+<span class="cmd-prompt">$</span> <span class="cmd-text">mdir</span> <span class="cmd-flag">-i</span> <span class="cmd-path">cywarx_usb_evidence.img</span> <span class="cmd-flag">-/</span> ::<br>
+<br>
+<span class="cmd-comment"># Read a specific file from image</span><br>
+<span class="cmd-prompt">$</span> <span class="cmd-text">mtype</span> <span class="cmd-flag">-i</span> <span class="cmd-path">cywarx_usb_evidence.img</span> ::/Documents/meeting_notes.txt<br>
+<br>
+<span class="cmd-comment"># File system timeline (inode level)</span><br>
+<span class="cmd-prompt">$</span> <span class="cmd-text">fls</span> <span class="cmd-flag">-r</span> <span class="cmd-path">cywarx_usb_evidence.img</span><br>
+<br>
+<span class="cmd-comment"># Show ALL entries incl. deleted (d/d = deleted)</span><br>
+<span class="cmd-prompt">$</span> <span class="cmd-text">fls</span> <span class="cmd-flag">-r -d</span> <span class="cmd-path">cywarx_usb_evidence.img</span>
+          </div>
+        </div>
+        <div>
+          <div class="cmd-block">
+<span class="cmd-comment"># Recover deleted files via carving</span><br>
+<span class="cmd-prompt">$</span> <span class="cmd-text">photorec</span> <span class="cmd-path">cywarx_usb_evidence.img</span><br>
+<br>
+<span class="cmd-comment"># Foremost file carving</span><br>
+<span class="cmd-prompt">$</span> <span class="cmd-text">foremost</span> <span class="cmd-flag">-i</span> <span class="cmd-path">cywarx_usb_evidence.img</span> <span class="cmd-flag">-o</span> ./recovered/<br>
+<br>
+<span class="cmd-comment"># Strings from unallocated space</span><br>
+<span class="cmd-prompt">$</span> <span class="cmd-text">strings</span> <span class="cmd-path">cywarx_usb_evidence.img</span> | grep <span class="cmd-flag">-i</span> "whatsapp\|transfer\|password"<br>
+<br>
+<span class="cmd-comment"># Open in Autopsy GUI</span><br>
+<span class="cmd-prompt">$</span> <span class="cmd-text">autopsy</span>  <span class="cmd-comment"># → Add Image → select .img</span>
+          </div>
+        </div>
+      </div>
+      <div class="cmd-block" style="margin-top:10px;">
+<span class="cmd-comment"># Verify image integrity at any time (re-hash and compare)</span><br>
+<span class="cmd-prompt">$</span> <span class="cmd-text">md5sum</span> <span class="cmd-path">cywarx_usb_evidence.img</span><br>
+<span class="cmd-comment"># Expected: fda5c3c69a3e0de34e753625372b06f3</span><br>
+<span class="cmd-prompt">$</span> <span class="cmd-text">sha256sum</span> <span class="cmd-path">cywarx_usb_evidence.img</span><br>
+<span class="cmd-comment"># Expected: b12f57848bc792639ef3c7fb90c778b81a3abf9721fdc0a98cb73f2f025ec355</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── WHY dc3dd ──────────────────────────────────────────────────────── -->
+  <div class="section"><div class="section-title"><span>⑧</span> Why dc3dd Over dd / dcfldd?</div></div>
+  <div class="grid3">
+    <div class="card">
+      <div class="card-head ch-red">❌ Plain dd</div>
+      <div class="card-body" style="font-size:11.5px;line-height:1.8;color:var(--muted);">
+        No built-in hashing.<br>
+        No log file output.<br>
+        No verification pass.<br>
+        Not court-acceptable alone.<br>
+        <span style="color:var(--text);">Must pipe to sha256sum separately — two-pass, error-prone.</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head ch-yellow">⚠ dcfldd</div>
+      <div class="card-body" style="font-size:11.5px;line-height:1.8;color:var(--muted);">
+        Has hashing + split output.<br>
+        Discontinued / unmaintained.<br>
+        No output hash verification.<br>
+        Hashes input only.<br>
+        <span style="color:var(--text);">Does not prove image = source byte-for-byte.</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head ch-green">✅ dc3dd (DoD standard)</div>
+      <div class="card-body" style="font-size:11.5px;line-height:1.8;color:var(--text);">
+        Hashes <strong>both</strong> input + output.<br>
+        Compares automatically ([ok]).<br>
+        Detailed log files built-in.<br>
+        Multiple simultaneous hashes.<br>
+        <span style="color:var(--green);">Court-ready forensic tool — DOD Cyber Crime Center.</span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<footer>
+  <span>Cywarx Digital Forensics Unit IV &nbsp;|&nbsp; Lab: dc3dd USB Forensic Imaging &nbsp;|&nbsp; Case: CYWARX-2024-GOA-001</span>
+  <span>Generated: 2026-03-28 &nbsp;|&nbsp; Examiner: Cywarx Lab &nbsp;|&nbsp; Tool: dc3dd v7.2.646</span>
+</footer>
+
+</body>
+</html>

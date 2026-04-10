@@ -1,0 +1,37 @@
+=================================================================
+CHAIN OF CUSTODY - RAM EVIDENCE
+=================================================================
+Case ID       : OPL-2024-007
+Suspect       : Rohan Mehta
+Computer      : ROHAN-LAPTOP
+Image File    : phantom_ledger.raw
+Image Size    : 64 MB (67108864 bytes)
+Acquired By   : HeXx | Cywarx
+Acquisition   : 2026-04-08 09:27:11 UTC
+Tool          : make_ramdump.py v1.0 (synthetic)
+
+INTEGRITY HASHES:
+  SHA256: 65599ca04c4693edf3834040049b2ac093d7b3b1525d11c59e57b70eb9877d3e
+  MD5   : fba3880af2d64180f24564ca8e0a3f31
+
+FLAG MANIFEST (for instructor only):
+  flag_01_strings           : Cywarx{v0l4t1l3_m3m0ry_1s_k3y_3v1d3nc3}
+  flag_02_process           : Cywarx{r0h4n_r4n_m4lware_pid_6621}
+  flag_03_network           : Cywarx{c2_b34c0n_185_220_t0r_3x1t}
+  flag_04_powershell        : Cywarx{d3c0d3d_p5_1nv0k3_m1m1k4tz}
+  flag_05_lsass             : Cywarx{lss4_dump_nthash_cr4ck3d}
+  flag_06_registry          : Cywarx{run_k3y_p3rs1st3nc3_3st4bl1sh3d}
+  flag_07_clipboard         : Cywarx{cl1pb04rd_4cc_num_3xfilt}
+  flag_08_transaction       : Cywarx{ph4ntom_l3dg3r_0p3r4t10n_cl0s3d}
+
+ANALYSIS GUIDANCE:
+  strings -n 8 <image>          # ASCII artifacts
+  strings -n 8 -e l <image>     # Unicode artifacts
+  python3 vol.py -f <image> windows.info
+  python3 vol.py -f <image> windows.pslist
+  python3 vol.py -f <image> windows.cmdline
+  python3 vol.py -f <image> windows.netscan
+  python3 vol.py -f <image> windows.registry.hivelist
+  python3 vol.py -f <image> windows.clipboard
+  bulk_extractor -o out/ <image>
+=================================================================

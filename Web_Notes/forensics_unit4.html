@@ -1,0 +1,2384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit IV — Fundamentals of Cyber Forensics</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   ROOT & RESET
+============================================================ */
+:root{
+  --bg:#03080d;
+  --bg2:#060f18;
+  --panel:#070d14;
+  --panel2:#0a1520;
+  --border:#0e2030;
+  --border2:#163045;
+
+  --cyan:#00e5ff;
+  --amber:#ffb300;
+  --green:#00ff88;
+  --red:#ff4757;
+  --purple:#c084fc;
+  --blue:#38bdf8;
+  --orange:#fb923c;
+
+  --text:#b8cdd8;
+  --text2:#7a9aaa;
+  --text3:#3d5a6a;
+  --white:#e8f4f8;
+
+  --glow-cyan:0 0 20px rgba(0,229,255,0.3);
+  --glow-amber:0 0 20px rgba(255,179,0,0.3);
+  --glow-green:0 0 20px rgba(0,255,136,0.25);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'IBM Plex Mono',monospace;
+  line-height:1.7;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* scanlines */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.03) 3px,rgba(0,0,0,0.03) 4px);
+  pointer-events:none;z-index:9999;
+}
+/* dot grid */
+body::after{
+  content:'';
+  position:fixed;inset:0;
+  background-image:radial-gradient(rgba(0,229,255,0.06) 1px,transparent 1px);
+  background-size:28px 28px;
+  pointer-events:none;z-index:0;
+}
+
+/* ============================================================
+   SIDEBAR NAV
+============================================================ */
+.sidebar{
+  position:fixed;left:0;top:0;bottom:0;width:260px;
+  background:var(--panel);
+  border-right:1px solid var(--border2);
+  z-index:100;
+  display:flex;flex-direction:column;
+  overflow-y:auto;
+}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-track{background:var(--panel)}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+.sidebar-brand{
+  padding:24px 20px 18px;
+  border-bottom:1px solid var(--border);
+}
+.brand-tag{
+  font-family:'Share Tech Mono',monospace;
+  font-size:9px;letter-spacing:4px;
+  color:var(--cyan);opacity:.6;
+  text-transform:uppercase;margin-bottom:6px;
+}
+.brand-title{
+  font-family:'Syne',sans-serif;
+  font-size:15px;font-weight:800;
+  color:var(--white);line-height:1.3;
+}
+.brand-title span{color:var(--cyan)}
+
+.nav-section-label{
+  padding:16px 20px 6px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:9px;letter-spacing:3px;
+  color:var(--text3);text-transform:uppercase;
+}
+.nav-item{
+  display:block;padding:9px 20px;
+  text-decoration:none;
+  font-family:'Share Tech Mono',monospace;
+  font-size:11px;color:var(--text2);
+  letter-spacing:.5px;
+  border-left:2px solid transparent;
+  transition:all .2s;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.nav-item:hover,.nav-item.active{
+  color:var(--cyan);
+  border-left-color:var(--cyan);
+  background:rgba(0,229,255,0.04);
+}
+.nav-item.sub{padding-left:32px;font-size:10px;}
+
+/* ============================================================
+   MAIN CONTENT
+============================================================ */
+.main{
+  margin-left:260px;
+  position:relative;z-index:1;
+  padding:0 0 80px;
+}
+
+/* ============================================================
+   HERO
+============================================================ */
+.hero{
+  padding:60px 60px 48px;
+  border-bottom:1px solid var(--border);
+  position:relative;
+  overflow:hidden;
+}
+.hero::before{
+  content:'FORENSICS';
+  position:absolute;right:-20px;top:50%;transform:translateY(-50%);
+  font-family:'Syne',sans-serif;font-size:130px;font-weight:800;
+  color:rgba(0,229,255,0.03);letter-spacing:-4px;white-space:nowrap;
+  pointer-events:none;
+}
+.hero-tag{
+  font-family:'Share Tech Mono',monospace;
+  font-size:10px;letter-spacing:5px;color:var(--cyan);
+  text-transform:uppercase;margin-bottom:14px;
+  display:flex;align-items:center;gap:10px;
+}
+.hero-tag::before{content:'';width:30px;height:1px;background:var(--cyan);}
+.hero h1{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(28px,4vw,46px);font-weight:800;
+  color:var(--white);line-height:1.1;margin-bottom:14px;
+}
+.hero h1 em{color:var(--cyan);font-style:normal;text-shadow:var(--glow-cyan);}
+.hero-sub{
+  font-size:13px;color:var(--text2);max-width:640px;
+  line-height:1.8;margin-bottom:28px;
+}
+.hero-badges{display:flex;flex-wrap:wrap;gap:8px;}
+.badge{
+  font-family:'Share Tech Mono',monospace;font-size:10px;
+  padding:4px 12px;border-radius:3px;border:1px solid;
+  letter-spacing:1px;text-transform:uppercase;
+}
+.badge-cyan{color:var(--cyan);border-color:rgba(0,229,255,.3);background:rgba(0,229,255,.06);}
+.badge-amber{color:var(--amber);border-color:rgba(255,179,0,.3);background:rgba(255,179,0,.06);}
+.badge-green{color:var(--green);border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.06);}
+
+/* ============================================================
+   SECTION WRAPPER
+============================================================ */
+.section{
+  padding:52px 60px;
+  border-bottom:1px solid var(--border);
+  opacity:0;transform:translateY(24px);
+  animation:reveal .6s ease forwards;
+}
+@keyframes reveal{to{opacity:1;transform:none}}
+.section:nth-child(2){animation-delay:.05s}
+.section:nth-child(3){animation-delay:.10s}
+.section:nth-child(4){animation-delay:.15s}
+.section:nth-child(5){animation-delay:.20s}
+.section:nth-child(6){animation-delay:.25s}
+.section:nth-child(7){animation-delay:.30s}
+.section:nth-child(8){animation-delay:.35s}
+.section:nth-child(9){animation-delay:.40s}
+
+.sec-header{
+  display:flex;align-items:flex-start;gap:18px;
+  margin-bottom:32px;
+}
+.sec-num{
+  font-family:'Syne',sans-serif;font-weight:800;
+  font-size:48px;line-height:1;
+  opacity:.08;color:var(--cyan);
+  flex-shrink:0;margin-top:-4px;
+  min-width:64px;
+}
+.sec-meta{}
+.sec-unit{
+  font-family:'Share Tech Mono',monospace;
+  font-size:9px;letter-spacing:4px;color:var(--cyan);
+  text-transform:uppercase;margin-bottom:6px;
+}
+.sec-title{
+  font-family:'Syne',sans-serif;font-size:26px;font-weight:800;
+  color:var(--white);line-height:1.2;margin-bottom:6px;
+}
+.sec-sub{font-size:12px;color:var(--text2);}
+
+/* ============================================================
+   CONTENT BLOCKS
+============================================================ */
+h3.block-title{
+  font-family:'Syne',sans-serif;font-size:16px;font-weight:700;
+  color:var(--white);margin:28px 0 10px;
+  display:flex;align-items:center;gap:10px;
+}
+h3.block-title::before{
+  content:'';width:4px;height:18px;
+  background:var(--cyan);border-radius:2px;flex-shrink:0;
+}
+h3.block-title.amber::before{background:var(--amber);}
+h3.block-title.green::before{background:var(--green);}
+h3.block-title.red::before{background:var(--red);}
+h3.block-title.purple::before{background:var(--purple);}
+
+p.prose{
+  font-size:13.5px;color:var(--text);line-height:1.9;margin-bottom:14px;
+}
+p.prose strong{color:var(--white);font-weight:600;}
+p.prose em{color:var(--cyan);font-style:normal;}
+
+/* ============================================================
+   INFO BOXES
+============================================================ */
+.info-box{
+  border-radius:8px;padding:18px 20px;
+  margin:16px 0;border:1px solid;
+  font-size:13px;line-height:1.8;
+}
+.info-box.tip{
+  background:rgba(0,229,255,0.04);
+  border-color:rgba(0,229,255,0.2);color:var(--text);
+}
+.info-box.tip .ib-label{color:var(--cyan);}
+.info-box.warn{
+  background:rgba(255,179,0,0.04);
+  border-color:rgba(255,179,0,0.2);color:var(--text);
+}
+.info-box.warn .ib-label{color:var(--amber);}
+.info-box.example{
+  background:rgba(0,255,136,0.03);
+  border-color:rgba(0,255,136,0.15);color:var(--text);
+}
+.info-box.example .ib-label{color:var(--green);}
+.info-box.danger{
+  background:rgba(255,71,87,0.04);
+  border-color:rgba(255,71,87,0.2);color:var(--text);
+}
+.info-box.danger .ib-label{color:var(--red);}
+.ib-label{
+  font-family:'Share Tech Mono',monospace;
+  font-size:9px;letter-spacing:3px;
+  text-transform:uppercase;margin-bottom:6px;
+  display:block;
+}
+
+/* ============================================================
+   CODE BLOCKS
+============================================================ */
+.code-block{
+  background:#020810;
+  border:1px solid var(--border2);
+  border-radius:8px;margin:14px 0;
+  overflow:hidden;
+}
+.code-header{
+  background:var(--panel2);
+  padding:8px 16px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);
+}
+.code-lang{
+  font-family:'Share Tech Mono',monospace;
+  font-size:10px;letter-spacing:2px;color:var(--cyan);
+  text-transform:uppercase;
+}
+.code-dots{display:flex;gap:6px;}
+.code-dots span{width:10px;height:10px;border-radius:50%;}
+.dot-r{background:#ff5f56}
+.dot-y{background:#ffbd2e}
+.dot-g{background:#27c93f}
+pre{
+  padding:18px 20px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:12px;color:#8ecae6;
+  overflow-x:auto;line-height:1.8;
+  white-space:pre;
+}
+pre .cmd{color:var(--cyan);}
+pre .comment{color:#3d5a6a;}
+pre .output{color:var(--green);}
+pre .path{color:var(--amber);}
+pre .flag{color:var(--purple);}
+pre .kw{color:var(--orange);}
+
+/* ============================================================
+   STEP LIST
+============================================================ */
+.steps{margin:16px 0;counter-reset:step;}
+.step{
+  display:flex;gap:16px;margin-bottom:14px;
+  counter-increment:step;
+}
+.step::before{
+  content:counter(step,'0');
+  font-family:'Syne',sans-serif;font-weight:800;
+  font-size:22px;color:var(--cyan);opacity:.5;
+  flex-shrink:0;width:32px;line-height:1;
+  padding-top:2px;text-align:right;
+}
+.step-body{}
+.step-title{
+  font-family:'Syne',sans-serif;font-size:14px;font-weight:700;
+  color:var(--white);margin-bottom:4px;
+}
+.step-desc{font-size:13px;color:var(--text);line-height:1.7;}
+
+/* ============================================================
+   TOOLS GRID
+============================================================ */
+.tools-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:12px;margin:16px 0;
+}
+.tool-card{
+  background:var(--panel2);
+  border:1px solid var(--border);
+  border-radius:8px;padding:16px 18px;
+  position:relative;overflow:hidden;
+  transition:border-color .2s,transform .2s;
+}
+.tool-card:hover{
+  border-color:var(--border2);
+  transform:translateY(-2px);
+}
+.tool-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+}
+.tc-cyan::before{background:linear-gradient(90deg,transparent,var(--cyan),transparent);}
+.tc-amber::before{background:linear-gradient(90deg,transparent,var(--amber),transparent);}
+.tc-green::before{background:linear-gradient(90deg,transparent,var(--green),transparent);}
+.tc-purple::before{background:linear-gradient(90deg,transparent,var(--purple),transparent);}
+.tc-red::before{background:linear-gradient(90deg,transparent,var(--red),transparent);}
+.tool-name{
+  font-family:'Syne',sans-serif;font-size:14px;font-weight:700;
+  color:var(--white);margin-bottom:4px;
+}
+.tool-purpose{font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:8px;}
+.tool-cmd{
+  font-family:'Share Tech Mono',monospace;
+  font-size:11px;color:var(--cyan);
+  background:rgba(0,229,255,0.05);
+  padding:4px 8px;border-radius:4px;
+  border:1px solid rgba(0,229,255,0.1);
+}
+
+/* ============================================================
+   TABLE
+============================================================ */
+.tbl-wrap{overflow-x:auto;margin:16px 0;}
+table{
+  width:100%;border-collapse:collapse;
+  font-size:12.5px;
+}
+th{
+  background:var(--panel2);
+  padding:10px 14px;
+  font-family:'Syne',sans-serif;font-size:11px;font-weight:700;
+  color:var(--cyan);letter-spacing:1px;text-transform:uppercase;
+  text-align:left;border-bottom:2px solid var(--border2);
+}
+td{
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+  color:var(--text);vertical-align:top;line-height:1.6;
+}
+tr:hover td{background:rgba(0,229,255,0.02);}
+td strong{color:var(--white);}
+td code{
+  font-family:'Share Tech Mono',monospace;
+  font-size:11px;color:var(--cyan);
+  background:rgba(0,229,255,0.07);
+  padding:2px 6px;border-radius:3px;
+}
+
+/* ============================================================
+   TASK BOXES
+============================================================ */
+.task-box{
+  border-radius:10px;margin:24px 0;
+  overflow:hidden;
+  border:1px solid rgba(255,179,0,0.25);
+}
+.task-header{
+  background:rgba(255,179,0,0.08);
+  padding:14px 20px;
+  display:flex;align-items:center;gap:12px;
+  border-bottom:1px solid rgba(255,179,0,0.2);
+}
+.task-icon{font-size:18px;}
+.task-label{
+  font-family:'Syne',sans-serif;font-size:13px;font-weight:800;
+  color:var(--amber);letter-spacing:1px;
+}
+.task-num{
+  font-family:'Share Tech Mono',monospace;font-size:10px;
+  color:var(--text3);margin-left:auto;
+}
+.task-body{padding:18px 20px;background:rgba(255,179,0,0.02);}
+.task-q{
+  font-size:13.5px;color:var(--text);
+  line-height:1.8;margin-bottom:14px;
+}
+.task-q strong{color:var(--white);}
+
+/* solution accordion */
+.sol-toggle{
+  background:none;border:1px solid rgba(0,255,136,.25);
+  color:var(--green);
+  font-family:'Share Tech Mono',monospace;
+  font-size:11px;letter-spacing:2px;padding:8px 16px;
+  border-radius:5px;cursor:pointer;
+  text-transform:uppercase;transition:all .2s;
+}
+.sol-toggle:hover{background:rgba(0,255,136,.07);}
+.solution{
+  display:none;margin-top:16px;
+  background:rgba(0,255,136,.03);
+  border:1px solid rgba(0,255,136,.15);
+  border-radius:8px;padding:16px 18px;
+}
+.solution.open{display:block;}
+.sol-label{
+  font-family:'Share Tech Mono',monospace;
+  font-size:9px;letter-spacing:3px;color:var(--green);
+  text-transform:uppercase;margin-bottom:10px;
+}
+.sol-body{font-size:13px;color:var(--text);line-height:1.8;}
+.sol-body strong{color:var(--white);}
+.sol-body code{
+  font-family:'Share Tech Mono',monospace;font-size:11.5px;
+  color:var(--cyan);background:rgba(0,229,255,0.07);
+  padding:2px 6px;border-radius:3px;
+}
+
+/* ============================================================
+   CONCEPT CARDS
+============================================================ */
+.concept-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  gap:12px;margin:16px 0;
+}
+.concept-card{
+  background:var(--panel2);
+  border:1px solid var(--border);
+  border-radius:8px;padding:16px 18px;
+  transition:border-color .2s;
+}
+.concept-card:hover{border-color:var(--border2);}
+.cc-icon{font-size:24px;margin-bottom:8px;}
+.cc-title{
+  font-family:'Syne',sans-serif;font-size:13px;font-weight:700;
+  color:var(--white);margin-bottom:6px;
+}
+.cc-desc{font-size:12px;color:var(--text2);line-height:1.6;}
+
+/* ============================================================
+   DIAGRAM / FLOW
+============================================================ */
+.flow{
+  display:flex;flex-wrap:wrap;align-items:center;
+  gap:0;margin:16px 0;
+  background:var(--panel2);
+  border:1px solid var(--border);
+  border-radius:8px;overflow:hidden;
+}
+.flow-step{
+  flex:1;min-width:110px;
+  padding:14px 12px;text-align:center;
+  border-right:1px solid var(--border);
+  position:relative;
+}
+.flow-step:last-child{border-right:none;}
+.flow-step:hover{background:rgba(0,229,255,.03);}
+.fs-num{
+  font-family:'Syne',sans-serif;font-weight:800;
+  font-size:24px;color:var(--cyan);opacity:.2;
+}
+.fs-name{
+  font-family:'Share Tech Mono',monospace;
+  font-size:10px;letter-spacing:1.5px;color:var(--cyan);
+  text-transform:uppercase;margin-top:4px;
+  text-shadow:var(--glow-cyan);
+}
+.fs-desc{font-size:11px;color:var(--text3);margin-top:3px;line-height:1.4;}
+
+/* ============================================================
+   HIGHLIGHT INLINE
+============================================================ */
+.hl{
+  background:rgba(0,229,255,.08);color:var(--cyan);
+  padding:1px 6px;border-radius:3px;
+  font-family:'Share Tech Mono',monospace;font-size:12px;
+}
+.hl-amber{background:rgba(255,179,0,.08);color:var(--amber);}
+.hl-green{background:rgba(0,255,136,.08);color:var(--green);}
+.hl-red{background:rgba(255,71,87,.08);color:var(--red);}
+
+/* ============================================================
+   MEMORY MAP VISUAL
+============================================================ */
+.mem-map{
+  display:flex;flex-direction:column;gap:2px;
+  margin:16px 0;font-family:'Share Tech Mono',monospace;
+  font-size:11px;
+}
+.mem-row{
+  display:grid;
+  grid-template-columns:120px 1fr 140px;
+  gap:2px;
+}
+.mem-addr{
+  background:var(--panel2);padding:6px 10px;
+  color:var(--text3);
+}
+.mem-data{
+  padding:6px 10px;
+  color:var(--text);
+}
+.mem-label{
+  padding:6px 10px;text-align:right;
+}
+.mem-boot{background:rgba(0,229,255,.08);color:var(--cyan);}
+.mem-part{background:rgba(255,179,0,.08);color:var(--amber);}
+.mem-fs{background:rgba(0,255,136,.08);color:var(--green);}
+.mem-data-row{background:rgba(191,90,242,.08);color:var(--purple);}
+.mem-free{background:rgba(61,90,106,.15);color:var(--text3);}
+
+/* ============================================================
+   DIVIDER
+============================================================ */
+.hdivider{
+  height:1px;
+  background:linear-gradient(90deg,transparent,var(--border2),var(--border2),transparent);
+  margin:32px 0;
+}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media(max-width:900px){
+  .sidebar{width:220px;}
+  .main{margin-left:220px;}
+  .section,.hero{padding:36px 28px;}
+}
+@media(max-width:700px){
+  .sidebar{display:none;}
+  .main{margin-left:0;}
+  .section,.hero{padding:28px 18px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     SIDEBAR
+============================================================ -->
+<nav class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-tag">// Unit IV</div>
+    <div class="brand-title">Cyber <span>Forensics</span><br>Fundamentals</div>
+  </div>
+
+  <div class="nav-section-label">Part A — Basics</div>
+  <a href="#intro" class="nav-item">1. Intro to Cyber Forensics</a>
+  <a href="#storage" class="nav-item">2. Storage Fundamentals</a>
+  <a href="#filesystem" class="nav-item">3. File System Concepts</a>
+  <a href="#osbasics" class="nav-item">4. OS Software & Terminology</a>
+  <a href="#datarecovery" class="nav-item">5. Data Recovery Basics</a>
+
+  <div class="nav-section-label">Part B — Evidence Recovery</div>
+  <a href="#deleted" class="nav-item">6. Deleted File Recovery</a>
+  <a href="#formatted" class="nav-item">7. Formatted Partition Recovery</a>
+
+  <div class="nav-section-label">Reference</div>
+  <a href="#tools" class="nav-item">All Tools Reference</a>
+  <a href="#tasks" class="nav-item">Tasks & Solutions</a>
+</nav>
+
+<!-- ============================================================
+     MAIN
+============================================================ -->
+<main class="main">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">Unit IV — Cyber Forensics</div>
+  <h1>Fundamentals of<br><em>Cyber Forensics</em></h1>
+  <p class="hero-sub">
+    A complete, in-depth study guide covering storage fundamentals, file systems, data recovery, 
+    OS artifacts, deleted file recovery, and formatted partition recovery — explained simply 
+    with real-world examples, practical commands, and tasks.
+  </p>
+  <div class="hero-badges">
+    <span class="badge badge-cyan">Part A: Basics</span>
+    <span class="badge badge-amber">Part B: Evidence Recovery</span>
+    <span class="badge badge-green">Practical + Tools</span>
+    <span class="badge badge-cyan">Tasks + Solutions</span>
+  </div>
+</div>
+
+<!-- ================================================================
+     SECTION 1: INTRODUCTION TO CYBER FORENSICS
+================================================================ -->
+<section class="section" id="intro">
+  <div class="sec-header">
+    <div class="sec-num">01</div>
+    <div class="sec-meta">
+      <div class="sec-unit">// Part A — Chapter 1</div>
+      <div class="sec-title">Introduction to Cyber Forensics</div>
+      <div class="sec-sub">What it is, why it matters, and how it works</div>
+    </div>
+  </div>
+
+  <h3 class="block-title">What is Cyber Forensics?</h3>
+  <p class="prose">
+    <strong>Cyber Forensics</strong> (also called <em>Digital Forensics</em> or <em>Computer Forensics</em>) is the 
+    science of collecting, preserving, analyzing, and presenting digital evidence in a 
+    legally acceptable manner. Think of it like traditional police forensics — but instead of fingerprints 
+    and DNA, we deal with <strong>bytes, files, logs, and network packets.</strong>
+  </p>
+
+  <div class="info-box example">
+    <span class="ib-label">🌍 Real-World Example</span>
+    Suppose an employee at a company is suspected of leaking confidential data. A cyber forensic 
+    investigator is called in. They take a <strong>forensic copy</strong> of the employee's laptop hard drive 
+    (without changing anything), examine browser history, USB connection logs, email outbox, and 
+    file access timestamps — and find evidence the employee copied files to a USB drive at 11:47 PM. 
+    This evidence is then presented in court.
+  </div>
+
+  <h3 class="block-title">Why is Cyber Forensics Important?</h3>
+  <div class="concept-grid">
+    <div class="concept-card">
+      <div class="cc-icon">⚖️</div>
+      <div class="cc-title">Legal Evidence</div>
+      <div class="cc-desc">Digital evidence (emails, logs, files) can be presented in court to prove or disprove a crime.</div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">🔍</div>
+      <div class="cc-title">Incident Response</div>
+      <div class="cc-desc">After a hack or breach, forensics tells you WHAT happened, WHO did it, and HOW it happened.</div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">🛡️</div>
+      <div class="cc-title">Data Recovery</div>
+      <div class="cc-desc">Recover accidentally or intentionally deleted evidence that criminals thought was gone forever.</div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">📋</div>
+      <div class="cc-title">Compliance</div>
+      <div class="cc-desc">Helps organizations meet legal and regulatory requirements by auditing systems.</div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">🔐</div>
+      <div class="cc-title">Internal Investigations</div>
+      <div class="cc-desc">Used by HR/legal teams to investigate fraud, IP theft, harassment, or policy violations.</div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">🌐</div>
+      <div class="cc-title">Cybercrime Investigation</div>
+      <div class="cc-desc">Track hackers, ransomware operators, fraudsters, and other cybercriminals across digital trails.</div>
+    </div>
+  </div>
+
+  <h3 class="block-title">The Forensic Process (6 Phases)</h3>
+  <div class="flow">
+    <div class="flow-step">
+      <div class="fs-num">1</div>
+      <div class="fs-name">Identification</div>
+      <div class="fs-desc">Find all sources of evidence (laptop, phone, USB, cloud)</div>
+    </div>
+    <div class="flow-step">
+      <div class="fs-num">2</div>
+      <div class="fs-name">Preservation</div>
+      <div class="fs-desc">Freeze evidence — prevent any change or corruption</div>
+    </div>
+    <div class="flow-step">
+      <div class="fs-num">3</div>
+      <div class="fs-name">Collection</div>
+      <div class="fs-desc">Make forensic bit-for-bit copy (image) of the device</div>
+    </div>
+    <div class="flow-step">
+      <div class="fs-num">4</div>
+      <div class="fs-name">Examination</div>
+      <div class="fs-desc">Extract relevant data from the image</div>
+    </div>
+    <div class="flow-step">
+      <div class="fs-num">5</div>
+      <div class="fs-name">Analysis</div>
+      <div class="fs-desc">Interpret findings, build timeline, find IOCs</div>
+    </div>
+    <div class="flow-step">
+      <div class="fs-num">6</div>
+      <div class="fs-name">Reporting</div>
+      <div class="fs-desc">Document everything in court-ready report</div>
+    </div>
+  </div>
+
+  <h3 class="block-title">Key Principles</h3>
+  <div class="info-box tip">
+    <span class="ib-label">💡 Golden Rules of Cyber Forensics</span>
+    <strong>1. Never work on original evidence.</strong> Always work on a forensic copy (image).<br>
+    <strong>2. Preserve Chain of Custody (CoC).</strong> Document every person who touched the evidence.<br>
+    <strong>3. Hash everything.</strong> MD5/SHA256 hashes prove the evidence was not modified.<br>
+    <strong>4. Document everything.</strong> Every action must be recorded with timestamp and reason.<br>
+    <strong>5. Be methodical.</strong> Follow a repeatable, documented process.
+  </div>
+
+  <h3 class="block-title">Types of Cyber Forensics</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Type</th><th>What it investigates</th><th>Example</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Disk Forensics</strong></td><td>Hard drives, SSDs, USB drives</td><td>Deleted files on a suspect's laptop</td></tr>
+        <tr><td><strong>Network Forensics</strong></td><td>Network traffic, logs, packets</td><td>Capturing a C2 connection in a PCAP file</td></tr>
+        <tr><td><strong>Memory Forensics</strong></td><td>RAM dumps from live systems</td><td>Finding encryption keys in RAM</td></tr>
+        <tr><td><strong>Mobile Forensics</strong></td><td>Smartphones, tablets</td><td>Extracting WhatsApp chats from an Android phone</td></tr>
+        <tr><td><strong>Email Forensics</strong></td><td>Email headers, attachments</td><td>Tracing the origin of a phishing email</td></tr>
+        <tr><td><strong>Malware Forensics</strong></td><td>Malicious code analysis</td><td>Reverse engineering a ransomware sample</td></tr>
+        <tr><td><strong>Database Forensics</strong></td><td>Database logs and records</td><td>Detecting SQL injection traces</td></tr>
+        <tr><td><strong>Cloud Forensics</strong></td><td>AWS, Azure, GCP logs</td><td>Auditing unauthorized S3 bucket access</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="task-box">
+    <div class="task-header">
+      <span class="task-icon">📝</span>
+      <span class="task-label">Task 1.1 — Understanding Cyber Forensics</span>
+      <span class="task-num">Unit IV / Ch.1</span>
+    </div>
+    <div class="task-body">
+      <div class="task-q">
+        <strong>Q1.</strong> A company notices that confidential pricing data has been appearing on competitor websites. The IT team suspects an insider threat. List the steps a cyber forensic investigator should follow, and explain what type of forensics is most relevant in this case.<br><br>
+        <strong>Q2.</strong> Why should a forensic investigator never work directly on original evidence? What could go wrong?
+      </div>
+      <button class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ SHOW SOLUTION</button>
+      <div class="solution">
+        <div class="sol-label">✓ Solution</div>
+        <div class="sol-body">
+          <strong>A1. Steps:</strong><br>
+          1. <strong>Identification</strong> — Identify all devices the suspect used: laptop, USB drives, company email, cloud storage.<br>
+          2. <strong>Preservation</strong> — Immediately suspend the account and take the laptop without powering it off (preserve RAM).<br>
+          3. <strong>Collection</strong> — Create a forensic image of the laptop using FTK Imager or <code>dd</code>. Calculate MD5/SHA256 hash.<br>
+          4. <strong>Examination</strong> — Look at USB connection history (Registry), recently accessed files, email outbox, browser history.<br>
+          5. <strong>Analysis</strong> — Build a timeline of file access and exfiltration events.<br>
+          6. <strong>Reporting</strong> — Write a court-ready report with findings, timestamps, and evidence.<br><br>
+          <strong>Most relevant type:</strong> Disk Forensics (USB/laptop) + Email Forensics (email exfiltration) + possibly Network Forensics (cloud uploads).<br><br>
+          <strong>A2.</strong> Working on original evidence risks:<br>
+          — <strong>Accidental modification</strong> of timestamps (e.g., opening a file changes the "Last Accessed" time)<br>
+          — <strong>Data corruption</strong> if tools crash during analysis<br>
+          — <strong>Legal inadmissibility</strong> — courts can reject evidence that was not preserved correctly<br>
+          — <strong>Destroying chain of custody</strong> — the integrity of the evidence is questioned
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     SECTION 2: STORAGE FUNDAMENTALS
+================================================================ -->
+<section class="section" id="storage">
+  <div class="sec-header">
+    <div class="sec-num">02</div>
+    <div class="sec-meta">
+      <div class="sec-unit">// Part A — Chapter 2</div>
+      <div class="sec-title">Storage Fundamentals</div>
+      <div class="sec-sub">How data is physically and logically stored on devices</div>
+    </div>
+  </div>
+
+  <h3 class="block-title">How Storage Works — The Big Picture</h3>
+  <p class="prose">
+    Before recovering any data, a forensic investigator must understand <em>how storage devices work</em>. 
+    Data doesn't just float in a hard drive — it is organized in a strict hierarchy: 
+    <strong>Disk → Partition → File System → Clusters → Sectors → Bytes.</strong>
+  </p>
+
+  <h3 class="block-title">Storage Device Types</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Device</th><th>Full Name</th><th>How it stores</th><th>Forensic Relevance</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>HDD</strong></td>
+          <td>Hard Disk Drive</td>
+          <td>Magnetic platters + spinning disk. Data written via read/write head.</td>
+          <td>Deleted data recoverable for months/years. Slack space retains old data.</td>
+        </tr>
+        <tr>
+          <td><strong>SSD</strong></td>
+          <td>Solid State Drive</td>
+          <td>NAND flash chips. TRIM command erases blocks automatically.</td>
+          <td>TRIM makes recovery harder. Wear-leveling may scatter data across chips.</td>
+        </tr>
+        <tr>
+          <td><strong>USB Flash</strong></td>
+          <td>USB Drive / Thumb Drive</td>
+          <td>Flash memory (similar to SSD). FAT32 file system usually.</td>
+          <td>Very common in insider threat cases. Can be cloned with dd.</td>
+        </tr>
+        <tr>
+          <td><strong>SD Card</strong></td>
+          <td>Secure Digital Card</td>
+          <td>Flash memory. Used in cameras, phones.</td>
+          <td>Photos, videos, GPS data. FAT32/exFAT. Easy to image.</td>
+        </tr>
+        <tr>
+          <td><strong>NVMe</strong></td>
+          <td>Non-Volatile Memory Express</td>
+          <td>Ultra-fast SSD protocol connected via PCIe.</td>
+          <td>Same challenges as SSD. Needs special adapters to image.</td>
+        </tr>
+        <tr>
+          <td><strong>Optical</strong></td>
+          <td>CD/DVD/Blu-ray</td>
+          <td>Laser burns pits into disc surface.</td>
+          <td>Write-once discs preserve evidence reliably. Data can't be modified.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="block-title">Key Storage Concepts</h3>
+
+  <div class="concept-grid">
+    <div class="concept-card">
+      <div class="cc-icon">⚙️</div>
+      <div class="cc-title">Sector</div>
+      <div class="cc-desc">The smallest unit of storage on a disk. Usually <strong>512 bytes</strong> (old) or <strong>4096 bytes</strong> (modern, 4K sectors). Every read/write happens in sector-sized chunks.</div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">🔗</div>
+      <div class="cc-title">Cluster / Allocation Unit</div>
+      <div class="cc-desc">A group of sectors. The file system works with clusters, not individual sectors. A typical cluster = 4KB to 64KB. <strong>Files occupy whole clusters</strong>, even if smaller.</div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">🗂️</div>
+      <div class="cc-title">Partition</div>
+      <div class="cc-desc">A logical division of a physical disk. One physical disk can have multiple partitions (C:, D:, etc.). Defined in MBR or GPT.</div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">📍</div>
+      <div class="cc-title">MBR (Master Boot Record)</div>
+      <div class="cc-desc">First 512 bytes of the disk. Contains the <strong>partition table</strong> and bootloader code. Old standard — supports max 4 partitions and 2TB disks.</div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">📋</div>
+      <div class="cc-title">GPT (GUID Partition Table)</div>
+      <div class="cc-desc">Modern replacement for MBR. Supports <strong>128 partitions</strong>, disks larger than 2TB. Used on all modern UEFI systems.</div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">🌑</div>
+      <div class="cc-title">Slack Space</div>
+      <div class="cc-desc">Unused space at the end of a cluster. If a file is 1.5KB but the cluster is 4KB, the remaining 2.5KB is slack space — it may contain <strong>old data from previous files!</strong></div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">🔓</div>
+      <div class="cc-title">Unallocated Space</div>
+      <div class="cc-desc">Disk space not assigned to any active file. Deleted files' data lives here until overwritten. <strong>Primary recovery target</strong> in forensics.</div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">🔢</div>
+      <div class="cc-title">LBA (Logical Block Addressing)</div>
+      <div class="cc-desc">Modern way to address sectors. Every sector gets a unique number starting from 0. Replaces the old CHS (Cylinder-Head-Sector) addressing.</div>
+    </div>
+  </div>
+
+  <h3 class="block-title">Disk Layout — Visual Map</h3>
+  <div class="mem-map">
+    <div class="mem-row" style="font-family:'Share Tech Mono';font-size:10px;color:var(--text3);padding:4px 0;">
+      <span style="padding:0 10px">ADDRESS</span>
+      <span style="padding:0 10px">CONTENTS</span>
+      <span style="padding:0 10px;text-align:right">TYPE</span>
+    </div>
+    <div class="mem-row">
+      <div class="mem-addr">LBA 0 (512B)</div>
+      <div class="mem-data mem-boot">MBR: Bootloader code + Partition Table + 0x55AA signature</div>
+      <div class="mem-label mem-boot">BOOT SECTOR</div>
+    </div>
+    <div class="mem-row">
+      <div class="mem-addr">LBA 1–63</div>
+      <div class="mem-data mem-boot">Reserved / MBR gap (hidden sectors)</div>
+      <div class="mem-label mem-boot">RESERVED</div>
+    </div>
+    <div class="mem-row">
+      <div class="mem-addr">LBA 64+</div>
+      <div class="mem-data mem-part">Partition 1 start — VBR (Volume Boot Record), FAT tables / MFT</div>
+      <div class="mem-label mem-part">PARTITION 1</div>
+    </div>
+    <div class="mem-row">
+      <div class="mem-addr">Variable</div>
+      <div class="mem-data mem-fs">File System Metadata (FAT/MFT/Superblock)</div>
+      <div class="mem-label mem-fs">FS METADATA</div>
+    </div>
+    <div class="mem-row">
+      <div class="mem-addr">Variable</div>
+      <div class="mem-data mem-data-row">Allocated clusters — Active file data</div>
+      <div class="mem-label mem-data-row">ACTIVE DATA</div>
+    </div>
+    <div class="mem-row">
+      <div class="mem-addr">Variable</div>
+      <div class="mem-data mem-free">Unallocated space — deleted file remnants, recoverable data</div>
+      <div class="mem-label mem-free">UNALLOCATED ★</div>
+    </div>
+    <div class="mem-row">
+      <div class="mem-addr">End of disk</div>
+      <div class="mem-data mem-part">GPT Backup / Partition 2 (if exists)</div>
+      <div class="mem-label mem-part">PARTITION 2+</div>
+    </div>
+  </div>
+
+  <h3 class="block-title amber">Forensic Imaging — Making a Bit-for-Bit Copy</h3>
+  <p class="prose">
+    Before examining any disk, forensics requires creating an exact <em>forensic image</em> — a byte-for-byte 
+    copy of the entire disk including empty/unallocated space. This is not like copy-pasting files; 
+    it copies <strong>everything</strong>, including deleted files, slack space, and metadata.
+  </p>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-lang">BASH — Forensic Imaging with dd</span>
+      <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+    </div>
+    <pre>
+<span class="comment"># STEP 1: Identify the target drive (do NOT mount it)</span>
+<span class="cmd">lsblk</span>
+<span class="output"># Output shows: sda (target suspect drive), sdb (forensic destination drive)</span>
+
+<span class="comment"># STEP 2: Write-block the source (read-only access)</span>
+<span class="comment"># On Linux use a hardware write blocker, or:</span>
+<span class="cmd">sudo blockdev --setro /dev/sda</span>
+
+<span class="comment"># STEP 3: Create forensic image using dd</span>
+<span class="cmd">sudo dd if=<span class="path">/dev/sda</span> of=<span class="path">/mnt/evidence/suspect.img</span> <span class="flag">bs=512</span> <span class="flag">conv=noerror,sync</span> <span class="flag">status=progress</span></span>
+<span class="comment">#  if  = input file (source — suspect drive)</span>
+<span class="comment">#  of  = output file (destination — forensic image)</span>
+<span class="comment">#  bs  = block size (512 bytes per sector)</span>
+<span class="comment">#  conv=noerror,sync = continue on read errors, pad with zeros</span>
+
+<span class="comment"># STEP 4: Verify image integrity with hash</span>
+<span class="cmd">md5sum <span class="path">/dev/sda</span></span>
+<span class="output">a3f4b9c1d2e5f8a7b6c4d3e2f1a9b8c7  /dev/sda</span>
+<span class="cmd">md5sum <span class="path">/mnt/evidence/suspect.img</span></span>
+<span class="output">a3f4b9c1d2e5f8a7b6c4d3e2f1a9b8c7  suspect.img</span>
+<span class="comment"># Hashes MUST match — proves image is identical to original</span>
+
+<span class="comment"># STEP 5: Better option — use dcfldd (forensic dd)</span>
+<span class="cmd">sudo dcfldd if=<span class="path">/dev/sda</span> of=<span class="path">/mnt/evidence/suspect.img</span> <span class="flag">hash=md5,sha256</span> <span class="flag">hashlog=/mnt/evidence/hash.log</span></span>
+</pre>
+  </div>
+
+  <div class="info-box warn">
+    <span class="ib-label">⚠️ Write Blocker — Critical!</span>
+    Always use a <strong>hardware write blocker</strong> (e.g., Tableau T35u, WiebeTech) or a software 
+    write block before connecting a suspect drive. This prevents ANY write to the original disk — 
+    even the OS mounting the drive can alter metadata and timestamps!
+  </div>
+
+  <div class="task-box">
+    <div class="task-header">
+      <span class="task-icon">📝</span>
+      <span class="task-label">Task 2.1 — Storage Fundamentals</span>
+      <span class="task-num">Unit IV / Ch.2</span>
+    </div>
+    <div class="task-body">
+      <div class="task-q">
+        <strong>Q1.</strong> A 10KB text file is stored on a hard drive with a cluster size of 32KB. How much <strong>slack space</strong> will this file create? What might the slack space contain?<br><br>
+        <strong>Q2.</strong> You are given a suspect's USB drive. Write the exact <code>dd</code> command to create a forensic image of <code>/dev/sdb</code> and save it as <code>/evidence/usb.img</code>, then verify it with SHA256.
+      </div>
+      <button class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ SHOW SOLUTION</button>
+      <div class="solution">
+        <div class="sol-label">✓ Solution</div>
+        <div class="sol-body">
+          <strong>A1. Slack Space Calculation:</strong><br>
+          File size = 10KB. Cluster size = 32KB.<br>
+          The OS allocates the entire cluster = 32KB.<br>
+          <strong>Slack space = 32KB − 10KB = 22KB</strong><br>
+          The 22KB of slack space may contain: fragments of previously deleted files, old versions of other documents, parts of emails, passwords, or any data that previously occupied those sectors on the disk. This is extremely useful in forensic investigations.<br><br>
+          <strong>A2. dd Command:</strong><br>
+          <code>sudo dd if=/dev/sdb of=/evidence/usb.img bs=512 conv=noerror,sync status=progress</code><br><br>
+          Then verify with SHA256:<br>
+          <code>sha256sum /dev/sdb > /evidence/original_hash.txt</code><br>
+          <code>sha256sum /evidence/usb.img > /evidence/image_hash.txt</code><br>
+          <code>diff /evidence/original_hash.txt /evidence/image_hash.txt</code><br>
+          If <code>diff</code> shows no output, the hashes are identical — image is verified.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     SECTION 3: FILE SYSTEM CONCEPTS
+================================================================ -->
+<section class="section" id="filesystem">
+  <div class="sec-header">
+    <div class="sec-num">03</div>
+    <div class="sec-meta">
+      <div class="sec-unit">// Part A — Chapter 3</div>
+      <div class="sec-title">File System Concepts</div>
+      <div class="sec-sub">How the OS organizes and tracks files on disk</div>
+    </div>
+  </div>
+
+  <h3 class="block-title">What is a File System?</h3>
+  <p class="prose">
+    A <strong>file system</strong> is the method an operating system uses to organize, store, and retrieve data 
+    on a storage device. Without a file system, a disk is just a random sequence of bytes — 
+    the OS wouldn't know where one file ends and another begins.
+  </p>
+  <p class="prose">
+    Think of a disk as a massive library. The file system is the <strong>catalog system</strong> — it records 
+    which shelf (cluster) each book (file) is on, how big it is, who owns it, and when it was last accessed.
+  </p>
+
+  <h3 class="block-title">Common File Systems</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>File System</th><th>OS</th><th>Max File Size</th><th>Max Volume</th><th>Key Forensic Features</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>FAT32</strong></td>
+          <td>Windows, USB drives, cameras</td>
+          <td>4GB</td>
+          <td>8TB</td>
+          <td>Simple structure. Deleted entries marked with 0xE5. Easy recovery.</td>
+        </tr>
+        <tr>
+          <td><strong>NTFS</strong></td>
+          <td>Windows (Vista+)</td>
+          <td>16TB</td>
+          <td>256TB</td>
+          <td>MFT records all files. ADS (Alternate Data Streams) can hide data. Journal logs changes.</td>
+        </tr>
+        <tr>
+          <td><strong>exFAT</strong></td>
+          <td>Windows, SD cards, USB</td>
+          <td>16EB</td>
+          <td>128PB</td>
+          <td>Used on large USB/SD cards. Better than FAT32 for large files.</td>
+        </tr>
+        <tr>
+          <td><strong>ext4</strong></td>
+          <td>Linux</td>
+          <td>16TB</td>
+          <td>1EB</td>
+          <td>Journaling. Inode-based. Directory entries cleared on delete but inode+data may remain.</td>
+        </tr>
+        <tr>
+          <td><strong>APFS</strong></td>
+          <td>macOS (2017+), iOS</td>
+          <td>8EB</td>
+          <td>8EB</td>
+          <td>Copy-on-write. Snapshots. Clones. Encryption by default. Challenging to recover.</td>
+        </tr>
+        <tr>
+          <td><strong>HFS+</strong></td>
+          <td>macOS (older)</td>
+          <td>8EB</td>
+          <td>8EB</td>
+          <td>Catalog file tracks all files. Timestamps stored as Mac epoch time.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="block-title">Deep Dive: NTFS (Most Common in Windows Forensics)</h3>
+  <p class="prose">
+    NTFS is the most forensically rich file system. It uses a special database called the 
+    <em>Master File Table (MFT)</em> to track every file on the volume. Even deleted files 
+    leave behind MFT entries that can be analyzed.
+  </p>
+
+  <div class="concept-grid">
+    <div class="concept-card">
+      <div class="cc-icon">📊</div>
+      <div class="cc-title">$MFT (Master File Table)</div>
+      <div class="cc-desc">A database with one record (1KB each) for every file and folder. Contains filename, timestamps, permissions, and data location. First 26 entries are system files (e.g., $MFTMirr, $LogFile, $Bitmap).</div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">📝</div>
+      <div class="cc-title">$LogFile (Journal)</div>
+      <div class="cc-desc">NTFS transaction log. Records metadata changes before they happen (write-ahead logging). Can reveal recent file operations even if files are deleted.</div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">🔄</div>
+      <div class="cc-title">$UsnJrnl (Change Journal)</div>
+      <div class="cc-desc">Logs every file change (create, delete, rename, modify) with timestamps. Goldmine for forensics — records operations even after the file is deleted.</div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">🕵️</div>
+      <div class="cc-title">ADS (Alternate Data Streams)</div>
+      <div class="cc-desc">Hidden streams attached to a file. A malicious file can be hidden inside a legit file using ADS: <code>notepad.exe:malware.exe</code>. The main file appears normal in Explorer.</div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">🕐</div>
+      <div class="cc-title">MACB Timestamps</div>
+      <div class="cc-desc"><strong>M</strong>odified, <strong>A</strong>ccessed, <strong>C</strong>hanged (MFT modified), <strong>B</strong>orn (created). NTFS stores two sets — in the file and in the MFT. Discrepancies reveal timestomping.</div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">🗺️</div>
+      <div class="cc-title">$Bitmap</div>
+      <div class="cc-desc">Tracks which clusters are allocated (used) and which are free. Each bit = one cluster. If bit is 0 = free = potentially recoverable. Critical for carving!</div>
+    </div>
+  </div>
+
+  <h3 class="block-title">FAT32 File System — How Deletion Works</h3>
+  <p class="prose">
+    In FAT32, the file system uses a <em>File Allocation Table (FAT)</em> — essentially a chain-link map 
+    showing which clusters belong to each file. When you delete a file in FAT32:
+  </p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-body">
+        <div class="step-title">Directory Entry Modified</div>
+        <div class="step-desc">The first character of the filename in the directory entry is replaced with <span class="hl">0xE5</span> (a special marker meaning "deleted"). The rest of the filename and metadata remains intact.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-body">
+        <div class="step-title">FAT Chain Zeroed Out</div>
+        <div class="step-desc">The FAT entries pointing to the file's clusters are set to 0 (free). But the <strong>actual data in those clusters is NOT erased</strong> — it's just marked as available for reuse.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-body">
+        <div class="step-title">Data Remains on Disk</div>
+        <div class="step-desc">Until the OS writes new data to those clusters, the original file data is physically present on disk. Recovery tools can read those clusters directly.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-body">
+        <div class="step-title">Recovery Window</div>
+        <div class="step-desc">The sooner you try to recover, the better. Every new file written to the drive risks overwriting the deleted file's clusters permanently.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-box example">
+    <span class="ib-label">🌍 Real Example — ADS Hidden Files</span>
+    An attacker hides a backdoor script inside an innocent text file using ADS:<br>
+    <code>type malware.exe &gt; innocent.txt:hidden.exe</code><br>
+    Windows Explorer shows <code>innocent.txt</code> as a tiny text file (0 bytes visible). 
+    The malware is hidden in the <code>:hidden.exe</code> stream. 
+    Forensic tools like <code>streams.exe</code> or <code>dir /r</code> can detect this.
+  </div>
+
+  <h3 class="block-title green">Practical: Analyzing NTFS with The Sleuth Kit (TSK)</h3>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-lang">BASH — TSK Commands for NTFS Analysis</span>
+      <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+    </div>
+    <pre>
+<span class="comment"># Install TSK on Kali Linux</span>
+<span class="cmd">sudo apt install sleuthkit -y</span>
+
+<span class="comment"># ---- DISK INFO ----</span>
+<span class="comment"># View partition layout of forensic image</span>
+<span class="cmd">mmls <span class="path">suspect.img</span></span>
+<span class="output">DOS Partition Table
+Offset Sector: 0
+Units are in 512-byte sectors
+      Slot      Start        End          Length       Description
+000:  Meta      0000000000   0000000000   0000000001   Primary Table (#0)
+001:  -------   0000000001   0000002047   0000002047   Unallocated
+002:  000:000   0000002048   0001026047   0001024000   NTFS / exFAT (0x07)</span>
+
+<span class="comment"># ---- FILE SYSTEM INFO ----</span>
+<span class="comment"># Get file system details (note offset from mmls × 512)</span>
+<span class="cmd">fsstat -o 2048 <span class="path">suspect.img</span></span>
+<span class="output">FILE SYSTEM INFORMATION
+--------------------------------------------
+File System Type: NTFS
+Volume Serial Number: 28A4F2C1
+OEM Name: NTFS
+Volume Name: Windows
+...</span>
+
+<span class="comment"># ---- FILE LISTING (including deleted) ----</span>
+<span class="comment"># List all files (including deleted, shown with * prefix)</span>
+<span class="cmd">fls -r -o 2048 <span class="path">suspect.img</span></span>
+<span class="output">d/d 5-128-1:    .
+d/d 5-128-2:    ..
+r/r 29-128-1:   <span class="flag">secret_doc.pdf</span>
+r/r * 31-128-3: <span class="flag">deleted_evidence.xlsx</span>    <span class="comment"># * = deleted file!</span>
+...</span>
+
+<span class="comment"># ---- RECOVER DELETED FILE ----</span>
+<span class="comment"># Get metadata of deleted file by inode number (31)</span>
+<span class="cmd">istat -o 2048 <span class="path">suspect.img</span> 31</span>
+
+<span class="comment"># Extract/recover the deleted file</span>
+<span class="cmd">icat -o 2048 <span class="path">suspect.img</span> 31 > <span class="path">/recovery/deleted_evidence.xlsx</span></span>
+
+<span class="comment"># ---- TIMELINE CREATION ----</span>
+<span class="cmd">fls -r -m "/" -o 2048 <span class="path">suspect.img</span> > <span class="path">bodyfile.txt</span></span>
+<span class="cmd">mactime -b <span class="path">bodyfile.txt</span> -d > <span class="path">timeline.csv</span></span>
+</pre>
+  </div>
+
+  <div class="task-box">
+    <div class="task-header">
+      <span class="task-icon">📝</span>
+      <span class="task-label">Task 3.1 — File System Analysis</span>
+      <span class="task-num">Unit IV / Ch.3</span>
+    </div>
+    <div class="task-body">
+      <div class="task-q">
+        <strong>Q1.</strong> You run <code>fls</code> on a disk image and see the entry: <code>r/r * 45-128-1: confidential_report.docx</code>. What does the <code>*</code> mean? How would you recover this file using TSK?<br><br>
+        <strong>Q2.</strong> A file is 3.8KB and the cluster size is 8KB. How much file slack exists? What important forensic information might exist in the slack space?<br><br>
+        <strong>Q3.</strong> Explain the difference between $LogFile and $UsnJrnl in NTFS from a forensics perspective.
+      </div>
+      <button class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ SHOW SOLUTION</button>
+      <div class="solution">
+        <div class="sol-label">✓ Solution</div>
+        <div class="sol-body">
+          <strong>A1.</strong> The <code>*</code> prefix in fls output means the file has been <strong>deleted</strong>. The inode number is 45.<br>
+          Recovery command:<br>
+          <code>icat -o [offset] suspect.img 45 > confidential_report.docx</code><br>
+          This reads the file's clusters directly using the inode and writes the raw bytes to a new file.<br><br>
+          <strong>A2. Slack Space:</strong><br>
+          File size = 3.8KB, Cluster = 8KB<br>
+          Slack space = 8KB − 3.8KB = <strong>4.2KB</strong><br>
+          The slack space may contain: fragments of a previously stored password document, chat messages, parts of another file that occupied those sectors before this file was written there. This is called <em>file slack</em> and is regularly found to contain sensitive data.<br><br>
+          <strong>A3. $LogFile vs $UsnJrnl:</strong><br>
+          <strong>$LogFile</strong> is a transaction journal used for <em>crash recovery</em> — it logs pending metadata changes so NTFS can roll back if the system crashes mid-write. It is circular (older entries overwritten) and typically holds only a few MB of recent operations.<br>
+          <strong>$UsnJrnl</strong> is the <em>change journal</em> designed for long-term auditing. It records every file create/delete/rename/modify with timestamps and reason codes. It grows much larger and is invaluable in forensics because it shows file activity history even after files are deleted. Tool: <code>usn.py</code>, <code>MFTECmd</code>.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     SECTION 4: OS SOFTWARE & BASIC TERMINOLOGY
+================================================================ -->
+<section class="section" id="osbasics">
+  <div class="sec-header">
+    <div class="sec-num">04</div>
+    <div class="sec-meta">
+      <div class="sec-unit">// Part A — Chapter 4</div>
+      <div class="sec-title">OS Software & Basic Terminology</div>
+      <div class="sec-sub">Key forensic terms, Windows/Linux artifacts, and OS-level evidence sources</div>
+    </div>
+  </div>
+
+  <h3 class="block-title">Essential Forensic Terminology</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Term</th><th>Simple Definition</th><th>Example</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Artifact</strong></td><td>Any digital item left behind by user activity. The breadcrumbs of digital behavior.</td><td>Browser history, prefetch files, event logs</td></tr>
+        <tr><td><strong>Evidence</strong></td><td>Any artifact that has legal/investigative relevance.</td><td>A deleted email proving fraud</td></tr>
+        <tr><td><strong>Volatile Data</strong></td><td>Data that disappears when power is removed (RAM, running processes, network connections).</td><td>RAM contents, open sockets, clipboard</td></tr>
+        <tr><td><strong>Non-Volatile Data</strong></td><td>Data that persists after power off (HDD, SSD, USB contents).</td><td>Files, registry, installed programs</td></tr>
+        <tr><td><strong>Hash Value</strong></td><td>A fixed-length fingerprint of data. Same input always gives same output. Used to verify integrity.</td><td>MD5, SHA1, SHA256</td></tr>
+        <tr><td><strong>Chain of Custody</strong></td><td>A documented trail showing who handled evidence, when, and why.</td><td>Evidence bag with signatures and dates</td></tr>
+        <tr><td><strong>Forensic Image</strong></td><td>An exact bit-for-bit copy of a storage device including empty space.</td><td>.img, .E01, .dd files</td></tr>
+        <tr><td><strong>Write Blocker</strong></td><td>Hardware or software that prevents any write to the source drive during imaging.</td><td>Tableau T35u hardware write blocker</td></tr>
+        <tr><td><strong>Metadata</strong></td><td>Data about data. Information describing a file's properties.</td><td>File size, creation date, author, GPS location</td></tr>
+        <tr><td><strong>Timestomping</strong></td><td>Deliberately altering file timestamps to mislead investigators.</td><td>Malware changes its creation date to 1970</td></tr>
+        <tr><td><strong>Anti-Forensics</strong></td><td>Techniques used to hinder forensic analysis.</td><td>Wiping, encryption, timestomping, ADS hiding</td></tr>
+        <tr><td><strong>IOC</strong></td><td>Indicator of Compromise — a piece of evidence pointing to a security breach.</td><td>Suspicious IP, malware hash, registry key</td></tr>
+        <tr><td><strong>Steganography</strong></td><td>Hiding data inside innocent-looking files (images, audio).</td><td>Secret message hidden in a JPEG's pixel data</td></tr>
+        <tr><td><strong>Carving</strong></td><td>Extracting files from raw disk data using file signatures, without file system metadata.</td><td>Finding JPEGs in unallocated space using FF D8 FF header</td></tr>
+        <tr><td><strong>MACB Times</strong></td><td>Modified, Accessed, Changed (MFT), Born (created) — four timestamp types in NTFS.</td><td>File modified at 11:02 PM but born at 9:15 AM</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="block-title">Windows Forensic Artifacts — Where Evidence Hides</h3>
+  <p class="prose">
+    Windows is <em>full of artifacts</em> — the OS records user activity in dozens of locations. 
+    A forensic investigator knows exactly where to look.
+  </p>
+
+  <div class="concept-grid">
+    <div class="concept-card">
+      <div class="cc-icon">🗝️</div>
+      <div class="cc-title">Windows Registry</div>
+      <div class="cc-desc">Central database for OS + app settings. Hives: SAM (user accounts), SYSTEM (hardware/services), SOFTWARE (installed apps), NTUSER.DAT (per-user settings), SECURITY. Contains USB history, recent docs, run keys (autorun malware), user accounts.</div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">📜</div>
+      <div class="cc-title">Event Logs (.evtx)</div>
+      <div class="cc-desc">Windows logs every login, process creation, service install, etc. Key IDs: 4624 (login success), 4625 (failed login), 4688 (process created), 7045 (service installed). Located in <code>%SystemRoot%\System32\winevt\Logs</code>.</div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">⚡</div>
+      <div class="cc-title">Prefetch Files</div>
+      <div class="cc-desc">Windows pre-loads frequently used programs. Prefetch file = proof a program was executed, includes timestamps of last 8 runs, and files accessed. Location: <code>C:\Windows\Prefetch\</code>. Format: PROGRAMNAME-HASH.pf</div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">📎</div>
+      <div class="cc-title">LNK Files (Shortcuts)</div>
+      <div class="cc-desc">Windows creates .lnk shortcut files every time you open a file. Contains: original file path, MAC timestamps, volume serial number, network share info. Even if original file is deleted, LNK file proves it existed!</div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">🖱️</div>
+      <div class="cc-title">Jump Lists</div>
+      <div class="cc-desc">Recent files for each application. Found in <code>%AppData%\Microsoft\Windows\Recent\AutomaticDestinations</code>. Proves files were opened even if deleted from disk.</div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">🔌</div>
+      <div class="cc-title">USB Registry Keys</div>
+      <div class="cc-desc">Windows records every USB device connected. Registry hive: <code>SYSTEM\CurrentControlSet\Enum\USBSTOR</code>. Shows device serial number, friendly name, first/last connected timestamps. Critical in insider threat cases!</div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">🌐</div>
+      <div class="cc-title">Browser History</div>
+      <div class="cc-desc">Chrome: <code>%AppData%\Google\Chrome\User Data\Default\History</code> (SQLite). Firefox: <code>%AppData%\Mozilla\Firefox\Profiles\</code>. Edge: <code>%AppData%\Microsoft\Edge\User Data\</code>. Contains URLs, visit times, download history.</div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">🗑️</div>
+      <div class="cc-title">Recycle Bin ($I + $R)</div>
+      <div class="cc-desc">Even after emptying Recycle Bin, the <code>$I</code> file retains metadata: original path, deletion time, file size. The <code>$R</code> file has the actual content. Located in <code>C:\$Recycle.Bin\{SID}\</code>.</div>
+    </div>
+  </div>
+
+  <h3 class="block-title amber">Linux Forensic Artifacts</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Artifact</th><th>Location</th><th>What it reveals</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Bash History</strong></td><td><code>~/.bash_history</code></td><td>Commands typed by the user. Can reveal attacks, downloads, file access.</td></tr>
+        <tr><td><strong>Auth Log</strong></td><td><code>/var/log/auth.log</code></td><td>SSH logins, sudo usage, failed login attempts.</td></tr>
+        <tr><td><strong>Syslog</strong></td><td><code>/var/log/syslog</code></td><td>System events, service starts/stops, kernel messages.</td></tr>
+        <tr><td><strong>Crontabs</strong></td><td><code>/etc/cron.d/, /var/spool/cron/</code></td><td>Scheduled tasks — attackers use cron for persistence.</td></tr>
+        <tr><td><strong>passwd/shadow</strong></td><td><code>/etc/passwd, /etc/shadow</code></td><td>User accounts, password hashes. Shadow needs root access.</td></tr>
+        <tr><td><strong>Proc FS</strong></td><td><code>/proc/</code></td><td>Live process info, network connections, open file handles. Volatile — only on live system.</td></tr>
+        <tr><td><strong>Last / Lastlog</strong></td><td><code>/var/log/lastlog, /var/log/wtmp</code></td><td>Last login for each user, login history timestamps.</td></tr>
+        <tr><td><strong>.ssh folder</strong></td><td><code>~/.ssh/</code></td><td>Authorized keys (backdoor access), known hosts, private keys.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="block-title green">Practical: Collecting Windows Artifacts with KAPE</h3>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-lang">CMD / PowerShell — KAPE Triage Collection</span>
+      <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+    </div>
+    <pre>
+<span class="comment"># KAPE = Kroll Artifact Parser and Extractor</span>
+<span class="comment"># Collects and parses Windows artifacts in minutes</span>
+<span class="comment"># Download: https://www.kroll.com/en/services/cyber-risk/incident-response-litigation-support/kroll-artifact-parser-extractor-kape</span>
+
+<span class="comment"># Run KAPE to collect all common triage artifacts</span>
+<span class="cmd">kape.exe <span class="flag">--tsource C:</span> <span class="flag">--tdest C:\Cases\Evidence</span> <span class="flag">--target !BasicCollection</span></span>
+
+<span class="comment"># Collect specific targets: Registry + EventLogs + Prefetch + Browser</span>
+<span class="cmd">kape.exe <span class="flag">--tsource C:</span> <span class="flag">--tdest C:\Cases\Evidence</span> <span class="flag">--target RegistryHives,EventLogs,Prefetch,ChromeHistory</span></span>
+
+<span class="comment"># Parse collected artifacts with modules</span>
+<span class="cmd">kape.exe <span class="flag">--msource C:\Cases\Evidence</span> <span class="flag">--mdest C:\Cases\Parsed</span> <span class="flag">--module EvtxECmd,PECmd,RECmd,JLECmd</span></span>
+
+<span class="comment"># View USB history from Registry manually</span>
+<span class="comment"># Open regedit and navigate to:</span>
+<span class="kw">HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Enum\USBSTOR</span>
+
+<span class="comment"># Or use RegRipper on extracted SYSTEM hive</span>
+<span class="cmd">rip.pl <span class="flag">-r</span> <span class="path">SYSTEM</span> <span class="flag">-p usbstor</span></span>
+<span class="output">SYSTEM\CurrentControlSet\Enum\USBSTOR
+---
+DiskKingston_DataTraveler_3.0&Ven_Kingston&Prod_DataTraveler_3.0&Rev_PMAP
+  SN: 001372995007F3A0&0
+  FriendlyName: Kingston DataTraveler 3.0 USB Device
+  First Connected: 2024-03-15 14:22:37</span>
+</pre>
+  </div>
+
+  <div class="task-box">
+    <div class="task-header">
+      <span class="task-icon">📝</span>
+      <span class="task-label">Task 4.1 — OS Artifacts & Terminology</span>
+      <span class="task-num">Unit IV / Ch.4</span>
+    </div>
+    <div class="task-body">
+      <div class="task-q">
+        <strong>Scenario:</strong> You're investigating an insider threat at a company. An employee (John) is suspected of copying files to a USB drive and deleting them from his Windows computer before leaving. <br><br>
+        <strong>Q1.</strong> List at least <strong>5 specific Windows artifacts</strong> you would examine, and explain what evidence each would provide.<br><br>
+        <strong>Q2.</strong> John claims he never connected any USB drive. Which registry key would disprove this? What information does it contain?
+      </div>
+      <button class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ SHOW SOLUTION</button>
+      <div class="solution">
+        <div class="sol-label">✓ Solution</div>
+        <div class="sol-body">
+          <strong>A1. Windows Artifacts to Examine:</strong><br>
+          1. <strong>USB Registry (USBSTOR)</strong> — Proves USB was connected, shows device serial number, timestamps of first/last connection.<br>
+          2. <strong>Prefetch Files</strong> — Shows if file copy tools (xcopy, robocopy, 7-zip) were executed, with timestamps of last 8 runs.<br>
+          3. <strong>LNK Files / Jump Lists</strong> — Proves which files John opened, with original path, timestamps. Even if files were deleted, LNK files remain.<br>
+          4. <strong>$Recycle.Bin $I files</strong> — Shows deleted files' original paths and deletion timestamps.<br>
+          5. <strong>$MFT / $UsnJrnl</strong> — Records every file that was created, modified, or deleted. Can reconstruct exact file operation timeline.<br>
+          6. <strong>Windows Event Logs (4663)</strong> — Object access audit logs show file reads/copies if auditing was enabled.<br>
+          7. <strong>NTFS $LogFile</strong> — Transaction log capturing recent metadata changes.<br><br>
+          <strong>A2. Registry Key to Disprove John's Claim:</strong><br>
+          <code>HKLM\SYSTEM\CurrentControlSet\Enum\USBSTOR</code><br>
+          This key contains: Device vendor and product name, <strong>Unique serial number</strong> of the USB drive, First installation date, Last connected/disconnected timestamps (from SetupAPI logs: <code>C:\Windows\INF\setupapi.dev.log</code>).<br>
+          Additionally, <code>HKLM\SYSTEM\CurrentControlSet\Enum\USB</code> shows the USB VID/PID (vendor/product ID), and <code>HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\MountPoints2</code> shows drive letters assigned.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     SECTION 5: DATA RECOVERY BASICS
+================================================================ -->
+<section class="section" id="datarecovery">
+  <div class="sec-header">
+    <div class="sec-num">05</div>
+    <div class="sec-meta">
+      <div class="sec-unit">// Part A — Chapter 5</div>
+      <div class="sec-title">Data Recovery — Basics</div>
+      <div class="sec-sub">Fundamentals of how and why data can be recovered after deletion</div>
+    </div>
+  </div>
+
+  <h3 class="block-title">Why Can Deleted Data Be Recovered?</h3>
+  <p class="prose">
+    When you delete a file, the operating system <strong>does not actually erase the data</strong>. 
+    It merely removes the "pointer" to the data and marks the space as available for future use. 
+    Think of it like removing a book from a library catalog — the book is still on the shelf, 
+    you just can't find it through the catalog anymore.
+  </p>
+  <p class="prose">
+    This is the foundation of data recovery. The data remains physically present on the disk 
+    until new data is written on top of it (overwritten). The recovery window depends on: 
+    <em>how much the disk is used after deletion</em> — a fresh disk with no new writes may 
+    have near 100% recovery; a heavily used disk may have 0%.
+  </p>
+
+  <h3 class="block-title">What Happens When You Delete a File? (OS by OS)</h3>
+
+  <div class="concept-grid">
+    <div class="concept-card">
+      <div class="cc-icon">🪟</div>
+      <div class="cc-title">Windows (NTFS)</div>
+      <div class="cc-desc">
+        1. File moved to Recycle Bin ($Recycle.Bin)<br>
+        2. If Bin emptied: MFT record marked inactive, clusters marked free in $Bitmap<br>
+        3. Data clusters NOT zeroed — still physically present<br>
+        4. $LogFile and $UsnJrnl retain a record of the deletion event
+      </div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">🐧</div>
+      <div class="cc-title">Linux (ext4)</div>
+      <div class="cc-desc">
+        1. Directory entry removed (inode reference decremented)<br>
+        2. Inode marked as free in inode bitmap<br>
+        3. Block pointers in inode may be zeroed (ext4 does this!)<br>
+        4. Data blocks marked free but content remains until overwritten<br>
+        5. <em>Note: ext4 is harder to recover from than ext3 due to zeroing</em>
+      </div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">💾</div>
+      <div class="cc-title">FAT32 / exFAT</div>
+      <div class="cc-desc">
+        1. First byte of directory entry set to 0xE5<br>
+        2. FAT chain entries zeroed (clusters marked free)<br>
+        3. Actual cluster data NOT modified<br>
+        4. Easiest to recover — filename and metadata partially preserved
+      </div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">⚡</div>
+      <div class="cc-title">SSD (TRIM enabled)</div>
+      <div class="cc-desc">
+        1. OS sends TRIM command to SSD controller<br>
+        2. SSD controller physically erases deleted blocks proactively<br>
+        3. Very hard to recover data from TRIM-enabled SSDs<br>
+        4. Some enterprise SSDs log TRIM activity
+      </div>
+    </div>
+  </div>
+
+  <h3 class="block-title">File Carving — Recovery Without Metadata</h3>
+  <p class="prose">
+    When the file system metadata (MFT entries, directory entries, FAT chains) is destroyed 
+    but the actual file data still exists on disk, forensic investigators use <em>file carving</em>. 
+    Carving works by scanning raw disk sectors for <strong>known file signature bytes</strong> 
+    (magic numbers) at the start and end of files.
+  </p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>File Type</th><th>Extension</th><th>Header (Magic Number)</th><th>Footer</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>JPEG Image</strong></td><td>.jpg/.jpeg</td><td><code>FF D8 FF</code></td><td><code>FF D9</code></td></tr>
+        <tr><td><strong>PNG Image</strong></td><td>.png</td><td><code>89 50 4E 47 0D 0A 1A 0A</code></td><td><code>49 45 4E 44 AE 42 60 82</code></td></tr>
+        <tr><td><strong>PDF Document</strong></td><td>.pdf</td><td><code>25 50 44 46</code> (%PDF)</td><td><code>%%EOF</code></td></tr>
+        <tr><td><strong>ZIP Archive</strong></td><td>.zip</td><td><code>50 4B 03 04</code> (PK)</td><td><code>50 4B 05 06</code></td></tr>
+        <tr><td><strong>MP3 Audio</strong></td><td>.mp3</td><td><code>49 44 33</code> (ID3)</td><td>Variable</td></tr>
+        <tr><td><strong>Word Doc</strong></td><td>.docx</td><td><code>50 4B 03 04</code> (ZIP-based)</td><td>Variable</td></tr>
+        <tr><td><strong>EXE File</strong></td><td>.exe</td><td><code>4D 5A</code> (MZ)</td><td>Variable</td></tr>
+        <tr><td><strong>SQLite DB</strong></td><td>.db/.sqlite</td><td><code>53 51 4C 69 74 65</code> (SQLite)</td><td>Variable</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="block-title green">Practical: File Carving with Foremost & Scalpel</h3>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-lang">BASH — File Carving Commands</span>
+      <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+    </div>
+    <pre>
+<span class="comment"># ---- FOREMOST ----</span>
+<span class="comment"># Install</span>
+<span class="cmd">sudo apt install foremost -y</span>
+
+<span class="comment"># Carve all default file types from disk image</span>
+<span class="cmd">foremost <span class="flag">-i</span> <span class="path">suspect.img</span> <span class="flag">-o</span> <span class="path">/recovery/foremost_output/</span></span>
+
+<span class="comment"># Carve only specific file types (jpg, pdf, doc)</span>
+<span class="cmd">foremost <span class="flag">-t</span> jpg,pdf,doc <span class="flag">-i</span> <span class="path">suspect.img</span> <span class="flag">-o</span> <span class="path">/recovery/foremost_output/</span></span>
+
+<span class="comment"># With verbose output to see progress</span>
+<span class="cmd">foremost <span class="flag">-v</span> <span class="flag">-t</span> all <span class="flag">-i</span> <span class="path">suspect.img</span> <span class="flag">-o</span> <span class="path">/recovery/</span></span>
+<span class="output">Foremost version 1.5.7 by Jesse Kornblum
+Processing: suspect.img
+|****|
+Files Found:
+     jpg:     47
+     pdf:      8
+     doc:      3
+     zip:     12</span>
+
+<span class="comment"># ---- SCALPEL (more configurable) ----</span>
+<span class="cmd">sudo apt install scalpel -y</span>
+<span class="comment"># Edit config file to enable file types</span>
+<span class="cmd">sudo nano <span class="path">/etc/scalpel/scalpel.conf</span></span>
+<span class="comment"># Uncomment desired file types, then run:</span>
+<span class="cmd">scalpel <span class="flag">-o</span> <span class="path">/recovery/scalpel_output/</span> <span class="path">suspect.img</span></span>
+
+<span class="comment"># ---- PHOTOREC (GUI/CLI, excellent for photos/docs) ----</span>
+<span class="cmd">sudo apt install testdisk -y</span>
+<span class="cmd">photorec <span class="path">suspect.img</span></span>
+<span class="comment"># Follow the interactive menu to select partition and output location</span>
+
+<span class="comment"># ---- BULK EXTRACTOR (fast parallel carver) ----</span>
+<span class="cmd">bulk_extractor <span class="flag">-o</span> <span class="path">/recovery/bulk_output/</span> <span class="path">suspect.img</span></span>
+<span class="comment"># Extracts emails, URLs, credit card numbers, GPS, etc.</span>
+</pre>
+  </div>
+
+  <div class="info-box example">
+    <span class="ib-label">🌍 Real-World Example — File Carving in Action</span>
+    <strong>Case:</strong> A suspect formatted their USB drive before handing it to police, claiming it was empty. 
+    The forensic team mounted the USB image read-only and ran Foremost on the raw image. 
+    Foremost found <strong>23 JPEG images</strong> and <strong>4 PDF documents</strong> in the unallocated space 
+    — including photos of confidential blueprints. The images were carved using their <code>FF D8 FF</code> 
+    JPEG headers despite the FAT32 directory being wiped clean.
+  </div>
+
+  <div class="task-box">
+    <div class="task-header">
+      <span class="task-icon">📝</span>
+      <span class="task-label">Task 5.1 — Data Recovery Fundamentals</span>
+      <span class="task-num">Unit IV / Ch.5</span>
+    </div>
+    <div class="task-body">
+      <div class="task-q">
+        <strong>Q1.</strong> Explain what "file carving" is and when would you use it instead of file system-based recovery.<br><br>
+        <strong>Q2.</strong> Write the <code>foremost</code> command to carve JPEGs, PDFs, and ZIP files from a disk image named <code>phone_backup.img</code> and save the results to <code>/evidence/carved/</code>.<br><br>
+        <strong>Q3.</strong> Why is it much harder to recover files from an SSD than from an HDD?
+      </div>
+      <button class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ SHOW SOLUTION</button>
+      <div class="solution">
+        <div class="sol-label">✓ Solution</div>
+        <div class="sol-body">
+          <strong>A1. File Carving:</strong><br>
+          File carving is the process of extracting files from a disk image by searching for known file signature bytes (magic numbers) rather than relying on file system metadata. You use carving when:<br>
+          — The file system is damaged or corrupted<br>
+          — The partition table has been destroyed<br>
+          — The disk was formatted (wiping metadata)<br>
+          — File system metadata (MFT, FAT table) was partially overwritten<br>
+          — You need to recover files from unallocated space with no metadata<br><br>
+          <strong>A2. Foremost Command:</strong><br>
+          <code>foremost -t jpg,pdf,zip -i phone_backup.img -o /evidence/carved/ -v</code><br><br>
+          <strong>A3. SSD vs HDD Recovery Difficulty:</strong><br>
+          SSDs use the <strong>TRIM command</strong> — when a file is deleted, the OS immediately notifies the SSD controller, which proactively erases those NAND flash blocks. This happens at the hardware level, independent of the file system. By the time a forensic investigator images the SSD, the data blocks may already be physically zeroed. Also, <strong>wear leveling</strong> on SSDs constantly moves data across chips, making carving less reliable since a file's data may be split across multiple non-contiguous blocks with no predictable pattern.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     SECTION 6: DELETED FILE RECOVERY
+================================================================ -->
+<section class="section" id="deleted">
+  <div class="sec-header">
+    <div class="sec-num">06</div>
+    <div class="sec-meta">
+      <div class="sec-unit">// Part B — Evidence Recovery</div>
+      <div class="sec-title">Deleted File Recovery</div>
+      <div class="sec-sub">Methods, tools, and techniques to recover deleted files from live and forensic images</div>
+    </div>
+  </div>
+
+  <h3 class="block-title">Types of Deletion — What the User Thinks vs Reality</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>User Action</th><th>What User Thinks</th><th>What Actually Happens</th><th>Recovery Possible?</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Delete key / Right-click Delete</td>
+          <td>"File is gone"</td>
+          <td>File moved to Recycle Bin. Data untouched.</td>
+          <td>✅ Very easy — just restore from Bin</td>
+        </tr>
+        <tr>
+          <td>Empty Recycle Bin</td>
+          <td>"File is permanently gone"</td>
+          <td>MFT entry marked inactive, clusters marked free. Data remains.</td>
+          <td>✅ High — with Recuva, Autopsy, TSK</td>
+        </tr>
+        <tr>
+          <td>Shift+Delete (bypass Bin)</td>
+          <td>"Skipped trash, permanently deleted"</td>
+          <td>Same as empty Bin — just skips the Recycle Bin step.</td>
+          <td>✅ High — clusters not overwritten</td>
+        </tr>
+        <tr>
+          <td>Format drive (Quick Format)</td>
+          <td>"Everything wiped"</td>
+          <td>Only file system metadata (MFT/FAT) rewritten. Data clusters remain.</td>
+          <td>✅ Medium-High — with carving tools</td>
+        </tr>
+        <tr>
+          <td>Full Format</td>
+          <td>"Drive is clean"</td>
+          <td>All sectors overwritten with zeros (Windows Vista+)</td>
+          <td>⚠️ Low — zeros destroy data</td>
+        </tr>
+        <tr>
+          <td>Secure Delete (1 pass)</td>
+          <td>"Truly gone"</td>
+          <td>Single overwrite with random/zero data</td>
+          <td>⚠️ Very low on HDD, Near zero</td>
+        </tr>
+        <tr>
+          <td>Secure Delete (7-35 passes)</td>
+          <td>"Military grade wiped"</td>
+          <td>Multiple overwrites — virtually irrecoverable</td>
+          <td>❌ Essentially zero</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="block-title">Step-by-Step: Deleted File Recovery Methodology</h3>
+  <div class="steps">
+    <div class="step">
+      <div class="step-body">
+        <div class="step-title">Stop Using the Drive Immediately</div>
+        <div class="step-desc">Every write operation risks overwriting the deleted file's clusters. Power off the device or use a hardware write blocker. The longer the drive is used, the lower the recovery chance.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-body">
+        <div class="step-title">Create a Forensic Image</div>
+        <div class="step-desc">Use <code>dd</code>, <code>dcfldd</code>, or FTK Imager to create a bit-for-bit copy. <strong>Always work on the image, never on the original.</strong> Calculate MD5/SHA256 hash to document integrity.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-body">
+        <div class="step-title">Check the Recycle Bin / Trash</div>
+        <div class="step-desc">If files were not emptied from the Recycle Bin, they can be restored directly. Examine <code>C:\$Recycle.Bin\{UserSID}\$I*</code> files for metadata of deleted items.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-body">
+        <div class="step-title">File System-Based Recovery (via MFT/FAT)</div>
+        <div class="step-desc">Use Autopsy, Recuva, or TSK's <code>fls + icat</code> to find and recover files whose MFT entries or FAT directory entries are still intact but marked as deleted.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-body">
+        <div class="step-title">Carve Unallocated Space</div>
+        <div class="step-desc">If file system metadata is gone, run Foremost/Scalpel/PhotoRec on the raw image to carve files by signature from unallocated space.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-body">
+        <div class="step-title">Examine Slack Space & Fragments</div>
+        <div class="step-desc">Bulk Extractor and Strings can extract fragments of text, emails, URLs from slack space even if complete file recovery is impossible.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-body">
+        <div class="step-title">Verify & Document Recovered Files</div>
+        <div class="step-desc">Hash each recovered file. Verify it opens correctly and is not corrupted. Document recovery method, timestamp, and source sector location for the court report.</div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="block-title">Tools for Deleted File Recovery</h3>
+  <div class="tools-grid">
+    <div class="tool-card tc-cyan">
+      <div class="tool-name">Recuva</div>
+      <div class="tool-purpose">GUI-based Windows recovery tool by CCleaner. Extremely user-friendly. Shows recovery probability (high/medium/low) per file.</div>
+      <div class="tool-cmd">recuva.exe (GUI)</div>
+    </div>
+    <div class="tool-card tc-cyan">
+      <div class="tool-name">Autopsy</div>
+      <div class="tool-purpose">Free open-source digital forensics platform. Load a disk image, see deleted files highlighted, recover in one click. Industry standard.</div>
+      <div class="tool-cmd">autopsy (web GUI at localhost:9999)</div>
+    </div>
+    <div class="tool-card tc-green">
+      <div class="tool-name">TSK (icat / fls)</div>
+      <div class="tool-purpose">Command-line Sleuth Kit. fls lists all files including deleted. icat extracts a file by inode from an image.</div>
+      <div class="tool-cmd">fls -r -d image.img | icat</div>
+    </div>
+    <div class="tool-card tc-amber">
+      <div class="tool-name">Foremost</div>
+      <div class="tool-purpose">File carver that uses header/footer signatures to recover files from raw images. Best for severely damaged file systems.</div>
+      <div class="tool-cmd">foremost -t all -i disk.img -o /out/</div>
+    </div>
+    <div class="tool-card tc-amber">
+      <div class="tool-name">PhotoRec</div>
+      <div class="tool-purpose">Carves 480+ file types. Works on hard drives, USB, memory cards. Despite the name, recovers much more than photos.</div>
+      <div class="tool-cmd">photorec disk.img</div>
+    </div>
+    <div class="tool-card tc-purple">
+      <div class="tool-name">R-Studio / GetDataBack</div>
+      <div class="tool-purpose">Commercial tools with deep file system reconstruction. Handles RAID recovery, complex corruption scenarios.</div>
+      <div class="tool-cmd">R-Studio (GUI)</div>
+    </div>
+    <div class="tool-card tc-green">
+      <div class="tool-name">Extundelete</div>
+      <div class="tool-purpose">Specifically for ext3/ext4 Linux file system deleted file recovery. Uses journal entries to reconstruct deleted files.</div>
+      <div class="tool-cmd">extundelete /dev/sdb1 --restore-all</div>
+    </div>
+    <div class="tool-card tc-red">
+      <div class="tool-name">FTK Imager</div>
+      <div class="tool-purpose">Free from AccessData. Creates forensic images (E01, AFF, DD) and can browse/export deleted files visually.</div>
+      <div class="tool-cmd">FTK Imager (GUI, Windows)</div>
+    </div>
+  </div>
+
+  <h3 class="block-title green">Practical: Full Deleted File Recovery Walkthrough (Kali Linux)</h3>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-lang">BASH — Complete Recovery Workflow</span>
+      <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+    </div>
+    <pre>
+<span class="comment">### SCENARIO: USB drive with deleted NTFS files ###</span>
+
+<span class="comment"># STEP 1: Create forensic image of USB (/dev/sdb)</span>
+<span class="cmd">sudo dcfldd if=<span class="path">/dev/sdb</span> of=<span class="path">/evidence/usb.img</span> hash=sha256 hashlog=<span class="path">/evidence/hashes.txt</span> bs=512 conv=noerror,sync</span>
+
+<span class="comment"># STEP 2: Check partition layout</span>
+<span class="cmd">mmls <span class="path">/evidence/usb.img</span></span>
+<span class="output">Slot    Start      End        Length     Description
+000:000 0000002048 0003905535 0003903488 NTFS (0x07)</span>
+
+<span class="comment"># STEP 3: List ALL files including deleted (offset=2048)</span>
+<span class="cmd">fls <span class="flag">-r -d</span> <span class="flag">-o 2048</span> <span class="path">/evidence/usb.img</span></span>
+<span class="output">r/r * 5-128-1:  salary_data_Q1_2024.xlsx   <span class="comment"># * = DELETED</span>
+r/r * 6-128-1:  customer_list.csv
+r/r * 7-128-1:  resignation_letter.docx</span>
+
+<span class="comment"># STEP 4: Get metadata for deleted file (inode 5)</span>
+<span class="cmd">istat <span class="flag">-o 2048</span> <span class="path">/evidence/usb.img</span> 5</span>
+<span class="output">MFT Entry Header Values:
+Entry: 5        Sequence: 2
+$STANDARD_INFORMATION Attribute Values:
+Created:  2024-03-10 09:22:44.000000000 (UTC)
+Modified: 2024-03-14 23:58:11.000000000 (UTC)
+MFT Modified: 2024-03-14 23:58:33.000000000 (UTC)
+Accessed: 2024-03-14 23:55:00.000000000 (UTC)</span>
+
+<span class="comment"># STEP 5: Recover the deleted file</span>
+<span class="cmd">icat <span class="flag">-o 2048</span> <span class="path">/evidence/usb.img</span> 5 > <span class="path">/evidence/recovered_salary.xlsx</span></span>
+
+<span class="comment"># STEP 6: Hash and verify recovered file</span>
+<span class="cmd">sha256sum <span class="path">/evidence/recovered_salary.xlsx</span></span>
+<span class="output">b3d9f1a2c4e7...  recovered_salary.xlsx</span>
+
+<span class="comment"># STEP 7: Carve remaining unallocated space</span>
+<span class="cmd">foremost <span class="flag">-v -t</span> all <span class="flag">-i</span> <span class="path">/evidence/usb.img</span> <span class="flag">-o</span> <span class="path">/evidence/carved/</span></span>
+
+<span class="comment"># STEP 8: Extract strings (partial text fragments)</span>
+<span class="cmd">strings <span class="path">/evidence/usb.img</span> | grep <span class="flag">-i</span> "salary\|confidential\|password\|customer" > <span class="path">/evidence/strings_hits.txt</span></span>
+</pre>
+  </div>
+
+  <h3 class="block-title amber">Practical: Deleted File Recovery with Autopsy (GUI)</h3>
+  <div class="steps">
+    <div class="step">
+      <div class="step-body">
+        <div class="step-title">Install & Launch Autopsy</div>
+        <div class="step-desc">Download from <code>https://www.autopsy.com</code>. Available on Windows, Linux, macOS. Launch and create a <strong>New Case</strong> with case name, examiner name, and case number.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-body">
+        <div class="step-title">Add Data Source</div>
+        <div class="step-desc">Click "Add Data Source" → Select "Disk Image or VM File" → Browse to your <code>.img</code> or <code>.E01</code> file. Autopsy auto-detects partitions and file systems.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-body">
+        <div class="step-title">Run Ingest Modules</div>
+        <div class="step-desc">Select modules: Hash Lookup, File Type Identification, Keyword Search, Recent Activity, Deleted Files. Click Finish and wait for analysis to complete.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-body">
+        <div class="step-title">Browse Deleted Files</div>
+        <div class="step-desc">In left panel: expand the image → partition → file system. Look for "Deleted Files" section. Deleted files are shown with a red X icon. Click to preview content.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-body">
+        <div class="step-title">Extract Evidence</div>
+        <div class="step-desc">Right-click on any file → "Extract File(s)" → Save to your evidence folder. Autopsy logs the action in the case timeline automatically.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="task-box">
+    <div class="task-header">
+      <span class="task-icon">📝</span>
+      <span class="task-label">Task 6.1 — Deleted File Recovery</span>
+      <span class="task-num">Unit IV / Part B / Ch.6</span>
+    </div>
+    <div class="task-body">
+      <div class="task-q">
+        <strong>Scenario:</strong> A fraud investigator receives a 16GB USB drive that a suspect tried to wipe by selecting all files and pressing Shift+Delete. The investigator images it as <code>suspect_usb.img</code>.<br><br>
+        <strong>Q1.</strong> Write the complete TSK workflow (mmls → fls → icat) to find and recover all deleted files from a FAT32 partition starting at sector 63.<br><br>
+        <strong>Q2.</strong> Using Foremost, write the command to recover only PDF and XLSX files from the image.<br><br>
+        <strong>Q3.</strong> The suspect claims "I shift-deleted everything, it can't be recovered." Why is this statement technically incorrect for an HDD with FAT32?
+      </div>
+      <button class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ SHOW SOLUTION</button>
+      <div class="solution">
+        <div class="sol-label">✓ Solution</div>
+        <div class="sol-body">
+          <strong>A1. Complete TSK Workflow:</strong><br>
+          <code>mmls suspect_usb.img</code> → confirm FAT32 partition starts at sector 63<br>
+          <code>fls -r -d -o 63 suspect_usb.img</code> → list only deleted files (-d flag)<br>
+          For each deleted file with inode N:<br>
+          <code>istat -o 63 suspect_usb.img N</code> → view file metadata and timestamps<br>
+          <code>icat -o 63 suspect_usb.img N > /recovery/filename.ext</code> → extract file<br>
+          After all: <code>sha256sum /recovery/*</code> → hash all recovered files<br><br>
+          <strong>A2. Foremost for PDF and XLSX:</strong><br>
+          <code>foremost -t pdf,ole -i suspect_usb.img -o /recovery/carved/ -v</code><br>
+          Note: XLSX files are ZIP-based Office XML format. Use: <code>foremost -t zip,pdf -i suspect_usb.img -o /recovery/carved/</code><br>
+          Then manually check ZIP-carved files for those with "xl/workbook.xml" inside (indicating XLSX format).<br><br>
+          <strong>A3. Why Shift+Delete doesn't truly delete on FAT32/HDD:</strong><br>
+          Shift+Delete bypasses the Recycle Bin, but in FAT32, "deletion" only: (1) sets the first byte of the directory entry to <code>0xE5</code>, and (2) zeros out the FAT chain entries marking clusters as free. The <strong>actual file data in the clusters is never overwritten</strong> — it remains byte-for-byte intact on the drive. The OS simply considers those clusters "available" for future allocation. Until new data is written to those exact sectors, the data can be fully recovered. On an HDD (no TRIM), this recovery window can persist for days, weeks, or even months.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     SECTION 7: FORMATTED PARTITION RECOVERY
+================================================================ -->
+<section class="section" id="formatted">
+  <div class="sec-header">
+    <div class="sec-num">07</div>
+    <div class="sec-meta">
+      <div class="sec-unit">// Part B — Evidence Recovery</div>
+      <div class="sec-title">Formatted Partition Recovery</div>
+      <div class="sec-sub">Recovering data after formatting, repartitioning, and volume deletion</div>
+    </div>
+  </div>
+
+  <h3 class="block-title">What is Formatting?</h3>
+  <p class="prose">
+    <strong>Formatting</strong> prepares a disk or partition for use by creating a new file system. 
+    Users often format a drive to "wipe everything" before selling, returning, or destroying 
+    a device. However, formatting is <em>not the same as erasing</em>.
+  </p>
+
+  <div class="concept-grid">
+    <div class="concept-card">
+      <div class="cc-icon">⚡</div>
+      <div class="cc-title">Quick Format</div>
+      <div class="cc-desc">Creates a new, empty file system metadata structure (new MFT or FAT tables). <strong>Does NOT touch data clusters.</strong> Old data remains 100% intact. Recovery is highly successful. This is what most users do.</div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">🔄</div>
+      <div class="cc-title">Full Format</div>
+      <div class="cc-desc">On Windows Vista+, a full format <strong>writes zeros to every sector</strong>. Data is overwritten once. Recovery with standard tools = very difficult. Some advanced hardware techniques may find remnants.</div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">✂️</div>
+      <div class="cc-title">Repartitioning</div>
+      <div class="cc-desc">Deleting and recreating partitions destroys the partition table entries. Old data often survives in the same location, recoverable by reconstruction of the original partition layout.</div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">🔃</div>
+      <div class="cc-title">File System Change</div>
+      <div class="cc-desc">Reformatting from NTFS to FAT32 (or vice versa) creates a completely different metadata structure, but again — data clusters are not overwritten. Carving tools can still recover files.</div>
+    </div>
+  </div>
+
+  <h3 class="block-title">What Formatting Actually Destroys vs Preserves</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Component</th><th>Quick Format</th><th>Full Format</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>MBR / Partition Table</td><td>⚠️ Recreated</td><td>⚠️ Recreated</td></tr>
+        <tr><td>File System Metadata (MFT/FAT)</td><td>⚠️ Replaced with new, empty version</td><td>⚠️ Replaced + zeroed</td></tr>
+        <tr><td>Volume Boot Record (VBR)</td><td>⚠️ Overwritten</td><td>⚠️ Overwritten + zeroed</td></tr>
+        <tr><td>Actual File Data (clusters)</td><td>✅ UNTOUCHED — fully recoverable</td><td>❌ Overwritten with zeros</td></tr>
+        <tr><td>Slack Space</td><td>✅ Preserved</td><td>❌ Zeroed</td></tr>
+        <tr><td>Free/Unallocated Space</td><td>✅ Unchanged</td><td>❌ Zeroed</td></tr>
+        <tr><td>File Names</td><td>❌ Lost (new empty MFT)</td><td>❌ Lost</td></tr>
+        <tr><td>Directory Structure</td><td>❌ Lost</td><td>❌ Lost</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="block-title">Recovery from a Quick-Formatted Drive</h3>
+  <p class="prose">
+    After a <em>Quick Format</em>, all file data is still present. The only things destroyed are the 
+    file system metadata tables. Recovery strategy:
+  </p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-body">
+        <div class="step-title">Image the Formatted Drive</div>
+        <div class="step-desc">Use dd/dcfldd to capture every bit including the now-empty file system structure and intact data clusters. Use write blocker. Calculate hashes.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-body">
+        <div class="step-title">Attempt File System Reconstruction</div>
+        <div class="step-desc">TestDisk can detect and rebuild the original partition table and file system structures by scanning for signature bytes. This often recovers filenames and directory structure too!</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-body">
+        <div class="step-title">Carve Directly from Raw Image</div>
+        <div class="step-desc">Even if TestDisk fails, Foremost/Scalpel/PhotoRec can extract files by signatures from the raw data — without needing any file system metadata.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-body">
+        <div class="step-title">Extract Strings and Fragments</div>
+        <div class="step-desc">Use Bulk Extractor and strings to extract email addresses, URLs, partial text documents, and other structured data that may not carve as complete files.</div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="block-title green">Practical: Partition Recovery with TestDisk</h3>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-lang">BASH — TestDisk Partition Recovery</span>
+      <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+    </div>
+    <pre>
+<span class="comment"># TestDisk = most powerful FREE partition recovery tool</span>
+<span class="comment"># Part of the TestDisk/PhotoRec suite</span>
+<span class="cmd">sudo apt install testdisk -y</span>
+
+<span class="comment"># ---- PARTITION RECOVERY ----</span>
+<span class="comment"># Run TestDisk on forensic image (not original!)</span>
+<span class="cmd">testdisk <span class="path">/evidence/formatted_disk.img</span></span>
+
+<span class="comment"># TestDisk Interactive Menu Flow:</span>
+<span class="comment"># 1. Create (creates a new log file) → Enter</span>
+<span class="comment"># 2. Select the disk image → Enter</span>
+<span class="comment"># 3. Partition Table: Intel (MBR) → Enter</span>
+<span class="comment"># 4. Analyse → Enter  (scans for lost partitions)</span>
+<span class="comment"># 5. Quick Search → TestDisk finds old partitions</span>
+<span class="comment"># 6. Review found partition details</span>
+<span class="comment"># 7. If correct: Write → Enter to restore partition table</span>
+<span class="comment"># 8. Reboot (or re-mount image)</span>
+
+<span class="comment"># ---- BROWSE FILES INSIDE FOUND PARTITION ----</span>
+<span class="comment"># After Quick Search, instead of Write, press P to list files</span>
+<span class="comment"># Navigate with arrow keys, press C to copy files out</span>
+
+<span class="comment"># ---- PHOTOREC (after TestDisk — carve remaining) ----</span>
+<span class="cmd">photorec <span class="path">/evidence/formatted_disk.img</span></span>
+<span class="comment"># 1. Select disk image → Enter</span>
+<span class="comment"># 2. Select partition (or whole disk → No partition)</span>
+<span class="comment"># 3. Choose file system type (FAT/NTFS/ext/Other)</span>
+<span class="comment"># 4. Select "Other" for unallocated/formatted space</span>
+<span class="comment"># 5. Choose output directory → Start recovery</span>
+<span class="output">PhotoRec 7.1, Data Recovery Utility
+Disk formatted_disk.img - 8 GB
+Partition: Whole disk
+Pass 1 - Reading sector 100000/16000000, 847 files found
+JPG: 412, PDF: 23, DOCX: 67, XLSX: 34, MP4: 12...</span>
+</pre>
+  </div>
+
+  <h3 class="block-title amber">Practical: Recover from Formatted NTFS with Autopsy</h3>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-lang">BASH + Autopsy — NTFS Format Recovery</span>
+      <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+    </div>
+    <pre>
+<span class="comment"># Scenario: Windows HDD was Quick Formatted from NTFS to NTFS</span>
+
+<span class="comment"># STEP 1: Image the drive</span>
+<span class="cmd">sudo dd if=<span class="path">/dev/sdb</span> of=<span class="path">/evidence/formatted_hdd.img</span> bs=4096 conv=noerror,sync status=progress</span>
+
+<span class="comment"># STEP 2: Check if original NTFS structures are detectable</span>
+<span class="cmd">fsstat <span class="flag">-o 2048</span> <span class="path">/evidence/formatted_hdd.img</span></span>
+<span class="output"># New empty MFT detected — but data clusters untouched</span>
+
+<span class="comment"># STEP 3: Load image in Autopsy</span>
+<span class="comment"># Autopsy → New Case → Add Data Source → Disk Image</span>
+<span class="comment"># Enable: "Carve Unallocated Space" ingest module</span>
+<span class="comment"># Enable: "File Type Identification"</span>
+
+<span class="comment"># STEP 4: Run bulk_extractor for deep artifact extraction</span>
+<span class="cmd">bulk_extractor <span class="flag">-o</span> <span class="path">/evidence/bulk_out/</span> <span class="flag">-x aes -x base64 -E pdf</span> <span class="path">/evidence/formatted_hdd.img</span></span>
+<span class="output">Found 234 email addresses
+Found 12 credit card patterns
+Found 89 URLs
+Found 2 GPS coordinates</span>
+
+<span class="comment"># STEP 5: Manually carve with Scalpel (more configurable)</span>
+<span class="cmd">sudo nano <span class="path">/etc/scalpel/scalpel.conf</span></span>
+<span class="comment"># Uncomment lines for: jpg, pdf, docx, xlsx, mp4, sqlite</span>
+<span class="cmd">scalpel <span class="flag">-o</span> <span class="path">/evidence/scalpel_out/</span> <span class="path">/evidence/formatted_hdd.img</span></span>
+
+<span class="comment"># STEP 6: Reconstruct NTFS $MFT manually (advanced)</span>
+<span class="cmd">MFTECmd.exe <span class="flag">-f</span> <span class="path">C:\evidence\$MFT</span> <span class="flag">--csv</span> <span class="path">C:\evidence\mft_output\</span></span>
+<span class="comment"># Even from Quick Format, the old $MFT may be partially in unallocated space</span>
+</pre>
+  </div>
+
+  <h3 class="block-title">Recovery Tools — Formatted Partitions</h3>
+  <div class="tools-grid">
+    <div class="tool-card tc-cyan">
+      <div class="tool-name">TestDisk</div>
+      <div class="tool-purpose">Recovers lost partitions, fixes partition tables, restores file systems. Can browse and copy files from found partitions without writing changes.</div>
+      <div class="tool-cmd">testdisk disk.img</div>
+    </div>
+    <div class="tool-card tc-amber">
+      <div class="tool-name">PhotoRec</div>
+      <div class="tool-purpose">Companion to TestDisk. Carves 480+ file types from formatted/damaged volumes. Best general-purpose carver.</div>
+      <div class="tool-cmd">photorec disk.img</div>
+    </div>
+    <div class="tool-card tc-green">
+      <div class="tool-name">Autopsy</div>
+      <div class="tool-purpose">Graphical forensic suite. Load formatted image, run carving module, see recovered files with original names where possible.</div>
+      <div class="tool-cmd">autopsy (web interface)</div>
+    </div>
+    <div class="tool-card tc-purple">
+      <div class="tool-name">Recuva (Windows)</div>
+      <div class="tool-purpose">GUI recovery for Windows. Run it on formatted drives — it scans headers and shows what can be recovered with color-coded confidence levels.</div>
+      <div class="tool-cmd">recuva.exe (GUI)</div>
+    </div>
+    <div class="tool-card tc-cyan">
+      <div class="tool-name">R-Studio</div>
+      <div class="tool-purpose">Commercial but powerful. Reconstructs file systems algorithmically, recovering directory trees even from quick-formatted NTFS/FAT32.</div>
+      <div class="tool-cmd">R-Studio (GUI)</div>
+    </div>
+    <div class="tool-card tc-red">
+      <div class="tool-name">Disk Drill</div>
+      <div class="tool-purpose">User-friendly GUI for Windows/Mac. Deep scan mode for formatted drives. Preview before recovery. Free tier available.</div>
+      <div class="tool-cmd">Disk Drill (GUI)</div>
+    </div>
+    <div class="tool-card tc-green">
+      <div class="tool-name">extundelete</div>
+      <div class="tool-purpose">Linux ext3/ext4 deleted/formatted partition recovery. Uses journal entries to reconstruct files.</div>
+      <div class="tool-cmd">extundelete --restore-all /dev/sdb1</div>
+    </div>
+    <div class="tool-card tc-amber">
+      <div class="tool-name">GetDataBack</div>
+      <div class="tool-purpose">Specialized commercial tool for NTFS and FAT32 recovery. Excellent at reconstructing directory trees from Quick Formatted volumes.</div>
+      <div class="tool-cmd">GetDataBack (GUI)</div>
+    </div>
+  </div>
+
+  <div class="info-box example">
+    <span class="ib-label">🌍 Real-World Example — Format Doesn't Hide Evidence</span>
+    <strong>Case (US v. Glinton, 2006-style scenario):</strong> A suspect quick-formatted a 500GB NTFS 
+    hard drive and gave it to police claiming it was empty. Forensic investigators used TestDisk 
+    to find the original partition structure, then PhotoRec to carve the drive. They recovered 
+    <strong>over 12,000 files</strong> including documents, spreadsheets, 847 images, and 
+    email database fragments — all from a "formatted" drive. The formatted file system metadata 
+    was gone, but 100% of file data survived in the data clusters.
+  </div>
+
+  <h3 class="block-title">Anti-Forensics: How Criminals Try to Destroy Evidence</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Anti-Forensic Technique</th><th>What it does</th><th>Forensic Counter</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Quick Format</strong></td><td>Clears file system metadata only</td><td>TestDisk + PhotoRec + file carving</td></tr>
+        <tr><td><strong>Secure Erase (7 pass)</strong></td><td>Overwrites all sectors multiple times</td><td>Very hard — check for backup copies, cloud sync</td></tr>
+        <tr><td><strong>Timestomping</strong></td><td>Alters MACB timestamps to mislead</td>
+        <td>Compare $STANDARD_INFO vs $FILE_NAME timestamps in MFT — they're often both not changed</td></tr>
+        <tr><td><strong>Encryption</strong></td><td>Renders data unreadable without key</td><td>Memory forensics (find key in RAM), brute force, legal compulsion</td></tr>
+        <tr><td><strong>Steganography</strong></td><td>Hides data inside innocent files</td><td>Stegdetect, Stegsolve, statistical LSB analysis</td></tr>
+        <tr><td><strong>Partition Hiding</strong></td><td>Creates hidden partitions not shown in OS</td><td>TestDisk full disk scan, mmls on raw image</td></tr>
+        <tr><td><strong>ADS (Alternate Data Streams)</strong></td><td>Hides files inside other files' NTFS streams</td><td><code>dir /r</code>, streams.exe, Autopsy detects ADS</td></tr>
+        <tr><td><strong>Log Clearing</strong></td><td>Deletes Windows Event Logs</td><td>Event ID 1102 (audit log cleared) is itself logged. Log backups in SIEM.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="task-box">
+    <div class="task-header">
+      <span class="task-icon">📝</span>
+      <span class="task-label">Task 7.1 — Formatted Partition Recovery</span>
+      <span class="task-num">Unit IV / Part B / Ch.7</span>
+    </div>
+    <div class="task-body">
+      <div class="task-q">
+        <strong>Scenario:</strong> A suspect's 64GB USB drive was Quick Formatted from NTFS to FAT32 before seizure. You have imaged it as <code>usb_formatted.img</code>.<br><br>
+        <strong>Q1.</strong> Explain step-by-step how you would approach recovering data from this image. Which tools would you use for each step?<br><br>
+        <strong>Q2.</strong> What specific evidence can you still recover after a Quick Format that would NOT survive a Full Format?<br><br>
+        <strong>Q3.</strong> The suspect claims they used "CCleaner's Drive Wiper" with 3 passes before formatting. How does this change your recovery approach? What alternative evidence sources would you now look for?
+      </div>
+      <button class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ SHOW SOLUTION</button>
+      <div class="solution">
+        <div class="sol-label">✓ Solution</div>
+        <div class="sol-body">
+          <strong>A1. Recovery Steps:</strong><br>
+          1. <strong>Write-block and verify image</strong>: <code>sha256sum usb_formatted.img</code><br>
+          2. <strong>TestDisk</strong>: Run <code>testdisk usb_formatted.img</code> → Analyze → Quick Search → Look for original NTFS partition signature. If found, browse files directly (Press P) and copy out. May restore original filenames and directory structure!<br>
+          3. <strong>PhotoRec</strong>: <code>photorec usb_formatted.img</code> → Select whole disk → Other (for reformatted drives) → Choose output dir. Recovers 480+ file types by signature. Filenames won't be recovered but file contents will.<br>
+          4. <strong>Foremost/Scalpel</strong>: <code>foremost -t all -i usb_formatted.img -o /carved/</code> for additional carving with different signatures.<br>
+          5. <strong>Bulk Extractor</strong>: Extract structured data (emails, URLs, credit card patterns) from entire image regardless of file system.<br>
+          6. <strong>Strings</strong>: <code>strings usb_formatted.img > strings_out.txt</code> — grep for keywords relevant to the investigation.<br><br>
+          <strong>A2. After Quick Format — What Survives vs Full Format:</strong><br>
+          Quick Format PRESERVES: All actual file data in clusters, file contents (images, docs, spreadsheets, emails), slack space data, file fragments in unallocated areas.<br>
+          Quick Format DESTROYS: FAT32 directory entries (filenames lost), original NTFS MFT records, volume label and serial number.<br>
+          Full Format DESTROYS: All of the above AND all data clusters (zeroed), slack space, unallocated space content.<br><br>
+          <strong>A3. After 3-Pass Wipe:</strong><br>
+          Recovery from the USB is essentially impossible — 3 passes overwrites every sector 3 times, leaving no useful data.<br>
+          Alternative evidence sources to investigate:<br>
+          — <strong>Windows Registry</strong> on the suspect's PC: USBSTOR shows the USB was connected, with timestamps<br>
+          — <strong>Windows Event Logs</strong>: File access events (4663) if auditing was enabled<br>
+          — <strong>$UsnJrnl / $LogFile</strong> on the PC's own hard drive: May show files copied to USB<br>
+          — <strong>LNK files and JumpLists</strong>: Prove files were opened before copying<br>
+          — <strong>Cloud backups / sync logs</strong>: OneDrive, Google Drive sync logs on the PC<br>
+          — <strong>Printer spooler</strong>: Were files printed before wiping?<br>
+          — <strong>Email server logs</strong>: Were files emailed before deletion?<br>
+          — <strong>Shadow copies</strong> on the PC: VSS (Volume Shadow Copies) may have copies of files before they were moved to the USB
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     SECTION: ALL TOOLS REFERENCE
+================================================================ -->
+<section class="section" id="tools">
+  <div class="sec-header">
+    <div class="sec-num">Ref</div>
+    <div class="sec-meta">
+      <div class="sec-unit">// Quick Reference</div>
+      <div class="sec-title">Complete Tools Reference</div>
+      <div class="sec-sub">All tools covered in Unit IV with purpose and key commands</div>
+    </div>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Tool</th><th>Category</th><th>Platform</th><th>Purpose</th><th>Key Command / Usage</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>dd</strong></td><td>Imaging</td><td>Linux/Mac</td><td>Create forensic bit-for-bit disk images</td><td><code>dd if=/dev/sda of=image.img bs=512 conv=noerror,sync</code></td></tr>
+        <tr><td><strong>dcfldd</strong></td><td>Imaging</td><td>Linux</td><td>Forensic dd with hashing and progress</td><td><code>dcfldd if=/dev/sda of=img hash=md5,sha256</code></td></tr>
+        <tr><td><strong>FTK Imager</strong></td><td>Imaging</td><td>Windows</td><td>GUI-based forensic imaging (E01, DD, AFF formats)</td><td>GUI — File → Create Disk Image</td></tr>
+        <tr><td><strong>Guymager</strong></td><td>Imaging</td><td>Linux</td><td>Fast GUI imager with hash verification</td><td>GUI tool, part of CAINE distro</td></tr>
+        <tr><td><strong>Autopsy</strong></td><td>Analysis Platform</td><td>Win/Linux</td><td>All-in-one forensic platform — files, deleted, timeline</td><td>Web GUI at localhost:9999</td></tr>
+        <tr><td><strong>TSK (fls)</strong></td><td>File System</td><td>Linux</td><td>List files including deleted from image</td><td><code>fls -r -d -o OFFSET image.img</code></td></tr>
+        <tr><td><strong>TSK (icat)</strong></td><td>File System</td><td>Linux</td><td>Extract file by inode number from image</td><td><code>icat -o OFFSET image.img INODE > file.ext</code></td></tr>
+        <tr><td><strong>TSK (mmls)</strong></td><td>Partition</td><td>Linux</td><td>Show partition layout of disk image</td><td><code>mmls image.img</code></td></tr>
+        <tr><td><strong>TSK (fsstat)</strong></td><td>File System</td><td>Linux</td><td>Show file system metadata and statistics</td><td><code>fsstat -o OFFSET image.img</code></td></tr>
+        <tr><td><strong>Foremost</strong></td><td>Carving</td><td>Linux</td><td>Carve files from raw image using signatures</td><td><code>foremost -t jpg,pdf -i img.dd -o /out/</code></td></tr>
+        <tr><td><strong>Scalpel</strong></td><td>Carving</td><td>Linux</td><td>Configurable file carver via scalpel.conf</td><td><code>scalpel -o /out/ image.img</code></td></tr>
+        <tr><td><strong>PhotoRec</strong></td><td>Carving</td><td>All</td><td>Interactive carver, 480+ file types, very reliable</td><td><code>photorec image.img</code></td></tr>
+        <tr><td><strong>Bulk Extractor</strong></td><td>Artifact Extraction</td><td>All</td><td>Extract emails, URLs, CC numbers, GPS from raw image</td><td><code>bulk_extractor -o /out/ image.img</code></td></tr>
+        <tr><td><strong>TestDisk</strong></td><td>Partition Recovery</td><td>All</td><td>Recover lost partitions, fix partition tables</td><td><code>testdisk image.img</code></td></tr>
+        <tr><td><strong>Recuva</strong></td><td>File Recovery</td><td>Windows</td><td>User-friendly deleted file recovery with confidence scores</td><td>GUI tool</td></tr>
+        <tr><td><strong>Extundelete</strong></td><td>File Recovery</td><td>Linux</td><td>Recover deleted files from ext3/ext4 using journal</td><td><code>extundelete --restore-all /dev/sdb1</code></td></tr>
+        <tr><td><strong>RegRipper</strong></td><td>Registry Analysis</td><td>Win/Linux</td><td>Parse Windows registry hives for forensic artifacts</td><td><code>rip.pl -r SYSTEM -p usbstor</code></td></tr>
+        <tr><td><strong>KAPE</strong></td><td>Triage Collection</td><td>Windows</td><td>Collect + parse Windows artifacts in minutes</td><td><code>kape.exe --tsource C: --tdest E:\evidence</code></td></tr>
+        <tr><td><strong>Volatility3</strong></td><td>Memory Analysis</td><td>All</td><td>Analyze RAM dumps for processes, network, malware</td><td><code>vol -f mem.dump windows.pslist</code></td></tr>
+        <tr><td><strong>Wireshark</strong></td><td>Network Forensics</td><td>All</td><td>Packet capture analysis and protocol inspection</td><td>GUI — open PCAP file, filter with BPF syntax</td></tr>
+        <tr><td><strong>ExifTool</strong></td><td>Metadata</td><td>All</td><td>Extract metadata from images, documents, videos</td><td><code>exiftool file.jpg</code></td></tr>
+        <tr><td><strong>Plaso/log2timeline</strong></td><td>Timeline</td><td>Linux</td><td>Create super-timeline from all artifact sources</td><td><code>log2timeline.py -z UTC timeline.plaso image.img</code></td></tr>
+        <tr><td><strong>Timesketch</strong></td><td>Timeline Viz</td><td>Web</td><td>Visualize and query forensic timelines</td><td>Web GUI, works with Plaso output</td></tr>
+        <tr><td><strong>Hayabusa</strong></td><td>Log Analysis</td><td>Win/Linux</td><td>Fast Windows event log hunting tool with Sigma rules</td><td><code>hayabusa.exe csv-timeline -d /evtx/ -o timeline.csv</code></td></tr>
+        <tr><td><strong>Chainsaw</strong></td><td>Log Analysis</td><td>Win/Linux</td><td>Hunt for IOCs in Windows event logs using Sigma rules</td><td><code>chainsaw hunt /path/to/evtx/ --sigma sigma_rules/</code></td></tr>
+        <tr><td><strong>MFTECmd</strong></td><td>NTFS Analysis</td><td>Windows</td><td>Parse $MFT, $UsnJrnl, $LogFile from NTFS volumes</td><td><code>MFTECmd.exe -f $MFT --csv output/</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ================================================================
+     SECTION: MASTER TASKS
+================================================================ -->
+<section class="section" id="tasks">
+  <div class="sec-header">
+    <div class="sec-num">★</div>
+    <div class="sec-meta">
+      <div class="sec-unit">// Exam Preparation</div>
+      <div class="sec-title">Master Tasks & Exam Questions</div>
+      <div class="sec-sub">Long-form questions covering entire Unit IV syllabus</div>
+    </div>
+  </div>
+
+  <div class="task-box">
+    <div class="task-header">
+      <span class="task-icon">🎯</span>
+      <span class="task-label">Master Task — Full Unit IV Scenario</span>
+      <span class="task-num">Exam Level</span>
+    </div>
+    <div class="task-body">
+      <div class="task-q">
+        <strong>Scenario:</strong> Cyber Crime Cell receives a complaint against Mr. Raj, a senior accountant at FinCorp Ltd. He is suspected of stealing client financial data and selling it to a competitor. When investigators arrive, Mr. Raj is still at his workstation. His Windows 10 PC is running, and a 32GB USB drive (Sandisk, NTFS, Quick Formatted 2 hours ago) is in his drawer.<br><br>
+
+        <strong>Q1 (6 marks):</strong> Describe the <em>complete initial response</em> procedure. What do you do first — power off the PC or image the RAM? Why? List all evidence sources you would identify at the scene.<br><br>
+
+        <strong>Q2 (8 marks):</strong> Explain how you would forensically image both the PC hard drive and the USB drive. Write actual commands using <code>dd</code> or <code>dcfldd</code>. How do you ensure evidence integrity?<br><br>
+
+        <strong>Q3 (6 marks):</strong> Mr. Raj claims the USB was "empty and freshly formatted." Using your knowledge of storage fundamentals and file systems, explain why a Quick Formatted NTFS USB is not truly empty. What tools would you use to recover data from it?<br><br>
+
+        <strong>Q4 (5 marks):</strong> List 5 Windows artifacts from Mr. Raj's PC that would prove he copied files to the USB drive, and what specific evidence each provides.
+      </div>
+      <button class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ SHOW COMPLETE SOLUTION</button>
+      <div class="solution">
+        <div class="sol-label">✓ Model Answer</div>
+        <div class="sol-body">
+          <strong>Q1 — Initial Response (6 marks):</strong><br>
+          <em>Do NOT power off — capture RAM first.</em> The PC is live and running. RAM contains volatile evidence that disappears on power off: running processes, network connections, encryption keys, clipboard contents, logged-in sessions, and potentially malware hiding only in memory.<br><br>
+          <strong>Step 1 — RAM Acquisition:</strong> Use WinPmem or Magnet RAM Capture on a write-protected USB to dump RAM to a file. Hash the dump immediately.<br>
+          <strong>Step 2 — Document the scene:</strong> Photograph the screen, connected devices, and workstation layout before touching anything.<br>
+          <strong>Step 3 — Network isolation:</strong> Disconnect ethernet, disable WiFi (without powering off) to prevent remote wiping.<br>
+          <strong>Step 4 — Collect the USB drive</strong> — place in anti-static evidence bag with CoC label.<br>
+          <strong>Step 5 — Graceful shutdown</strong> (if warranted) or pull-plug depending on jurisdiction protocol.<br><br>
+          Evidence sources: PC hard drive, USB drive (Sandisk), RAM dump, network router logs, email server logs, company SIEM, CCTV footage of workstation.<br><br>
+
+          <strong>Q2 — Forensic Imaging (8 marks):</strong><br>
+          For both drives, use a hardware write blocker (Tableau T35u) first.<br>
+          <strong>PC Hard Drive (/dev/sda):</strong><br>
+          <code>dcfldd if=/dev/sda of=/evidence/raj_pc.img hash=md5,sha256 hashlog=/evidence/pc_hashes.txt bs=512 conv=noerror,sync status=progress</code><br><br>
+          <strong>USB Drive (/dev/sdb):</strong><br>
+          <code>dcfldd if=/dev/sdb of=/evidence/raj_usb.img hash=md5,sha256 hashlog=/evidence/usb_hashes.txt bs=512 conv=noerror,sync status=progress</code><br><br>
+          <strong>Integrity Verification:</strong><br>
+          <code>sha256sum /dev/sda > /evidence/orig_hash_pc.txt</code><br>
+          <code>sha256sum /evidence/raj_pc.img > /evidence/img_hash_pc.txt</code><br>
+          <code>diff /evidence/orig_hash_pc.txt /evidence/img_hash_pc.txt</code> (must show no difference)<br>
+          Seal original drives in tamper-evident evidence bags with signatures, date, and hash values recorded on the bag and in the CoC form.<br><br>
+
+          <strong>Q3 — Quick Format Not Truly Empty (6 marks):</strong><br>
+          A <strong>Quick Format</strong> only rewrites the file system metadata — specifically the $MFT (Master File Table) and the $Bitmap are reset to empty. The <strong>data clusters are never touched or zeroed.</strong> Every file that Mr. Raj had on the USB still occupies the exact same sectors on the drive — the OS simply no longer has a map to find them. It's like tearing out the index of a book: the content is still there, you just can't look it up anymore.<br><br>
+          <strong>Recovery approach:</strong><br>
+          1. <strong>TestDisk</strong> — Can find the old NTFS partition structure and may restore original file names: <code>testdisk raj_usb.img</code> → Analyse → Quick Search<br>
+          2. <strong>PhotoRec</strong> — Carves 480+ file types from the raw data: <code>photorec raj_usb.img</code> → Whole disk → Other<br>
+          3. <strong>Foremost/Scalpel</strong> — Additional carving: <code>foremost -t all -i raj_usb.img -o /evidence/carved/</code><br>
+          4. <strong>TSK (fls + icat)</strong> — If NTFS metadata partially survived: <code>fls -r -d -o 2048 raj_usb.img</code><br><br>
+
+          <strong>Q4 — 5 Windows Artifacts (5 marks):</strong><br>
+          1. <strong>USBSTOR Registry Key</strong> (<code>HKLM\SYSTEM\CurrentControlSet\Enum\USBSTOR</code>) — Proves the Sandisk USB was connected to Mr. Raj's PC, shows exact serial number and timestamps of first/last connection.<br>
+          2. <strong>$UsnJrnl (Change Journal)</strong> — Records every file that was copied, moved, or renamed, with precise timestamps — even after those files are deleted from the USB.<br>
+          3. <strong>LNK Files and Jump Lists</strong> — Prove which financial files Mr. Raj opened before copying; contain original file paths, file size, and MAC timestamps even if original files are deleted.<br>
+          4. <strong>Windows Event Log ID 4663</strong> — If file auditing was enabled, records "Object Access" events showing exact filenames accessed and times.<br>
+          5. <strong>Prefetch Files</strong> (<code>C:\Windows\Prefetch\</code>) — Prove execution of any file copying tools (e.g., robocopy, xcopy, 7-zip) used by Mr. Raj, with timestamps of the last 8 executions.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="task-box" style="border-color:rgba(0,229,255,0.25)">
+    <div class="task-header" style="background:rgba(0,229,255,0.06);border-bottom-color:rgba(0,229,255,0.2)">
+      <span class="task-icon">📋</span>
+      <span class="task-label" style="color:var(--cyan)">Short Answer Questions — Unit IV</span>
+      <span class="task-num">Exam Quick Fire</span>
+    </div>
+    <div class="task-body">
+      <div class="task-q">
+        1. Define "Chain of Custody" and explain why it is critical in a court case.<br>
+        2. What is the difference between volatile and non-volatile data? Give two examples of each.<br>
+        3. What does the magic number <code>FF D8 FF</code> represent? How is it used in file carving?<br>
+        4. Explain MACB timestamps and what it means if the M time is earlier than the B (Born) time.<br>
+        5. Why is recovering files from an SSD more challenging than from an HDD?<br>
+        6. What is slack space? What might an investigator find there?<br>
+        7. Name the two types of formatting and explain the difference from a data recovery standpoint.<br>
+        8. What is the purpose of a hash value in digital forensics?
+      </div>
+      <button class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ SHOW ANSWERS</button>
+      <div class="solution">
+        <div class="sol-label">✓ Short Answers</div>
+        <div class="sol-body">
+          <strong>1. Chain of Custody:</strong> A chronological record documenting who collected, handled, examined, or transferred evidence. Critical in court because it proves the evidence was not tampered with — if CoC is broken, defense can argue evidence was planted or altered, rendering it inadmissible.<br><br>
+          <strong>2. Volatile vs Non-Volatile:</strong><br>
+          Volatile (lost on power off): RAM contents, running processes, network connections, clipboard, logged-in users.<br>
+          Non-volatile (persists): Hard drive files, registry, installed programs, USB connection history, event logs.<br><br>
+          <strong>3. FF D8 FF:</strong> This is the JPEG file signature (magic number/header). In file carving, tools like Foremost scan raw disk sectors looking for this byte sequence. When found, the carver knows a JPEG file starts here and carves bytes until the JPEG footer <code>FF D9</code> is found, extracting a complete image even with no file system metadata.<br><br>
+          <strong>4. MACB:</strong> Modified-Accessed-Changed (MFT)-Born. If M time is earlier than B (Born/Created) time, this is impossible for a legitimately created file and indicates <strong>timestomping</strong> — the suspect deliberately altered the Modified timestamp to make the file appear older than it is. This is a strong sign of anti-forensic activity.<br><br>
+          <strong>5. SSD Recovery:</strong> SSDs use the TRIM command — when a file is deleted, the OS notifies the SSD to proactively erase those flash blocks for performance. By the time forensics begins, data may already be physically wiped at hardware level. Also, wear-leveling scrambles data across NAND chips unpredictably.<br><br>
+          <strong>6. Slack Space:</strong> The unused area at the end of a cluster after a file ends but before the cluster boundary. A 1KB file in a 4KB cluster leaves 3KB of slack. Slack may contain fragments of previously stored files, passwords, text snippets, or email data from when those sectors were last used by a different file.<br><br>
+          <strong>7. Quick vs Full Format:</strong> Quick Format: Only file system metadata (MFT/FAT tables) is reset — data clusters untouched, high recovery chance. Full Format (Vista+): Every sector written with zeros — data is overwritten, essentially irrecoverable with standard tools.<br><br>
+          <strong>8. Hash in Forensics:</strong> A hash (MD5, SHA256) is a unique mathematical fingerprint of data. Same input always gives same output; any change in the data gives a completely different hash. In forensics, it proves: (1) the forensic image is an exact copy of the original (both should have identical hashes), and (2) evidence was not modified after collection. If hashes match before and after, no tampering occurred.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+// Active nav highlight on scroll
+const sections = document.querySelectorAll('section[id], div[id]');
+const navItems = document.querySelectorAll('.nav-item');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      navItems.forEach(n => n.classList.remove('active'));
+      const active = document.querySelector(`.nav-item[href="#${entry.target.id}"]`);
+      if (active) active.classList.add('active');
+    }
+  });
+}, { threshold: 0.3 });
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

