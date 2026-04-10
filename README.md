@@ -87,4 +87,4 @@ sudo python3 "CTF/Phantom Ledger - The 0xE5 Incident/make_pendrive.py"
 > These notes are a **reference resource** — not official SSCBS study material. Always refer to your faculty's discussion material alongside these notes.
 
 ---
-*MIT License · © 2024 Ankit Ojha*
+*MIT License · © 2026 Ankit Ojha*
