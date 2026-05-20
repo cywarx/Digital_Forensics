@@ -1,0 +1,1069 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+:root{
+  --obs-bg:#1a1a2e;--obs-sidebar:#0f0f1a;--obs-card:#16213e;--obs-accent:#7c3aed;
+  --obs-accent2:#06b6d4;--obs-text:#e2e8f0;--obs-muted:#94a3b8;--obs-border:#2d3748;
+  --obs-green:#10b981;--obs-yellow:#f59e0b;--obs-red:#ef4444;--obs-pink:#ec4899;
+  --obs-code:#1e2a3a;--obs-tag:#7c3aed
+}
+.obsidian{display:flex;height:100vh;min-height:700px;background:var(--obs-bg);color:var(--obs-text);font-size:14px;border-radius:var(--border-radius-lg);overflow:hidden;border:0.5px solid var(--obs-border)}
+.sidebar{width:220px;min-width:220px;background:var(--obs-sidebar);border-right:1px solid var(--obs-border);display:flex;flex-direction:column;overflow-y:auto}
+.sidebar-header{padding:16px 12px 8px;font-size:11px;font-weight:500;color:var(--obs-muted);text-transform:uppercase;letter-spacing:.08em}
+.nav-item{display:flex;align-items:center;gap:8px;padding:6px 12px;cursor:pointer;border-radius:4px;margin:1px 6px;font-size:13px;color:var(--obs-muted);transition:all .15s}
+.nav-item:hover{background:rgba(124,58,237,.15);color:var(--obs-text)}
+.nav-item.active{background:rgba(124,58,237,.25);color:#a78bfa}
+.nav-item .icon{font-size:14px;min-width:16px}
+.nav-section{margin-top:8px}
+.content{flex:1;overflow-y:auto;padding:32px 36px}
+.page{display:none}
+.page.active{display:block}
+.page-title{font-size:26px;font-weight:500;color:var(--obs-text);margin-bottom:6px;display:flex;align-items:center;gap:10px}
+.page-title .badge{font-size:11px;padding:3px 8px;border-radius:20px;font-weight:500}
+.badge-purple{background:rgba(124,58,237,.2);color:#a78bfa;border:1px solid rgba(124,58,237,.4)}
+.badge-cyan{background:rgba(6,182,212,.15);color:#22d3ee;border:1px solid rgba(6,182,212,.3)}
+.badge-green{background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.3)}
+.badge-red{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.3)}
+.badge-yellow{background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.3)}
+.subtitle{color:var(--obs-muted);font-size:13px;margin-bottom:24px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:24px}
+.tag{font-size:11px;padding:2px 8px;border-radius:20px;background:rgba(124,58,237,.15);color:#a78bfa;border:1px solid rgba(124,58,237,.3);cursor:default}
+h2{font-size:18px;font-weight:500;color:var(--obs-text);margin:28px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--obs-border);display:flex;align-items:center;gap:8px}
+h3{font-size:15px;font-weight:500;color:#c4b5fd;margin:18px 0 8px}
+p{color:var(--obs-muted);line-height:1.7;margin-bottom:10px;font-size:13.5px}
+.callout{border-radius:8px;padding:12px 16px;margin:14px 0;border-left:3px solid}
+.callout-info{background:rgba(6,182,212,.08);border-color:var(--obs-accent2)}
+.callout-warn{background:rgba(245,158,11,.08);border-color:var(--obs-yellow)}
+.callout-danger{background:rgba(239,68,68,.08);border-color:var(--obs-red)}
+.callout-success{background:rgba(16,185,129,.08);border-color:var(--obs-green)}
+.callout-title{font-size:12px;font-weight:500;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.callout-info .callout-title{color:var(--obs-accent2)}
+.callout-warn .callout-title{color:var(--obs-yellow)}
+.callout-danger .callout-title{color:var(--obs-red)}
+.callout-success .callout-title{color:var(--obs-green)}
+.callout p{margin:0;font-size:13px}
+.code-block{background:var(--obs-code);border:1px solid var(--obs-border);border-radius:8px;padding:14px 16px;margin:12px 0;font-family:var(--font-mono);font-size:12px;line-height:1.8;overflow-x:auto;white-space:pre}
+.code-block .hl-key{color:#7dd3fc}
+.code-block .hl-val{color:#86efac}
+.code-block .hl-comment{color:#64748b}
+.code-block .hl-ip{color:#fbbf24}
+.code-block .hl-warn{color:#f87171}
+.code-block .hl-ok{color:#34d399}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:14px 0}
+.card{background:var(--obs-card);border:1px solid var(--obs-border);border-radius:10px;padding:14px 16px}
+.card h4{font-size:13px;font-weight:500;color:var(--obs-text);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.card p{font-size:12.5px;margin:0}
+.tool-card{background:var(--obs-card);border:1px solid var(--obs-border);border-radius:10px;padding:14px 16px;cursor:pointer;transition:border-color .2s}
+.tool-card:hover{border-color:var(--obs-accent)}
+.tool-card .tool-name{font-weight:500;font-size:13px;color:var(--obs-text);display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.tool-card .tool-type{font-size:11px;margin-bottom:6px}
+.tool-card p{font-size:12.5px}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:12.5px}
+th{background:rgba(124,58,237,.2);color:#c4b5fd;padding:8px 12px;text-align:left;font-weight:500;font-size:12px}
+td{padding:8px 12px;border-bottom:1px solid var(--obs-border);color:var(--obs-muted);vertical-align:top}
+tr:hover td{background:rgba(255,255,255,.02)}
+.ip-tag{display:inline-block;padding:2px 7px;border-radius:4px;font-family:var(--font-mono);font-size:11px;background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3)}
+.flow{display:flex;align-items:center;gap:0;margin:14px 0;flex-wrap:wrap}
+.flow-step{background:var(--obs-card);border:1px solid var(--obs-border);border-radius:8px;padding:8px 12px;font-size:12px;text-align:center;min-width:90px}
+.flow-step .step-num{font-size:10px;color:var(--obs-accent);font-weight:500;margin-bottom:2px}
+.flow-arrow{color:var(--obs-muted);padding:0 6px;font-size:16px}
+.accordion{margin:8px 0;border:1px solid var(--obs-border);border-radius:8px;overflow:hidden}
+.acc-header{padding:10px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:var(--obs-card);font-size:13px;font-weight:500;color:var(--obs-text);user-select:none}
+.acc-header:hover{background:rgba(124,58,237,.1)}
+.acc-body{background:var(--obs-code);padding:0 14px;max-height:0;overflow:hidden;transition:max-height .3s,padding .3s}
+.acc-body.open{padding:12px 14px;max-height:600px}
+.progress-bar{height:6px;background:var(--obs-border);border-radius:3px;margin:4px 0 8px}
+.progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--obs-accent),var(--obs-accent2))}
+.spf-result{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:500}
+.spf-pass{background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.3)}
+.spf-fail{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.3)}
+.spf-soft{background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.3)}
+.tabs{display:flex;gap:4px;margin:14px 0 0;border-bottom:1px solid var(--obs-border)}
+.tab{padding:7px 14px;cursor:pointer;font-size:12.5px;color:var(--obs-muted);border-bottom:2px solid transparent;transition:all .15s}
+.tab.active{color:#a78bfa;border-bottom-color:var(--obs-accent)}
+.tab-content{display:none;padding:14px 0}
+.tab-content.active{display:block}
+.inline-link{color:#7dd3fc;cursor:pointer;text-decoration:none;font-size:13px}
+.inline-link:hover{text-decoration:underline}
+.step-list{list-style:none;padding:0;margin:12px 0}
+.step-list li{display:flex;gap:12px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;color:var(--obs-muted)}
+.step-list li:last-child{border:none}
+.step-num-circle{width:22px;height:22px;border-radius:50%;background:rgba(124,58,237,.3);color:#c4b5fd;font-size:11px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.search-box{display:flex;align-items:center;gap:8px;background:var(--obs-code);border:1px solid var(--obs-border);border-radius:8px;padding:7px 12px;margin-bottom:20px}
+.search-box input{background:transparent;border:none;outline:none;color:var(--obs-text);font-size:13px;flex:1;font-family:var(--font-sans)}
+.search-box input::placeholder{color:var(--obs-muted)}
+.highlight{background:rgba(251,191,36,.2);color:#fbbf24;padding:1px 3px;border-radius:3px}
+</style>
+
+<div class="obsidian">
+  <div class="sidebar">
+    <div style="padding:14px 12px 10px;border-bottom:1px solid var(--obs-border)">
+      <div style="font-size:15px;font-weight:500;color:var(--obs-text);display:flex;align-items:center;gap:8px">
+        <i class="ti ti-shield-search" style="color:#7c3aed;font-size:18px" aria-hidden="true"></i> Email Forensics
+      </div>
+      <div style="font-size:11px;color:var(--obs-muted);margin-top:2px">Complete Investigation Guide</div>
+    </div>
+    <div class="sidebar-header">Navigation</div>
+    <div class="nav-section">
+      <div class="nav-item active" onclick="showPage('intro')"><span class="icon"><i class="ti ti-home" aria-hidden="true"></i></span> Overview</div>
+      <div class="nav-item" onclick="showPage('headers')"><span class="icon"><i class="ti ti-list-details" aria-hidden="true"></i></span> Email Headers</div>
+      <div class="nav-item" onclick="showPage('auth')"><span class="icon"><i class="ti ti-lock" aria-hidden="true"></i></span> SPF / DKIM / DMARC</div>
+      <div class="nav-item" onclick="showPage('tracing')"><span class="icon"><i class="ti ti-route" aria-hidden="true"></i></span> IP Tracing</div>
+      <div class="nav-item" onclick="showPage('phishing')"><span class="icon"><i class="ti ti-fish" aria-hidden="true"></i></span> Phishing Analysis</div>
+      <div class="nav-item" onclick="showPage('attachments')"><span class="icon"><i class="ti ti-paperclip" aria-hidden="true"></i></span> Attachment Analysis</div>
+      <div class="nav-item" onclick="showPage('tools')"><span class="icon"><i class="ti ti-tool" aria-hidden="true"></i></span> Tools Arsenal</div>
+      <div class="nav-item" onclick="showPage('timeline')"><span class="icon"><i class="ti ti-timeline" aria-hidden="true"></i></span> Building Timeline</div>
+      <div class="nav-item" onclick="showPage('checklist')"><span class="icon"><i class="ti ti-checkbox" aria-hidden="true"></i></span> Investigation Checklist</div>
+    </div>
+    <div class="sidebar-header" style="margin-top:8px">Quick Tags</div>
+    <div style="padding:4px 12px 12px;display:flex;flex-wrap:wrap;gap:4px">
+      <span style="font-size:11px;color:#7dd3fc;cursor:pointer" onclick="showPage('headers')">#headers</span>
+      <span style="font-size:11px;color:#a78bfa;cursor:pointer" onclick="showPage('auth')">#spf-dkim</span>
+      <span style="font-size:11px;color:#34d399;cursor:pointer" onclick="showPage('tracing')">#ip-trace</span>
+      <span style="font-size:11px;color:#f87171;cursor:pointer" onclick="showPage('phishing')">#phishing</span>
+      <span style="font-size:11px;color:#fbbf24;cursor:pointer" onclick="showPage('tools')">#tools</span>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- OVERVIEW PAGE -->
+    <div class="page active" id="page-intro">
+      <div class="page-title"><i class="ti ti-shield-search" style="color:#7c3aed" aria-hidden="true"></i> Email Forensics <span class="badge badge-purple">Master Notes</span></div>
+      <div class="subtitle">Complete guide to email investigation, header analysis, and digital evidence gathering</div>
+      <div class="tags">
+        <span class="tag">#email-forensics</span><span class="tag">#cybersecurity</span><span class="tag">#dfir</span><span class="tag">#phishing</span><span class="tag">#spf-dkim-dmarc</span><span class="tag">#threat-analysis</span>
+      </div>
+      <div class="callout callout-info">
+        <div class="callout-title"><i class="ti ti-info-circle" aria-hidden="true"></i> What is Email Forensics?</div>
+        <p>Email forensics is the systematic process of collecting, analyzing, and preserving email evidence to investigate cybercrimes, fraud, phishing, harassment, or unauthorized access. It involves tracing email origins, verifying authenticity, and building timelines.</p>
+      </div>
+
+      <h2><i class="ti ti-map" style="color:#7c3aed" aria-hidden="true"></i> What We Cover</h2>
+      <div class="grid-2">
+        <div class="card" style="cursor:pointer" onclick="showPage('headers')">
+          <h4><i class="ti ti-list-details" style="color:#22d3ee" aria-hidden="true"></i> Email Headers</h4>
+          <p>How to read and interpret raw email headers — Received, From, X-Originating-IP, Message-ID and more.</p>
+        </div>
+        <div class="card" style="cursor:pointer" onclick="showPage('auth')">
+          <h4><i class="ti ti-lock" style="color:#a78bfa" aria-hidden="true"></i> SPF / DKIM / DMARC</h4>
+          <p>Authentication protocols that tell you whether an email is legitimate or spoofed. Real output examples included.</p>
+        </div>
+        <div class="card" style="cursor:pointer" onclick="showPage('tracing')">
+          <h4><i class="ti ti-route" style="color:#34d399" aria-hidden="true"></i> IP Tracing</h4>
+          <p>Extract originating IPs from headers, trace geolocation, identify hosting providers, and flag VPN/TOR exit nodes.</p>
+        </div>
+        <div class="card" style="cursor:pointer" onclick="showPage('phishing')">
+          <h4><i class="ti ti-fish" style="color:#f87171" aria-hidden="true"></i> Phishing Analysis</h4>
+          <p>Techniques to detect phishing emails — fake domains, lookalike sender addresses, malicious links, and urgency manipulation.</p>
+        </div>
+        <div class="card" style="cursor:pointer" onclick="showPage('attachments')">
+          <h4><i class="ti ti-paperclip" style="color:#fbbf24" aria-hidden="true"></i> Attachment Analysis</h4>
+          <p>Safely analyze suspicious attachments — MIME decoding, hash verification, metadata extraction, and malware scanning.</p>
+        </div>
+        <div class="card" style="cursor:pointer" onclick="showPage('tools')">
+          <h4><i class="ti ti-tool" style="color:#ec4899" aria-hidden="true"></i> Tools Arsenal</h4>
+          <p>Every major tool used by forensic analysts — online analyzers, CLI tools, Python libraries, and Wireshark tips.</p>
+        </div>
+      </div>
+
+      <h2><i class="ti ti-flow" style="color:#7c3aed" aria-hidden="true"></i> Investigation Workflow</h2>
+      <div class="flow">
+        <div class="flow-step"><div class="step-num">01</div>Acquire Raw Email</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><div class="step-num">02</div>Extract Headers</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><div class="step-num">03</div>Check Auth (SPF/DKIM)</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><div class="step-num">04</div>Trace IPs</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><div class="step-num">05</div>Analyze Content</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><div class="step-num">06</div>Document Evidence</div>
+      </div>
+
+      <div class="callout callout-warn">
+        <div class="callout-title"><i class="ti ti-alert-triangle" aria-hidden="true"></i> Legal Notice</div>
+        <p>Always obtain proper authorization before analyzing emails. Unauthorized email interception may violate laws like CFAA (US), CMA (UK), or IT Act (India). Preserve chain of custody for any evidence used in legal proceedings.</p>
+      </div>
+    </div>
+
+    <!-- HEADERS PAGE -->
+    <div class="page" id="page-headers">
+      <div class="page-title"><i class="ti ti-list-details" style="color:#22d3ee" aria-hidden="true"></i> Email Headers <span class="badge badge-cyan">Deep Dive</span></div>
+      <div class="subtitle">Raw email headers contain the entire journey and metadata of an email. Learn to read every field.</div>
+
+      <h2>How to Get Raw Headers</h2>
+      <div class="grid-3">
+        <div class="card"><h4>Gmail</h4><p>Open email → ⋮ More → "Show original"</p></div>
+        <div class="card"><h4>Outlook</h4><p>File → Properties → Internet headers box</p></div>
+        <div class="card"><h4>Thunderbird</h4><p>View → Headers → All, or Ctrl+U</p></div>
+      </div>
+
+      <h2>Real Header Example</h2>
+      <p>Below is a real-world raw email header from a suspicious email. Click each section to understand what it means:</p>
+      <div class="accordion">
+        <div class="acc-header" onclick="toggleAcc(this)">
+          <span><span style="color:#34d399">Received:</span> Hop Chain (Most Important — Read Bottom to Top) <span class="badge badge-green" style="margin-left:8px">Critical</span></span>
+          <i class="ti ti-chevron-down" aria-hidden="true"></i>
+        </div>
+        <div class="acc-body">
+          <div class="code-block"><span class="hl-key">Received:</span> <span class="hl-val">from mail.evil-sender.ru</span> (<span class="hl-ip">185.220.101.45</span>)
+        by mx.victim-corp.com with ESMTP id x7si123
+        <span class="hl-ok">for &lt;victim@victim-corp.com&gt;;</span>
+        Thu, 15 May 2025 09:14:22 -0700
+
+<span class="hl-comment"># ← This is the LAST hop (nearest to recipient = least trustworthy)</span>
+<span class="hl-comment"># "from" = sending server self-identified name</span>
+<span class="hl-comment"># IP in () = ACTUAL IP address (trust this over the name)</span>
+<span class="hl-comment"># "by" = receiving mail server</span>
+
+<span class="hl-key">Received:</span> <span class="hl-val">from webmail.evil-sender.ru</span> (<span class="hl-ip">185.220.101.45</span>)
+        by mail.evil-sender.ru with ESMTPS
+        Thu, 15 May 2025 09:13:55 +0300
+
+<span class="hl-comment"># ← This is the FIRST hop (origin of the email)</span>
+<span class="hl-comment"># Read from BOTTOM to TOP for true path</span></div>
+          <div class="callout callout-warn" style="margin-top:8px">
+            <div class="callout-title"><i class="ti ti-alert-triangle" aria-hidden="true"></i> Key Rule</div>
+            <p>The BOTTOM-MOST "Received" header is where the email originated. Each hop ABOVE is a relay. Attackers CAN forge headers above — trust only the first hop received by your own mail server.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="acc-header" onclick="toggleAcc(this)">
+          <span><span style="color:#7dd3fc">From / Return-Path / Reply-To:</span> Identity Fields <span class="badge badge-red" style="margin-left:8px">Spoofable</span></span>
+          <i class="ti ti-chevron-down" aria-hidden="true"></i>
+        </div>
+        <div class="acc-body">
+          <div class="code-block"><span class="hl-key">From:</span>         <span class="hl-warn">"PayPal Security" &lt;noreply@paypa1.com&gt;</span>
+<span class="hl-key">Reply-To:</span>     <span class="hl-warn">harvest@phisher.ru</span>
+<span class="hl-key">Return-Path:</span>  <span class="hl-warn">&lt;bounce@evil-mailer.net&gt;</span>
+
+<span class="hl-comment"># ANALYSIS:</span>
+<span class="hl-comment"># From: display name says "PayPal" but domain is paypa1.com (number 1 not letter l!)</span>
+<span class="hl-comment"># Reply-To: replies go to attacker, not sender</span>
+<span class="hl-comment"># Return-Path: bounces (delivery failures) go to attacker's server</span>
+<span class="hl-comment"># These fields are ENTIRELY under the sender's control — always verify!</span></div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="acc-header" onclick="toggleAcc(this)">
+          <span><span style="color:#a78bfa">Message-ID / X-Mailer:</span> Origin Fingerprinting</span>
+          <i class="ti ti-chevron-down" aria-hidden="true"></i>
+        </div>
+        <div class="acc-body">
+          <div class="code-block"><span class="hl-key">Message-ID:</span> <span class="hl-val">&lt;CABc123xyz@mail.gmail.com&gt;</span>
+<span class="hl-comment"># Legitimate: domain matches sender's domain</span>
+<span class="hl-comment"># Suspicious: Message-ID domain differs from From: domain</span>
+
+<span class="hl-key">Message-ID:</span> <span class="hl-warn">&lt;20250515091422.12345@evil-sender.ru&gt;</span>
+<span class="hl-comment"># Reveals real sending server: evil-sender.ru</span>
+
+<span class="hl-key">X-Mailer:</span> <span class="hl-val">The Bat! 10.3.1.1</span>
+<span class="hl-comment"># Reveals the email client used (can be faked)</span>
+
+<span class="hl-key">X-Originating-IP:</span> <span class="hl-ip">185.220.101.45</span>
+<span class="hl-comment"># Added by some webmail providers — the device's public IP</span>
+<span class="hl-comment"># Gmail stopped including this; Yahoo/Hotmail still do sometimes</span></div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="acc-header" onclick="toggleAcc(this)">
+          <span><span style="color:#fbbf24">Date / Timezone:</span> Timestamp Analysis</span>
+          <i class="ti ti-chevron-down" aria-hidden="true"></i>
+        </div>
+        <div class="acc-body">
+          <div class="code-block"><span class="hl-key">Date:</span> <span class="hl-val">Thu, 15 May 2025 09:14:22 -0700</span>
+
+<span class="hl-comment"># Timezone offset: -0700 = PDT (Pacific Daylight Time, USA)</span>
+<span class="hl-comment"># BUT: The Received header shows +0300 (Moscow/Istanbul time)</span>
+<span class="hl-comment"># MISMATCH: Date claims US Pacific, server is Eastern Europe</span>
+<span class="hl-comment"># This timezone inconsistency is a RED FLAG</span>
+
+<span class="hl-comment"># Compare ALL timestamps in Received chain:</span>
+<span class="hl-key">Received:</span> ... Thu, 15 May 2025 09:13:55 <span class="hl-ip">+0300</span>
+<span class="hl-key">Received:</span> ... Thu, 15 May 2025 09:14:01 <span class="hl-ip">+0300</span>
+<span class="hl-key">Received:</span> ... Thu, 15 May 2025 09:14:22 <span class="hl-warn">-0700</span>
+<span class="hl-comment"># Transit time between hops should be 0–120 seconds. Longer = suspicious.</span></div>
+        </div>
+      </div>
+
+      <h2>Header Field Reference Table</h2>
+      <table>
+        <tr><th>Header Field</th><th>Purpose</th><th>Trustworthy?</th><th>What to Look For</th></tr>
+        <tr><td><code>Received</code></td><td>Mail server relay chain</td><td><span style="color:#34d399">Bottom hop only</span></td><td>Real IPs, transit times, relay path</td></tr>
+        <tr><td><code>From</code></td><td>Displayed sender</td><td><span style="color:#f87171">No — fully spoofable</span></td><td>Display name vs actual domain mismatch</td></tr>
+        <tr><td><code>Return-Path</code></td><td>Bounce destination</td><td><span style="color:#fbbf24">Partially</span></td><td>Should match From domain; if different = suspicious</td></tr>
+        <tr><td><code>Reply-To</code></td><td>Where replies go</td><td><span style="color:#f87171">No</span></td><td>If differs from From, replies go to attacker</td></tr>
+        <tr><td><code>Message-ID</code></td><td>Unique email identifier</td><td><span style="color:#fbbf24">Partially</span></td><td>Domain should match sender's domain</td></tr>
+        <tr><td><code>X-Originating-IP</code></td><td>Client device IP</td><td><span style="color:#34d399">Usually yes</span></td><td>Added by mail provider — use for geolocation</td></tr>
+        <tr><td><code>MIME-Version</code></td><td>Email format version</td><td><span style="color:#94a3b8">Neutral</span></td><td>1.0 is standard; mismatches suggest old/unusual clients</td></tr>
+        <tr><td><code>Content-Type</code></td><td>Body encoding type</td><td><span style="color:#94a3b8">Neutral</span></td><td>multipart/mixed = has attachments; check boundary values</td></tr>
+      </table>
+    </div>
+
+    <!-- AUTH PAGE -->
+    <div class="page" id="page-auth">
+      <div class="page-title"><i class="ti ti-lock" style="color:#a78bfa" aria-hidden="true"></i> SPF / DKIM / DMARC <span class="badge badge-purple">Authentication</span></div>
+      <div class="subtitle">The three pillars of email authentication. Together they tell you if an email truly came from who it claims.</div>
+
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab(this,'spf')">SPF</div>
+        <div class="tab" onclick="switchTab(this,'dkim')">DKIM</div>
+        <div class="tab" onclick="switchTab(this,'dmarc')">DMARC</div>
+        <div class="tab" onclick="switchTab(this,'combined')">Combined Example</div>
+      </div>
+
+      <div class="tab-content active" id="tab-spf">
+        <h3>SPF — Sender Policy Framework</h3>
+        <p>SPF is a DNS TXT record that lists which IP addresses are authorized to send email for a domain. The receiving mail server checks if the sending IP is in this list.</p>
+        <div class="callout callout-info">
+          <div class="callout-title"><i class="ti ti-bulb" aria-hidden="true"></i> How it works</div>
+          <p>When email arrives from <code>user@example.com</code>, the receiving server looks up the DNS TXT record for <code>example.com</code> and checks if the sending IP is authorized there.</p>
+        </div>
+        <h3>SPF DNS Record Example</h3>
+        <div class="code-block"><span class="hl-comment"># DNS lookup: dig TXT example.com</span>
+<span class="hl-key">example.com.</span>  IN  TXT  "<span class="hl-val">v=spf1 ip4:192.0.2.0/24 ip4:198.51.100.123 include:_spf.google.com ~all</span>"
+
+<span class="hl-comment"># v=spf1          → SPF version 1</span>
+<span class="hl-comment"># ip4:192.0.2.0/24 → Entire /24 range is authorized</span>
+<span class="hl-comment"># ip4:198.51.100.123 → This specific IP is authorized</span>
+<span class="hl-comment"># include:_spf.google.com → Also authorize Google's mail servers</span>
+<span class="hl-comment"># ~all             → SoftFail: anything else is suspicious (not a hard reject)</span>
+<span class="hl-comment"># -all             → HardFail: anything else MUST be rejected</span>
+<span class="hl-comment"># +all             → Allow ALL (dangerous — do not use)</span></div>
+        <h3>SPF Result in Email Header</h3>
+        <div class="code-block"><span class="hl-key">Received-SPF:</span> <span class="hl-ok">pass</span> (google.com: domain of support@amazon.com designates
+             192.0.2.47 as permitted sender)
+             client-ip=<span class="hl-ip">192.0.2.47</span>;
+
+<span class="hl-comment">─── Phishing email example ───</span>
+
+<span class="hl-key">Received-SPF:</span> <span class="hl-warn">fail</span> (google.com: domain of noreply@amazon.com does NOT
+             designate <span class="hl-ip">185.220.101.45</span> as permitted sender)
+             client-ip=<span class="hl-ip">185.220.101.45</span>; <span class="hl-warn">mechanism="-all"</span></div>
+        <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
+          <span class="spf-result spf-pass">✓ pass — IP is authorized</span>
+          <span class="spf-result spf-fail">✗ fail — IP not authorized, reject</span>
+          <span class="spf-result spf-soft">~ softfail — suspicious but accept</span>
+          <span class="spf-result" style="background:rgba(148,163,184,.1);color:#94a3b8;border:1px solid rgba(148,163,184,.3)">? neutral — no policy</span>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-dkim">
+        <h3>DKIM — DomainKeys Identified Mail</h3>
+        <p>DKIM adds a cryptographic digital signature to emails. The signing domain publishes its public key in DNS. Recipients verify the signature to confirm the email wasn't modified in transit.</p>
+        <div class="callout callout-success">
+          <div class="callout-title"><i class="ti ti-check" aria-hidden="true"></i> Why DKIM matters</div>
+          <p>SPF only checks if the IP is authorized. DKIM proves the email content was not tampered with after the sender signed it. Even if someone relays your email, a valid DKIM signature proves the body is intact.</p>
+        </div>
+        <h3>DKIM Signature in Header</h3>
+        <div class="code-block"><span class="hl-key">DKIM-Signature:</span> <span class="hl-val">v=1; a=rsa-sha256; c=relaxed/relaxed;</span>
+        <span class="hl-val">d=amazon.com;</span>    <span class="hl-comment">← signing domain</span>
+        <span class="hl-val">s=20210112;</span>      <span class="hl-comment">← selector (key identifier)</span>
+        h=from:to:subject:date:message-id:mime-version;
+        <span class="hl-comment">          ↑ which headers are covered by signature</span>
+        bh=<span class="hl-ok">Yc1QVqPdZWwDvhWqaEn...</span>;  <span class="hl-comment">← hash of body</span>
+        b=<span class="hl-ok">ABCDef123...GHIJkl456==</span>    <span class="hl-comment">← actual digital signature</span>
+
+<span class="hl-comment"># DNS key lookup: dig TXT 20210112._domainkey.amazon.com</span>
+<span class="hl-key">20210112._domainkey.amazon.com.</span> IN TXT "<span class="hl-val">v=DKIM1; k=rsa; p=MIGfMA0...</span>"
+
+<span class="hl-comment">─── Forged email — DKIM fails ───</span>
+<span class="hl-key">Authentication-Results:</span>
+    dkim=<span class="hl-warn">fail</span> (signature did not verify)
+         header.d=amazon.com header.s=20210112
+<span class="hl-comment"># Body was modified after signing, or header.d doesn't match From domain</span></div>
+        <div class="callout callout-warn">
+          <div class="callout-title"><i class="ti ti-alert-triangle" aria-hidden="true"></i> DKIM Replay Attack</div>
+          <p>An attacker can copy a legitimate DKIM-signed email and replay it to new victims. The signature still passes! This is why DMARC alignment checks are also needed.</p>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-dmarc">
+        <h3>DMARC — Domain-based Message Authentication</h3>
+        <p>DMARC ties SPF and DKIM together. It tells receivers what to do when SPF or DKIM fail, and requires that the "From" domain aligns with SPF/DKIM domains.</p>
+        <div class="code-block"><span class="hl-comment"># DNS lookup: dig TXT _dmarc.example.com</span>
+<span class="hl-key">_dmarc.example.com.</span>  IN  TXT
+    "<span class="hl-val">v=DMARC1;</span>
+     <span class="hl-val">p=reject;</span>          <span class="hl-comment">← policy: none / quarantine / reject</span>
+     <span class="hl-val">pct=100;</span>           <span class="hl-comment">← apply to 100% of messages</span>
+     <span class="hl-val">rua=mailto:dmarc-reports@example.com;</span>  <span class="hl-comment">← send aggregate reports here</span>
+     <span class="hl-val">ruf=mailto:forensics@example.com;</span>      <span class="hl-comment">← send forensic reports here</span>
+     <span class="hl-val">aspf=s;</span>            <span class="hl-comment">← strict SPF alignment</span>
+     <span class="hl-val">adkim=s"</span>           <span class="hl-comment">← strict DKIM alignment</span>
+
+<span class="hl-comment"># Policies:</span>
+<span class="hl-comment"># none       = monitor only, take no action (bad — lets phishing through)</span>
+<span class="hl-comment"># quarantine = send to spam folder</span>
+<span class="hl-comment"># reject     = refuse delivery entirely (best protection)</span></div>
+        <h3>DMARC Result in Header</h3>
+        <div class="code-block"><span class="hl-comment">─── Legitimate email ───</span>
+<span class="hl-key">Authentication-Results:</span> mx.google.com;
+    spf=<span class="hl-ok">pass</span> (google.com: domain of @amazon.com designates 192.0.2.47 as permitted)
+    dkim=<span class="hl-ok">pass</span> header.i=@amazon.com header.s=20210112
+    dmarc=<span class="hl-ok">pass</span> (p=REJECT sp=REJECT dis=NONE) header.from=amazon.com
+
+<span class="hl-comment">─── Phishing/spoofed email ───</span>
+<span class="hl-key">Authentication-Results:</span> mx.google.com;
+    spf=<span class="hl-warn">fail</span> (domain of noreply@amazon.com does not designate 185.220.101.45)
+    dkim=<span class="hl-warn">fail</span>
+    dmarc=<span class="hl-warn">fail</span> (p=REJECT sp=REJECT dis=REJECT) header.from=amazon.com
+<span class="hl-comment"># Result: email should have been REJECTED but might still slip through</span>
+<span class="hl-comment"># if recipient server ignores DMARC policy (common with weak configs)</span></div>
+      </div>
+
+      <div class="tab-content" id="tab-combined">
+        <h3>Full Authentication Results — Real Example</h3>
+        <p>Here is a complete Authentication-Results header from a real phishing email impersonating a bank:</p>
+        <div class="code-block"><span class="hl-key">Authentication-Results:</span> mx.google.com;
+       dkim=<span class="hl-warn">fail</span> reason="signature verification failed"
+            header.i=<span class="hl-warn">@secure-hsbc-alerts.com</span>
+            header.s=default header.b=aB3xY7pQ;
+       spf=<span class="hl-warn">softfail</span> (google.com: domain of alert@secure-hsbc-alerts.com
+            does not designate <span class="hl-ip">45.33.32.156</span> as permitted sender)
+            smtp.mailfrom=alert@secure-hsbc-alerts.com;
+       dmarc=<span class="hl-warn">fail</span> (p=NONE sp=NONE dis=NONE)
+            header.from=<span class="hl-warn">secure-hsbc-alerts.com</span>
+
+<span class="hl-comment">─── Forensic Analysis ───</span>
+<span class="hl-comment"># 1. DKIM fails → email content was modified, or fake domain</span>
+<span class="hl-comment"># 2. SPF softfail → 45.33.32.156 not in authorized list</span>
+<span class="hl-comment"># 3. Sending domain: secure-hsbc-alerts.com (NOT hsbc.com)</span>
+<span class="hl-comment"># 4. DMARC policy=NONE → hsbc.com has no protection on this subdomain</span>
+<span class="hl-comment"># 5. Verdict: PHISHING — fake domain impersonating HSBC bank</span></div>
+        <div class="callout callout-danger">
+          <div class="callout-title"><i class="ti ti-x" aria-hidden="true"></i> Red Flags Found</div>
+          <p>Domain <code>secure-hsbc-alerts.com</code> is NOT <code>hsbc.com</code>. SPF softfail + DKIM fail + DMARC fail = clear phishing attempt. The sender registered a lookalike domain to bypass naive From: header checks.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- IP TRACING PAGE -->
+    <div class="page" id="page-tracing">
+      <div class="page-title"><i class="ti ti-route" style="color:#34d399" aria-hidden="true"></i> IP Address Tracing <span class="badge badge-green">Geolocation</span></div>
+      <div class="subtitle">Extract real IP addresses from email headers and trace them to physical locations, ISPs, and threat intelligence databases.</div>
+
+      <h2>Step 1 — Extract the Real IP</h2>
+      <div class="code-block"><span class="hl-comment"># Full Received chain from a suspicious email:</span>
+
+<span class="hl-key">Received:</span> from [<span class="hl-ip">185.220.101.45</span>] (helo=mail.totally-legit.com)
+    by mx1.victim.org (Postfix) with ESMTPS id A1B2C3D4
+    for &lt;hr@victim.org&gt;; Mon, 20 May 2025 14:22:11 -0400
+
+<span class="hl-key">Received:</span> from [<span class="hl-ip">10.0.0.5</span>] (localhost [127.0.0.1])
+    by mail.totally-legit.com with ESMTP
+    for &lt;hr@victim.org&gt;; Mon, 20 May 2025 21:22:05 +0300
+
+<span class="hl-comment"># ANALYSIS:</span>
+<span class="hl-comment"># 10.0.0.5 = private/internal IP — NOT useful for tracing</span>
+<span class="hl-comment"># 185.220.101.45 = public IP — THIS is what we trace</span>
+<span class="hl-comment"># The first hop received by victim.org's MX server is most reliable</span></div>
+
+      <h2>Step 2 — WHOIS + RDNS Lookup</h2>
+      <div class="code-block"><span class="hl-comment"># Terminal commands:</span>
+<span class="hl-key">$</span> whois <span class="hl-ip">185.220.101.45</span>
+
+<span class="hl-comment">─── Output ───</span>
+<span class="hl-key">NetRange:</span>       <span class="hl-ip">185.220.96.0</span> - <span class="hl-ip">185.220.127.255</span>
+<span class="hl-key">CIDR:</span>           <span class="hl-ip">185.220.96.0/19</span>
+<span class="hl-key">NetName:</span>        <span class="hl-warn">ACCESSNOW-TOR</span>
+<span class="hl-key">OrgName:</span>        <span class="hl-warn">Tor Project, Inc.</span>
+<span class="hl-key">OrgId:</span>          TORPR
+<span class="hl-key">Country:</span>        <span class="hl-val">US</span>
+<span class="hl-key">RegDate:</span>        <span class="hl-val">2018-10-03</span>
+
+<span class="hl-comment"># 185.220.101.45 is a TOR Exit Node!</span>
+<span class="hl-comment"># This means the sender intentionally anonymized their real IP</span>
+<span class="hl-comment"># Tracing beyond this point requires legal process (subpoena to TOR directory)</span>
+
+<span class="hl-key">$</span> host <span class="hl-ip">185.220.101.45</span>
+<span class="hl-comment"># Output: 45.101.220.185.in-addr.arpa → tor-exit-relay.example.org</span></div>
+
+      <h2>Step 3 — Geolocation Lookup</h2>
+      <div class="code-block"><span class="hl-comment"># Using MaxMind GeoIP2 (Python):</span>
+<span class="hl-key">import</span> geoip2.database
+reader = geoip2.database.Reader(<span class="hl-val">'GeoLite2-City.mmdb'</span>)
+response = reader.city(<span class="hl-val">'91.108.4.1'</span>)
+
+<span class="hl-comment">─── Output ───</span>
+<span class="hl-key">Country:</span>          <span class="hl-val">Russia (RU)</span>
+<span class="hl-key">City:</span>             <span class="hl-val">Moscow</span>
+<span class="hl-key">Latitude:</span>         <span class="hl-val">55.7386</span>
+<span class="hl-key">Longitude:</span>        <span class="hl-val">37.6068</span>
+<span class="hl-key">ISP:</span>              <span class="hl-warn">Telegram Messenger Inc.</span>
+<span class="hl-key">Organization:</span>     <span class="hl-warn">Telegram</span>
+<span class="hl-key">ASN:</span>              <span class="hl-val">AS62041</span>
+
+<span class="hl-comment"># Note: Geolocation accuracy is ~city-level for most IPs</span>
+<span class="hl-comment"># VPN/proxy IPs will show VPN provider location, not real attacker</span></div>
+
+      <h2>Identifying Suspicious IPs</h2>
+      <table>
+        <tr><th>IP Range / Indicator</th><th>What it Means</th><th>Action</th></tr>
+        <tr><td><span class="ip-tag">10.x.x.x / 192.168.x.x</span></td><td>Private/internal — not routable on internet</td><td>Ignore for external tracing</td></tr>
+        <tr><td><span class="ip-tag">127.0.0.1</span></td><td>Localhost — server added internally</td><td>Ignore</td></tr>
+        <tr><td>WHOIS shows Tor Project / "Tor Exit"</td><td>Traffic routed through Tor anonymizer</td><td>Flag as anonymized — legal process needed</td></tr>
+        <tr><td>WHOIS shows hosting provider (OVH, DigitalOcean, Linode)</td><td>Sent from VPS/cloud server</td><td>Subpoena hosting provider logs</td></tr>
+        <tr><td>IP in known blacklists (Spamhaus, SURBL)</td><td>Known spam/malware source</td><td>High confidence malicious</td></tr>
+        <tr><td>IP country mismatches From: domain country</td><td>Geographic inconsistency</td><td>Investigate further</td></tr>
+      </table>
+
+      <h2>Threat Intelligence Lookups</h2>
+      <div class="code-block"><span class="hl-comment"># VirusTotal API lookup for an IP:</span>
+<span class="hl-key">$</span> curl -s "https://www.virustotal.com/api/v3/ip_addresses/<span class="hl-ip">185.220.101.45</span>" \
+  -H "x-apikey: YOUR_KEY" | python3 -m json.tool
+
+<span class="hl-comment">─── Key fields in output ───</span>
+<span class="hl-key">"malicious":</span>        <span class="hl-warn">47</span>    <span class="hl-comment">← 47 security vendors flagged this IP</span>
+<span class="hl-key">"suspicious":</span>       <span class="hl-val">3</span>
+<span class="hl-key">"harmless":</span>         <span class="hl-val">0</span>
+<span class="hl-key">"country":</span>          <span class="hl-val">"NL"</span>
+<span class="hl-key">"as_owner":</span>         <span class="hl-warn">"Tor Project"</span>
+<span class="hl-key">"last_analysis_date":</span><span class="hl-val">1747123200</span>
+
+<span class="hl-comment"># AbuseIPDB:</span>
+<span class="hl-key">$</span> curl "https://api.abuseipdb.com/api/v2/check?ipAddress=<span class="hl-ip">185.220.101.45</span>" \
+  -H "Key: YOUR_KEY" -H "Accept: application/json"
+
+<span class="hl-comment">─── Output ───</span>
+<span class="hl-key">"abuseConfidenceScore":</span> <span class="hl-warn">100</span>   <span class="hl-comment">← 100% = definitely malicious</span>
+<span class="hl-key">"totalReports":</span>         <span class="hl-warn">3892</span>
+<span class="hl-key">"lastReportedAt":</span>       <span class="hl-val">"2025-05-14T..."</span>
+<span class="hl-key">"usageType":</span>            <span class="hl-warn">"Tor Exit Node"</span></div>
+    </div>
+
+    <!-- PHISHING PAGE -->
+    <div class="page" id="page-phishing">
+      <div class="page-title"><i class="ti ti-fish" style="color:#f87171" aria-hidden="true"></i> Phishing Analysis <span class="badge badge-red">High Risk</span></div>
+      <div class="subtitle">Systematically identify and document phishing emails. Real examples of social engineering techniques.</div>
+
+      <h2>Domain Spoofing Techniques</h2>
+      <div class="accordion">
+        <div class="acc-header" onclick="toggleAcc(this)">
+          <span>Homograph / Lookalike Domain Attack</span>
+          <i class="ti ti-chevron-down" aria-hidden="true"></i>
+        </div>
+        <div class="acc-body">
+          <div class="code-block"><span class="hl-comment"># Real domain vs. fake domains (visual comparison):</span>
+<span class="hl-ok">paypal.com</span>         ← Legitimate
+<span class="hl-warn">paypa1.com</span>         ← Number 1 instead of letter l
+<span class="hl-warn">paypal-secure.com</span>  ← Extra subdomain prepended
+<span class="hl-warn">pаypal.com</span>         ← Cyrillic 'а' (Unicode U+0430) looks identical to Latin 'a'
+<span class="hl-warn">paypa⁠l.com</span>         ← Zero-width space inserted (invisible!)
+
+<span class="hl-comment"># Check for IDN homograph:</span>
+<span class="hl-key">$</span> python3 -c "print('pаypal.com'.encode('idna'))"
+<span class="hl-comment"># Output: xn--pypal-4ve.com  ← Punycode reveals Cyrillic character!</span></div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="acc-header" onclick="toggleAcc(this)">
+          <span>Display Name Spoofing</span>
+          <i class="ti ti-chevron-down" aria-hidden="true"></i>
+        </div>
+        <div class="acc-body">
+          <div class="code-block"><span class="hl-comment"># Email clients show display name prominently</span>
+<span class="hl-key">From:</span> <span class="hl-warn">"Apple Support &lt;noreply@apple.com&gt;" &lt;phisher@random-server.ru&gt;</span>
+
+<span class="hl-comment"># The display name is "Apple Support &lt;noreply@apple.com&gt;"</span>
+<span class="hl-comment"># Many clients show this as the sender — including the fake Apple address</span>
+<span class="hl-comment"># The REAL sending address is phisher@random-server.ru</span>
+
+<span class="hl-comment"># Another common form:</span>
+<span class="hl-key">From:</span> <span class="hl-warn">"security-alert@amazon.com" &lt;no-reply@amaz0n-support.net&gt;</span></div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="acc-header" onclick="toggleAcc(this)">
+          <span>Malicious Link Analysis</span>
+          <i class="ti ti-chevron-down" aria-hidden="true"></i>
+        </div>
+        <div class="acc-body">
+          <div class="code-block"><span class="hl-comment"># Phishing email body HTML source:</span>
+&lt;a href="<span class="hl-warn">https://secure-login.paypal.com.verification-needed.xyz/auth</span>"&gt;
+    Click here to verify your account
+&lt;/a&gt;
+
+<span class="hl-comment"># URL Analysis:</span>
+<span class="hl-comment"># Domain is: verification-needed.xyz  (NOT paypal.com!)</span>
+<span class="hl-comment"># paypal.com appears in the PATH, not the domain</span>
+<span class="hl-comment"># Browser reads: [subdomain].[domain].[TLD]/[path]</span>
+<span class="hl-comment"># = secure-login.paypal.com . verification-needed.xyz / auth</span>
+
+<span class="hl-comment"># Defang URLs before analysis (prevent accidental clicks):</span>
+<span class="hl-key">$</span> python3 -c "
+url = 'https://secure-login.paypal.com.verification-needed.xyz/auth'
+print(url.replace('http', 'hxxp').replace('.', '[.]'))
+"
+<span class="hl-comment"># Output: hxxps://secure-login[.]paypal[.]com[.]verification-needed[.]xyz/auth</span></div>
+        </div>
+      </div>
+
+      <h2>Social Engineering Indicators</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h4><i class="ti ti-alarm" style="color:#f87171" aria-hidden="true"></i> Urgency / Scarcity</h4>
+          <p>Phrases like "Your account will be closed in 24 hours", "Immediate action required", "Last warning". Creates panic to bypass critical thinking.</p>
+        </div>
+        <div class="card">
+          <h4><i class="ti ti-trophy" style="color:#fbbf24" aria-hidden="true"></i> Rewards / Too Good</h4>
+          <p>"You've won $1,000", "Unclaimed package", "Tax refund of $450 awaiting". Exploits greed and curiosity.</p>
+        </div>
+        <div class="card">
+          <h4><i class="ti ti-user-check" style="color:#a78bfa" aria-hidden="true"></i> Authority</h4>
+          <p>Impersonating CEO (BEC), bank, IRS/IT department, police. "This is the IT department, your password must be reset now."</p>
+        </div>
+        <div class="card">
+          <h4><i class="ti ti-eye-off" style="color:#94a3b8" aria-hidden="true"></i> Obfuscation</h4>
+          <p>Tiny font URLs, white text on white background, HTML comments breaking keywords to bypass filters, base64-encoded content.</p>
+        </div>
+      </div>
+
+      <h2>BEC (Business Email Compromise) Example</h2>
+      <div class="code-block"><span class="hl-comment"># Email received by finance team:</span>
+<span class="hl-key">From:</span>     <span class="hl-warn">"John Smith CEO" &lt;jsmith@company-corp.co&gt;</span>
+<span class="hl-comment">#                         ↑ Real domain: company.com — this is company-corp.co</span>
+<span class="hl-key">To:</span>       finance@company.com
+<span class="hl-key">Subject:</span>  Urgent Wire Transfer Required — Confidential
+
+Hi Sarah,
+
+I'm in a board meeting and need you to process a wire transfer
+immediately. $47,500 to our new vendor:
+
+Bank: First National Bank
+Account: 8823441290
+Routing: 021000021
+
+Please do this ASAP and do not discuss with anyone — NDA.
+I'll explain when I'm back.
+
+John
+
+<span class="hl-comment">─── Red Flags ───</span>
+<span class="hl-comment"># 1. Domain: company-corp.co (not company.com)</span>
+<span class="hl-comment"># 2. Urgency: "immediately", "ASAP"</span>
+<span class="hl-comment"># 3. Secrecy: "do not discuss with anyone"</span>
+<span class="hl-comment"># 4. Out of normal process (no PO, no approval chain)</span>
+<span class="hl-comment"># 5. SPF: fail, DKIM: none (check headers!)</span></div>
+    </div>
+
+    <!-- ATTACHMENTS PAGE -->
+    <div class="page" id="page-attachments">
+      <div class="page-title"><i class="ti ti-paperclip" style="color:#fbbf24" aria-hidden="true"></i> Attachment Analysis <span class="badge badge-yellow">Malware Detection</span></div>
+      <div class="subtitle">Safely examine suspicious email attachments without executing them. Extract metadata, hashes, and malware indicators.</div>
+
+      <div class="callout callout-danger">
+        <div class="callout-title"><i class="ti ti-alert-triangle" aria-hidden="true"></i> Safety First</div>
+        <p>NEVER open suspicious attachments on your main machine. Use an isolated VM (Kali Linux, REMnux) or an online sandbox like any.run, Joe Sandbox, or Triage. Disable network access before analyzing.</p>
+      </div>
+
+      <h2>MIME Decoding — Extract Attachments from Raw Email</h2>
+      <div class="code-block"><span class="hl-comment"># Raw email MIME structure:</span>
+<span class="hl-key">MIME-Version:</span> 1.0
+<span class="hl-key">Content-Type:</span> multipart/mixed; boundary="<span class="hl-val">==_boundary_12345==</span>"
+
+--==_boundary_12345==
+<span class="hl-key">Content-Type:</span> text/html; charset="UTF-8"
+<span class="hl-comment">[HTML email body here]</span>
+
+--==_boundary_12345==
+<span class="hl-key">Content-Type:</span> application/octet-stream; name="<span class="hl-warn">Invoice_May2025.pdf.exe</span>"
+<span class="hl-key">Content-Disposition:</span> attachment; filename="<span class="hl-warn">Invoice_May2025.pdf.exe</span>"
+<span class="hl-key">Content-Transfer-Encoding:</span> base64
+
+TVqQAAMAAAAEAAAA//8AALgAAAAAAAAAQA...
+<span class="hl-comment"># ↑ Base64 encoded executable!</span>
+<span class="hl-comment"># Filename shows .pdf.exe — Windows hides .exe extension by default</span>
+<span class="hl-comment"># Victim sees "Invoice_May2025.pdf" with PDF icon</span></div>
+
+      <h2>Python — Extract and Analyze Attachments</h2>
+      <div class="code-block"><span class="hl-key">import</span> email, hashlib, magic, sys
+
+<span class="hl-comment"># Load raw email</span>
+with open(<span class="hl-val">'suspicious.eml'</span>, <span class="hl-val">'rb'</span>) as f:
+    msg = email.message_from_binary_file(f)
+
+for part in msg.walk():
+    if part.get_content_disposition() == <span class="hl-val">'attachment'</span>:
+        filename = part.get_filename()
+        payload = part.get_payload(decode=<span class="hl-key">True</span>)
+        
+        <span class="hl-comment"># Calculate hashes</span>
+        md5    = hashlib.md5(payload).hexdigest()
+        sha1   = hashlib.sha1(payload).hexdigest()
+        sha256 = hashlib.sha256(payload).hexdigest()
+        
+        <span class="hl-comment"># Detect true file type (ignore extension)</span>
+        file_type = magic.from_buffer(payload, mime=<span class="hl-key">True</span>)
+        
+        print(f<span class="hl-val">"Filename: {filename}"</span>)
+        print(f<span class="hl-val">"True type: {file_type}"</span>)   <span class="hl-comment">← CRITICAL: compare to extension</span>
+        print(f<span class="hl-val">"MD5:    {md5}"</span>)
+        print(f<span class="hl-val">"SHA256: {sha256}"</span>)
+
+<span class="hl-comment">─── Output ───</span>
+<span class="hl-key">Filename:</span>   <span class="hl-warn">Invoice_May2025.pdf</span>
+<span class="hl-key">True type:</span>  <span class="hl-warn">application/x-dosexec</span>   ← It's an EXE disguised as PDF!
+<span class="hl-key">MD5:</span>        <span class="hl-warn">a1b2c3d4e5f6789012345678</span>
+<span class="hl-key">SHA256:</span>     <span class="hl-warn">deadbeef1234...abc789</span>    ← Submit this to VirusTotal</span></div>
+
+      <h2>File Magic Bytes Reference</h2>
+      <table>
+        <tr><th>File Type</th><th>Magic Bytes (Hex)</th><th>Extension</th></tr>
+        <tr><td>PDF</td><td><code>25 50 44 46</code> (= %PDF)</td><td>.pdf</td></tr>
+        <tr><td>Windows PE (EXE/DLL)</td><td><code>4D 5A</code> (= MZ)</td><td>.exe .dll</td></tr>
+        <tr><td>ZIP archive</td><td><code>50 4B 03 04</code></td><td>.zip .docx .xlsx</td></tr>
+        <tr><td>RAR archive</td><td><code>52 61 72 21 1A 07</code></td><td>.rar</td></tr>
+        <tr><td>Office macro doc</td><td><code>D0 CF 11 E0</code></td><td>.doc .xls .ppt</td></tr>
+        <tr><td>ISO image</td><td><code>43 44 30 30 31</code> (=CD001)</td><td>.iso</td></tr>
+      </table>
+
+      <h2>Macro Analysis in Office Files</h2>
+      <div class="code-block"><span class="hl-comment"># Install olevba (part of oletools):</span>
+<span class="hl-key">$</span> pip install oletools
+<span class="hl-key">$</span> olevba <span class="hl-val">Invoice_April.doc</span>
+
+<span class="hl-comment">─── Output ───</span>
+<span class="hl-key">Filename:</span>         Invoice_April.doc
+<span class="hl-key">Type:</span>             OLE
+<span class="hl-key">VBA code:</span>         FOUND in Module: AutoOpen
+
+<span class="hl-key">SUSPICIOUS KEYWORDS:</span>
+  <span class="hl-warn">AutoOpen</span>       → Executes when document opens
+  <span class="hl-warn">Shell</span>          → Runs operating system commands
+  <span class="hl-warn">CreateObject</span>   → Creates COM objects (often WScript.Shell)
+  <span class="hl-warn">powershell</span>     → Invokes PowerShell
+  <span class="hl-warn">-EncodedCommand</span> → Base64-encoded PowerShell (obfuscation)
+  <span class="hl-warn">DownloadFile</span>   → Downloads additional payload
+
+<span class="hl-key">EXTRACTED VBA:</span>
+Sub AutoOpen()
+    Dim cmd As String
+    cmd = "powershell -EncodedCommand <span class="hl-warn">aQBlAHgAI...</span>"
+    Shell cmd, vbHide
+End Sub
+<span class="hl-comment"># This downloads and executes a second stage payload silently</span></div>
+    </div>
+
+    <!-- TOOLS PAGE -->
+    <div class="page" id="page-tools">
+      <div class="page-title"><i class="ti ti-tool" style="color:#ec4899" aria-hidden="true"></i> Tools Arsenal <span class="badge badge-purple">Complete List</span></div>
+      <div class="subtitle">Every tool a forensic analyst needs — from quick web checks to deep command-line analysis.</div>
+
+      <h2>Online Tools</h2>
+      <div class="grid-2">
+        <div class="tool-card">
+          <div class="tool-name"><i class="ti ti-world" aria-hidden="true"></i> MXToolbox</div>
+          <div class="tool-type"><span class="badge badge-cyan">Web Tool</span></div>
+          <p><strong>URL:</strong> mxtoolbox.com<br>Analyze email headers, check SPF/DKIM/DMARC, blacklist checks, DNS lookups. Best starting point for header analysis.</p>
+        </div>
+        <div class="tool-card">
+          <div class="tool-name"><i class="ti ti-mail-search" aria-hidden="true"></i> Google Admin Toolbox</div>
+          <div class="tool-type"><span class="badge badge-cyan">Web Tool</span></div>
+          <p><strong>URL:</strong> toolbox.googleapps.com/apps/messageheader<br>Google's own header analyzer. Excellent for Gmail headers — shows delay between hops visually.</p>
+        </div>
+        <div class="tool-card">
+          <div class="tool-name"><i class="ti ti-virus" aria-hidden="true"></i> VirusTotal</div>
+          <div class="tool-type"><span class="badge badge-red">Threat Intel</span></div>
+          <p><strong>URL:</strong> virustotal.com<br>Scan IP addresses, domains, URLs, and file hashes against 70+ antivirus engines. Essential for quick threat scoring.</p>
+        </div>
+        <div class="tool-card">
+          <div class="tool-name"><i class="ti ti-database" aria-hidden="true"></i> AbuseIPDB</div>
+          <div class="tool-type"><span class="badge badge-red">Threat Intel</span></div>
+          <p><strong>URL:</strong> abuseipdb.com<br>Community-driven database of malicious IPs. Reports include attack type, date, and confidence score.</p>
+        </div>
+        <div class="tool-card">
+          <div class="tool-name"><i class="ti ti-search" aria-hidden="true"></i> Shodan</div>
+          <div class="tool-type"><span class="badge badge-yellow">OSINT</span></div>
+          <p><strong>URL:</strong> shodan.io<br>Search engine for internet-connected devices. Look up a mail server IP to see what services it exposes and any known vulnerabilities.</p>
+        </div>
+        <div class="tool-card">
+          <div class="tool-name"><i class="ti ti-box" aria-hidden="true"></i> Any.Run / Joe Sandbox</div>
+          <div class="tool-type"><span class="badge badge-red">Sandbox</span></div>
+          <p><strong>URLs:</strong> any.run, joesandbox.com<br>Execute suspicious files in an isolated sandbox. See network connections, registry changes, dropped files in real time.</p>
+        </div>
+      </div>
+
+      <h2>Command Line Tools</h2>
+      <div class="code-block"><span class="hl-comment"># ── Forensic CLI Toolkit ──</span>
+
+<span class="hl-comment"># 1. emlAnalyzer — parse and analyze .eml files</span>
+<span class="hl-key">$</span> pip install eml-analyzer
+<span class="hl-key">$</span> emlAnalyzer -i suspicious.eml --header --html -u
+
+<span class="hl-comment"># 2. mail-parser (Python) — extract structured data</span>
+<span class="hl-key">$</span> pip install mail-parser
+<span class="hl-key">$</span> python3 -c "
+import mailparser
+mail = mailparser.parse_from_file('email.eml')
+print(mail.headers)
+print(mail.from_)
+print(mail.attachments)
+"
+
+<span class="hl-comment"># 3. oletools — Office macro analysis</span>
+<span class="hl-key">$</span> pip install oletools
+<span class="hl-key">$</span> olevba attachment.doc
+<span class="hl-key">$</span> mraptor attachment.doc    <span class="hl-comment">← checks for AutoRun macros</span>
+
+<span class="hl-comment"># 4. exiftool — metadata from attachments</span>
+<span class="hl-key">$</span> exiftool attachment.pdf
+<span class="hl-comment"># Reveals: Author, Created date, Modified date, Software used</span>
+
+<span class="hl-comment"># 5. dig — DNS lookups for SPF/DKIM/DMARC</span>
+<span class="hl-key">$</span> dig TXT example.com                    <span class="hl-comment">← SPF record</span>
+<span class="hl-key">$</span> dig TXT _dmarc.example.com             <span class="hl-comment">← DMARC record</span>
+<span class="hl-key">$</span> dig TXT selector._domainkey.example.com <span class="hl-comment">← DKIM public key</span>
+
+<span class="hl-comment"># 6. Thunderbird + ImportExportTools NG</span>
+<span class="hl-comment">#    Export emails as .eml for batch analysis</span>
+
+<span class="hl-comment"># 7. volatility3 (advanced) — memory forensics</span>
+<span class="hl-comment">#    If email opened malware, analyze memory for IOCs</span>
+<span class="hl-key">$</span> python3 vol.py -f memory.dmp windows.cmdline</div>
+
+      <h2>Python Analysis Script Template</h2>
+      <div class="code-block"><span class="hl-key">#!/usr/bin/env python3</span>
+<span class="hl-comment">"""Email Forensic Analysis Script — Use on isolated system"""</span>
+<span class="hl-key">import</span> email, hashlib, re, socket
+from email import policy
+
+def analyze_email(filepath):
+    with open(filepath, <span class="hl-val">'rb'</span>) as f:
+        msg = email.message_from_binary_file(f, policy=policy.default)
+    
+    print(<span class="hl-val">"=== HEADER ANALYSIS ==="</span>)
+    print(f<span class="hl-val">"From:     {msg['from']}"</span>)
+    print(f<span class="hl-val">"Reply-To: {msg['reply-to']}"</span>)
+    print(f<span class="hl-val">"Subject:  {msg['subject']}"</span>)
+    print(f<span class="hl-val">"Date:     {msg['date']}"</span>)
+    print(f<span class="hl-val">"Msg-ID:   {msg['message-id']}"</span>)
+    
+    print(<span class="hl-val">"\n=== RECEIVED HOPS ==="</span>)
+    for received in msg.get_all(<span class="hl-val">'received'</span>, []):
+        ips = re.findall(r'\b(?:\d{1,3}\.){3}\d{1,3}\b', received)
+        print(f<span class="hl-val">"  IPs: {ips}"</span>)
+        print(f<span class="hl-val">"  {received[:80]}..."</span>)
+    
+    print(<span class="hl-val">"\n=== AUTHENTICATION ==="</span>)
+    auth = msg.get(<span class="hl-val">'authentication-results'</span>, <span class="hl-val">'NOT FOUND'</span>)
+    print(auth)
+    
+    print(<span class="hl-val">"\n=== ATTACHMENTS ==="</span>)
+    for part in msg.walk():
+        if part.get_content_disposition() == <span class="hl-val">'attachment'</span>:
+            name = part.get_filename()
+            data = part.get_payload(decode=<span class="hl-key">True</span>)
+            sha256 = hashlib.sha256(data).hexdigest()
+            print(f<span class="hl-val">"  File: {name}"</span>)
+            print(f<span class="hl-val">"  SHA256: {sha256}"</span>)
+            print(f<span class="hl-val">"  Size: {len(data)} bytes"</span>)
+
+analyze_email(<span class="hl-val">'suspicious.eml'</span>)</div>
+    </div>
+
+    <!-- TIMELINE PAGE -->
+    <div class="page" id="page-timeline">
+      <div class="page-title"><i class="ti ti-timeline" style="color:#22d3ee" aria-hidden="true"></i> Building Investigation Timeline <span class="badge badge-cyan">Evidence</span></div>
+      <div class="subtitle">Reconstruct exactly what happened and when. Proper documentation is essential for legal proceedings.</div>
+
+      <h2>Timeline from Real Phishing Case</h2>
+      <div class="code-block"><span class="hl-comment">╔══════════════════════════════════════════════════════════╗</span>
+<span class="hl-comment">║          PHISHING ATTACK TIMELINE — CASE #2025-047       ║</span>
+<span class="hl-comment">╚══════════════════════════════════════════════════════════╝</span>
+
+<span class="hl-key">2025-05-15 09:13:55 UTC+3</span>
+  → Attacker sends email from <span class="hl-ip">185.220.101.45</span> (Tor Exit, NL)
+    via mail.evil-sender.ru
+    From: "PayPal Security" &lt;noreply@paypal.evil-sender.ru&gt;
+
+<span class="hl-key">2025-05-15 09:14:01 UTC+3</span>
+  → Email relayed through mail.evil-sender.ru outbound MX
+    (6 second processing time — normal)
+
+<span class="hl-key">2025-05-15 09:14:22 PDT</span>
+  → Email received by mx.victim-corp.com
+    SPF: FAIL, DKIM: FAIL, DMARC: FAIL
+    <span class="hl-warn">⚠ Spam filter did NOT quarantine (misconfigured DMARC p=none)</span>
+
+<span class="hl-key">2025-05-15 09:17:03 PDT</span>
+  → victim@victim-corp.com opens email (mail server access log)
+
+<span class="hl-key">2025-05-15 09:18:41 PDT</span>
+  → victim clicks link:
+    hxxps://paypal[.]verification-needed[.]xyz/secure/login
+    Source IP of victim's click: <span class="hl-ip">203.0.113.27</span>
+    (victim's corporate outbound proxy)
+
+<span class="hl-key">2025-05-15 09:19:15 PDT</span>
+  → Victim enters credentials on phishing page
+    (observed via web proxy HTTPS inspection log)
+
+<span class="hl-key">2025-05-15 09:22:00 UTC</span>
+  → Attacker logs into victim's real PayPal from IP: <span class="hl-ip">91.108.4.111</span>
+    (Telegram datacenter / secondary VPN)
+    PayPal account drained: $2,340</div>
+
+      <h2>Evidence Preservation Checklist</h2>
+      <ul class="step-list">
+        <li><div class="step-num-circle">1</div><div><strong style="color:var(--obs-text)">Export raw .eml file</strong> — right-click → Save As in most clients. Hash it immediately with SHA256 to prove it wasn't altered.</div></li>
+        <li><div class="step-num-circle">2</div><div><strong style="color:var(--obs-text)">Screenshot headers</strong> — with timestamps visible. Include the full Authentication-Results field.</div></li>
+        <li><div class="step-num-circle">3</div><div><strong style="color:var(--obs-text)">Document all IOCs</strong> — IP addresses, domains, URLs, attachment hashes. Use standard format (defang URLs).</div></li>
+        <li><div class="step-num-circle">4</div><div><strong style="color:var(--obs-text)">Collect server logs</strong> — MTA (Postfix/Exchange) logs show exact receive timestamps. Preserve before log rotation.</div></li>
+        <li><div class="step-num-circle">5</div><div><strong style="color:var(--obs-text)">Chain of custody</strong> — document who accessed evidence, when, and what actions were taken. Use write blockers if applicable.</div></li>
+        <li><div class="step-num-circle">6</div><div><strong style="color:var(--obs-text)">Submit IOCs to threat intel</strong> — report phishing domains to APWG (eCrimeX), report IPs to AbuseIPDB, submit files to VirusTotal.</div></li>
+      </ul>
+
+      <h2>IOC Report Template</h2>
+      <div class="code-block"><span class="hl-comment">==== EMAIL FORENSICS REPORT ====</span>
+<span class="hl-key">Case:</span>          2025-047
+<span class="hl-key">Analyst:</span>       [Analyst Name]
+<span class="hl-key">Date:</span>          2025-05-15
+<span class="hl-key">Classification:</span>Phishing / Credential Harvest
+
+<span class="hl-key">SENDER DETAILS:</span>
+  Display Name:  PayPal Security
+  Email:         noreply@paypal.evil-sender.ru
+  Real Domain:   evil-sender.ru
+  Registrar:     NameCheap (registered 2025-05-12, 3 days before attack)
+  
+<span class="hl-key">NETWORK INDICATORS:</span>
+  Sending IP:    185.220.101.45  (Tor Exit, AS62041)
+  Phishing URL:  hxxps://paypal[.]verification-needed[.]xyz/secure/login
+  C2 IP:         91.108.4.111
+
+<span class="hl-key">AUTHENTICATION:</span>
+  SPF:   FAIL
+  DKIM:  FAIL
+  DMARC: FAIL (p=none — no enforcement on victim domain)
+
+<span class="hl-key">FILE HASHES:</span>
+  (no attachments in this case)
+
+<span class="hl-key">TIMELINE:</span>   (see above)
+
+<span class="hl-key">VERDICT:</span>       MALICIOUS — Credential phishing, confirmed by proxy logs</div>
+    </div>
+
+    <!-- CHECKLIST PAGE -->
+    <div class="page" id="page-checklist">
+      <div class="page-title"><i class="ti ti-checkbox" style="color:#34d399" aria-hidden="true"></i> Investigation Checklist <span class="badge badge-green">SOP</span></div>
+      <div class="subtitle">Standard Operating Procedure for every email forensics investigation. Tap each item to mark complete.</div>
+
+      <h2>Phase 1 — Acquisition</h2>
+      <div id="checklist-container"></div>
+
+      <div class="callout callout-success" style="margin-top:20px">
+        <div class="callout-title"><i class="ti ti-check" aria-hidden="true"></i> Quick Reference Commands</div>
+        <p>Hash email for evidence: <code>sha256sum suspicious.eml</code><br>
+        Check SPF: <code>dig TXT sender-domain.com</code><br>
+        Check DMARC: <code>dig TXT _dmarc.sender-domain.com</code><br>
+        IP whois: <code>whois IP_ADDRESS</code><br>
+        Extract attachments: <code>python3 extract_attachments.py email.eml</code></p>
+      </div>
+
+      <h2>Red Flag Summary</h2>
+      <table>
+        <tr><th>Indicator</th><th>Risk Level</th><th>Action</th></tr>
+        <tr><td>SPF fail + DKIM fail + DMARC fail</td><td><span style="color:#f87171">Critical</span></td><td>Likely phishing — investigate immediately</td></tr>
+        <tr><td>Reply-To differs from From</td><td><span style="color:#f87171">High</span></td><td>Replies hijacked — do not reply</td></tr>
+        <tr><td>Timezone mismatch in headers</td><td><span style="color:#fbbf24">Medium</span></td><td>Possible header forgery</td></tr>
+        <tr><td>Sending IP is Tor exit node</td><td><span style="color:#f87171">High</span></td><td>Deliberate anonymization</td></tr>
+        <tr><td>Domain registered &lt; 30 days ago</td><td><span style="color:#fbbf24">Medium</span></td><td>Throwaway phishing domain</td></tr>
+        <tr><td>Attachment type ≠ magic bytes</td><td><span style="color:#f87171">Critical</span></td><td>Disguised malware — sandbox immediately</td></tr>
+        <tr><td>Macro with AutoOpen + Shell</td><td><span style="color:#f87171">Critical</span></td><td>Malicious Office macro — do not open</td></tr>
+        <tr><td>Lookalike domain (unicode, numbers)</td><td><span style="color:#f87171">High</span></td><td>Homograph attack</td></tr>
+        <tr><td>Message-ID domain ≠ From domain</td><td><span style="color:#fbbf24">Medium</span></td><td>Sent from different infrastructure</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+const checklistItems = [
+  {phase:"Phase 1 — Acquisition",items:["Export raw .eml file (do not modify original)","Calculate SHA256 hash of .eml file for evidence integrity","Make a forensic copy — work on copy, not original","Document who provided the email and when"]},
+  {phase:"Phase 2 — Header Analysis",items:["Extract full raw headers","Identify all Received: hops (bottom to top)","Extract public IPs from all Received headers","Check Date headers for timezone consistency","Verify From vs Reply-To vs Return-Path alignment","Note Message-ID domain vs From domain","Look for X-Originating-IP field"]},
+  {phase:"Phase 3 — Authentication",items:["Check Authentication-Results header in email","Verify SPF result (pass/fail/softfail)","Verify DKIM result and check alignment","Verify DMARC result and policy enforcement","Manually query SPF DNS record: dig TXT domain","Manually query DMARC DNS record: dig TXT _dmarc.domain"]},
+  {phase:"Phase 4 — IP Investigation",items:["Run WHOIS on each public IP","Check if IP is Tor exit node / VPN / hosting provider","Run geolocation lookup (MaxMind or ipinfo.io)","Check IP against VirusTotal and AbuseIPDB","Check IP against Spamhaus blacklist","Reverse DNS lookup (host IP)"]},
+  {phase:"Phase 5 — Content Analysis",items:["Examine From display name vs email address","Check for lookalike/homograph domains","Defang and analyze all URLs in email body","Extract and hash all attachments","Check attachment magic bytes vs extension","Scan attachment hashes on VirusTotal","Run olevba on any Office files","Look for social engineering indicators (urgency, authority, rewards)"]},
+  {phase:"Phase 6 — Documentation",items:["Write IOC report with all findings","Document complete timeline","Submit phishing domain to APWG/Google Safe Browsing","Report malicious IPs to AbuseIPDB","Preserve all logs with timestamps","Deliver findings to incident response team"]}
+];
+
+const container = document.getElementById('checklist-container');
+const state = {};
+checklistItems.forEach((section,si) => {
+  const h = document.createElement('h3');
+  h.textContent = section.phase;
+  h.style.marginTop = si === 0 ? '12px' : '20px';
+  container.appendChild(h);
+  section.items.forEach((item,ii) => {
+    const key = `${si}-${ii}`;
+    state[key] = false;
+    const div = document.createElement('div');
+    div.style.cssText = 'display:flex;align-items:flex-start;gap:10px;padding:8px 10px;border-radius:6px;cursor:pointer;transition:background .15s;margin:2px 0;border:1px solid transparent';
+    div.innerHTML = `<div id="cb-${key}" style="width:18px;height:18px;border:1.5px solid var(--obs-border);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:all .15s;font-size:11px"></div><span id="lbl-${key}" style="font-size:13px;color:var(--obs-muted);line-height:1.5">${item}</span>`;
+    div.addEventListener('click', () => {
+      state[key] = !state[key];
+      const cb = document.getElementById(`cb-${key}`);
+      const lbl = document.getElementById(`lbl-${key}`);
+      if(state[key]) {
+        cb.style.background = '#10b981';
+        cb.style.borderColor = '#10b981';
+        cb.innerHTML = '<i class="ti ti-check" style="color:white;font-size:11px"></i>';
+        lbl.style.textDecoration = 'line-through';
+        lbl.style.color = 'var(--obs-muted)';
+        div.style.background = 'rgba(16,185,129,.06)';
+      } else {
+        cb.style.background = 'transparent';
+        cb.style.borderColor = 'var(--obs-border)';
+        cb.innerHTML = '';
+        lbl.style.textDecoration = 'none';
+        lbl.style.color = 'var(--obs-muted)';
+        div.style.background = 'transparent';
+      }
+    });
+    container.appendChild(div);
+  });
+});
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  event.currentTarget && event.currentTarget.classList.add('active');
+  const navItems = document.querySelectorAll('.nav-item');
+  navItems.forEach(item => {
+    if(item.getAttribute('onclick') && item.getAttribute('onclick').includes("'"+id+"'")) {
+      item.classList.add('active');
+    }
+  });
+  document.querySelector('.content').scrollTop = 0;
+}
+
+function toggleAcc(header) {
+  const body = header.nextElementSibling;
+  const icon = header.querySelector('.ti-chevron-down, .ti-chevron-up');
+  body.classList.toggle('open');
+  if(icon) {
+    icon.className = body.classList.contains('open') ? 'ti ti-chevron-up' : 'ti ti-chevron-down';
+  }
+}
+
+function switchTab(el, id) {
+  const parent = el.closest('.page') || document.querySelector('.content');
+  parent.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  parent.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+  el.classList.add('active');
+  const target = document.getElementById('tab-'+id);
+  if(target) target.classList.add('active');
+}
+</script>
