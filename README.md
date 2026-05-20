@@ -14,6 +14,12 @@ Practical, terminal-first notes for the Digital Forensics curriculum of the **PG
 
 ## 📚 Syllabus Coverage
 
+### Unit I — Introductino to Cyberspace, Cybercrime and Cyber Law
+
+### Unit II — Regulatory Framework of the Information Technology Act, 2000	
+
+### Unit III — Offences and Penalties
+
 ### Unit IV — Fundamentals of Cyber Forensics
 - Introduction to Cyber Forensics
 - Storage Fundamentals & File System Concepts (FAT32, NTFS, MBR)
@@ -21,7 +27,7 @@ Practical, terminal-first notes for the Digital Forensics curriculum of the **PG
 - Formatted Partition Recovery
 - OS Artifacts & Basic Terminology
 
-### Unit V — Data Recovery Tools, Procedures & Ethics
+### Unit V — Data Recovery Tools, Recovery Procedures and Ethics
 - Chain of Custody & Evidence Admissibility
 - Timeline Analysis (file creation / modification / access)
 - Internet Usage, Swap Files, Temp Files & Cache Recovery
