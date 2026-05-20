@@ -71,7 +71,7 @@ Practical, terminal-first notes for the Digital Forensics curriculum of the **PG
 ## ⚡ Quick Start
 
 ```bash
-git clone https://github.com/Ankit-Ojha16/Digital_Forensics.git
+git clone https://github.com/cywarx/Digital_Forensics.git
 cd Digital_Forensics
 
 # Install tools
@@ -88,9 +88,9 @@ sudo python3 "CTF/Phantom Ledger - The 0xE5 Incident/make_pendrive.py"
 
 ## 👤 Author
 
-**Ankit Ojha** · [cywarx.com](https://cywarx.com) · [GitHub](https://github.com/Ankit-Ojha16) · [LinkedIn](https://linkedin.com/in/ankit-ojha) · [Ankit.ojha.1432@gmail.com](mailto:Ankit.ojha.1432@gmail.com)
+**Ankit Ojha** · [cywarx.com](https://cywarx.com) · [GitHub](https://github.com/cywarx) · [LinkedIn](https://www.linkedin.com/company/cywarx-solutions/) · [cywarx@gmail.com](mailto:cywarx@gmail.com)
 
 > These notes are a **reference resource** — not official SSCBS study material. Always refer to your faculty's discussion material alongside these notes.
 
 ---
-*MIT License · © 2026 Ankit Ojha*
+*MIT License · © 2026 Cywarx
