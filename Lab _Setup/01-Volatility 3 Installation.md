@@ -13,11 +13,8 @@ vol -f memory.img windows.pslist
 ## ⚠️ Common Issues (Avoid These)
 
 - ❌ Installing in `/opt` → permission errors
-    
 - ❌ Using `sudo pip` → breaks system (PEP 668)
-    
 - ❌ Mixing root + user installs → causes failures
-    
 
 ---
 
