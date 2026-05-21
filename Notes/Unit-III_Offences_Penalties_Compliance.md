@@ -661,7 +661,7 @@ STEP 1: IDENTIFY ASSETS
   → What data/systems need protection?
   → Inventory of hardware, software, data
           ↓
-STEP 2: RISK ASSESSMENT
+STEP 2: RISK ASSESSMENT[[01. Create a Forensics Image for Practice]]
   → What threats exist? (hackers, insiders, disasters)
   → What are the vulnerabilities?
   → What is the impact if breached?

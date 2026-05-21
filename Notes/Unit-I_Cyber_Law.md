@@ -53,22 +53,22 @@ status: complete
 
 ### 🔑 Key Concepts
 
-| Term | Meaning |
-|---|---|
-| **URL** | Uniform Resource Locator — address of a web resource |
-| **HTTP/HTTPS** | Protocol used to transfer web pages |
-| **HTML** | Language used to build web pages |
-| **Browser** | Software to access the Web (Chrome, Firefox) |
-| **Hyperlink** | Clickable connection between web pages |
-| **Web Server** | Stores and serves web content |
+| Term           | Meaning                                              |
+| -------------- | ---------------------------------------------------- |
+| **URL**        | Uniform Resource Locator — address of a web resource |
+| **HTTP/HTTPS** | Protocol used to transfer web pages                  |
+| **HTML**       | Language used to build web pages                     |
+| **Browser**    | Software to access the Web (Chrome, Firefox)         |
+| **Hyperlink**  | Clickable connection between web pages               |
+| **Web Server** | Stores and serves web content                        |
 
 ### 📌 WWW vs Internet
 
-| Feature | Internet | WWW |
-|---|---|---|
+| Feature    | Internet                        | WWW                               |
+| ---------- | ------------------------------- | --------------------------------- |
 | What it is | Physical network infrastructure | A service running on the Internet |
-| Invented | 1960s (ARPANET) | 1989 (Tim Berners-Lee) |
-| Examples | Email, FTP, VoIP | Websites, web apps |
+| Invented   | 1960s (ARPANET)                 | 1989 (Tim Berners-Lee)            |
+| Examples   | Email, FTP, VoIP                | Websites, web apps                |
 
 > [!tip] Exam Tip
 > The **Internet** is the infrastructure (hardware + protocols); the **Web** is one service *on top of* the Internet.

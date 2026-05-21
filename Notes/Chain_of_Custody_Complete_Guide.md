@@ -914,18 +914,18 @@ EXHIBITS : Ordered confiscated (tools of crime)
 
 > [!danger] ❌ Top 10 CoC Mistakes
 
-| # | Mistake | Consequence | Prevention |
-|---|---|---|---|
-| 1 | **Turning off a running computer** | RAM contents (passwords, encryption keys) lost forever | Always do live acquisition first |
-| 2 | **No Faraday bag for phone** | Remote wipe destroys all evidence | Always bag phones immediately |
-| 3 | **Working on original drive** | Timestamps modified; evidence contaminated | Always use write blocker + forensic image |
-| 4 | **Gaps in transfer records** | Defence argues tampering occurred in the gap | Document every single transfer immediately |
-| 5 | **Not calculating hash at collection** | Cannot prove evidence unchanged later | Always hash at scene AND after each transfer |
-| 6 | **Broken seal not documented** | Suggests tampering; evidence challenged | Always document seal breaks + new seal number |
-| 7 | **Taking evidence home overnight** | Unauthorized access; CoC broken | Evidence must only be in authorized secure locations |
-| 8 | **No witness at collection** | Officer's word alone — challengeable | Always have a witness who also signs the CoC form |
-| 9 | **Vague or incorrect labels** | Cannot identify exhibit in court | Complete, accurate labels on everything |
-| 10 | **No BSA/Section 63 certificate** | Digital evidence inadmissible in court | Always prepare and attach the certificate |
+| #   | Mistake                                | Consequence                                            | Prevention                                           |
+| --- | -------------------------------------- | ------------------------------------------------------ | ---------------------------------------------------- |
+| 1   | **Turning off a running computer**     | RAM contents (passwords, encryption keys) lost forever | Always do live acquisition first                     |
+| 2   | **No Faraday bag for phone**           | Remote wipe destroys all evidence                      | Always bag phones immediately                        |
+| 3   | **Working on original drive**          | Timestamps modified; evidence contaminated             | Always use write blocker + forensic image            |
+| 4   | **Gaps in transfer records**           | Defence argues tampering occurred in the gap           | Document every single transfer immediately           |
+| 5   | **Not calculating hash at collection** | Cannot prove evidence unchanged later                  | Always hash at scene AND after each transfer         |
+| 6   | **Broken seal not documented**         | Suggests tampering; evidence challenged                | Always document seal breaks + new seal number        |
+| 7   | **Taking evidence home overnight**     | Unauthorized access; CoC broken                        | Evidence must only be in authorized secure locations |
+| 8   | **No witness at collection**           | Officer's word alone — challengeable                   | Always have a witness who also signs the CoC form    |
+| 9   | **Vague or incorrect labels**          | Cannot identify exhibit in court                       | Complete, accurate labels on everything              |
+| 10  | **No BSA/Section 63 certificate**      | Digital evidence inadmissible in court                 | Always prepare and attach the certificate            |
 
 ---
 
