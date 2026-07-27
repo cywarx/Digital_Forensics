@@ -1,0 +1,224 @@
+Jul 18 00:05:07 labserver CRON[9000]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 18 00:05:08 labserver CRON[9000]: pam_unix(cron:session): session closed for user root
+Jul 18 01:03:47 labserver CRON[9001]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 18 01:03:48 labserver CRON[9001]: pam_unix(cron:session): session closed for user root
+Jul 18 02:04:15 labserver CRON[9002]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 18 02:04:16 labserver CRON[9002]: pam_unix(cron:session): session closed for user root
+Jul 18 03:03:08 labserver CRON[9003]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 18 03:03:09 labserver CRON[9003]: pam_unix(cron:session): session closed for user root
+Jul 18 04:05:06 labserver CRON[9004]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 18 04:05:07 labserver CRON[9004]: pam_unix(cron:session): session closed for user root
+Jul 18 05:05:47 labserver CRON[9005]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 18 05:05:48 labserver CRON[9005]: pam_unix(cron:session): session closed for user root
+Jul 18 06:05:05 labserver CRON[9006]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 18 06:05:06 labserver CRON[9006]: pam_unix(cron:session): session closed for user root
+Jul 18 07:05:27 labserver CRON[9007]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 18 07:05:28 labserver CRON[9007]: pam_unix(cron:session): session closed for user root
+Jul 18 07:10:59 labserver sshd[30949]: Accepted password for sysadmin from 10.0.0.22 port 53923 ssh2
+Jul 18 07:11:00 labserver sshd[30949]: pam_unix(sshd:session): session opened for user sysadmin by (uid=0)
+Jul 18 07:30:59 labserver sshd[30949]: pam_unix(sshd:session): session closed for user sysadmin
+Jul 18 08:03:01 labserver CRON[9008]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 18 08:03:02 labserver CRON[9008]: pam_unix(cron:session): session closed for user root
+Jul 18 09:03:13 labserver CRON[9009]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 18 09:03:14 labserver CRON[9009]: pam_unix(cron:session): session closed for user root
+Jul 18 10:03:32 labserver CRON[9010]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 18 10:03:33 labserver CRON[9010]: pam_unix(cron:session): session closed for user root
+Jul 18 10:58:40 labserver sshd[33258]: Accepted password for deploy from 10.0.0.22 port 58317 ssh2
+Jul 18 10:58:41 labserver sshd[33258]: pam_unix(sshd:session): session opened for user deploy by (uid=0)
+Jul 18 11:05:01 labserver CRON[9011]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 18 11:05:02 labserver CRON[9011]: pam_unix(cron:session): session closed for user root
+Jul 18 11:11:00 labserver sudo: hexx : TTY=pts/0 ; PWD=/home/hexx ; USER=root ; COMMAND=/usr/bin/apt update
+Jul 18 11:11:01 labserver sudo: pam_unix(sudo:session): session opened for user root by hexx(uid=1000)
+Jul 18 11:11:04 labserver sudo: pam_unix(sudo:session): session closed for user root
+Jul 18 11:12:40 labserver sshd[33258]: pam_unix(sshd:session): session closed for user deploy
+Jul 18 12:05:12 labserver CRON[9012]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 18 12:05:13 labserver CRON[9012]: pam_unix(cron:session): session closed for user root
+Jul 18 13:05:41 labserver CRON[9013]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 18 13:05:42 labserver CRON[9013]: pam_unix(cron:session): session closed for user root
+Jul 18 14:05:34 labserver CRON[9014]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 18 14:05:35 labserver CRON[9014]: pam_unix(cron:session): session closed for user root
+Jul 18 15:04:14 labserver CRON[9015]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 18 15:04:15 labserver CRON[9015]: pam_unix(cron:session): session closed for user root
+Jul 18 15:08:00 labserver sudo: hexx : TTY=pts/0 ; PWD=/home/hexx ; USER=root ; COMMAND=/usr/bin/apt update
+Jul 18 15:08:01 labserver sudo: pam_unix(sudo:session): session opened for user root by hexx(uid=1000)
+Jul 18 15:08:04 labserver sudo: pam_unix(sudo:session): session closed for user root
+Jul 18 15:52:41 labserver sshd[37123]: Accepted password for hexx from 10.0.0.22 port 54808 ssh2
+Jul 18 15:52:42 labserver sshd[37123]: pam_unix(sshd:session): session opened for user hexx by (uid=0)
+Jul 18 16:04:37 labserver CRON[9016]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 18 16:04:38 labserver CRON[9016]: pam_unix(cron:session): session closed for user root
+Jul 18 16:07:41 labserver sshd[37123]: pam_unix(sshd:session): session closed for user hexx
+Jul 18 17:04:51 labserver CRON[9017]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 18 17:04:52 labserver CRON[9017]: pam_unix(cron:session): session closed for user root
+Jul 18 17:28:00 labserver sudo: hexx : TTY=pts/0 ; PWD=/home/hexx ; USER=root ; COMMAND=/usr/bin/apt update
+Jul 18 17:28:01 labserver sudo: pam_unix(sudo:session): session opened for user root by hexx(uid=1000)
+Jul 18 17:28:04 labserver sudo: pam_unix(sudo:session): session closed for user root
+Jul 18 18:03:48 labserver CRON[9018]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 18 18:03:49 labserver CRON[9018]: pam_unix(cron:session): session closed for user root
+Jul 18 18:51:10 labserver sshd[35310]: Accepted password for deploy from 10.0.0.8 port 50009 ssh2
+Jul 18 18:51:11 labserver sshd[35310]: pam_unix(sshd:session): session opened for user deploy by (uid=0)
+Jul 18 19:03:44 labserver CRON[9019]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 18 19:03:45 labserver CRON[9019]: pam_unix(cron:session): session closed for user root
+Jul 18 19:27:10 labserver sshd[35310]: pam_unix(sshd:session): session closed for user deploy
+Jul 18 20:04:21 labserver CRON[9020]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 18 20:04:22 labserver CRON[9020]: pam_unix(cron:session): session closed for user root
+Jul 18 21:03:46 labserver sshd[32927]: Accepted password for sysadmin from 10.0.0.8 port 58201 ssh2
+Jul 18 21:03:47 labserver sshd[32927]: pam_unix(sshd:session): session opened for user sysadmin by (uid=0)
+Jul 18 21:04:09 labserver CRON[9021]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 18 21:04:10 labserver CRON[9021]: pam_unix(cron:session): session closed for user root
+Jul 18 21:40:46 labserver sshd[32927]: pam_unix(sshd:session): session closed for user sysadmin
+Jul 18 22:03:48 labserver CRON[9022]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 18 22:03:49 labserver CRON[9022]: pam_unix(cron:session): session closed for user root
+Jul 18 23:04:06 labserver CRON[9023]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 18 23:04:07 labserver CRON[9023]: pam_unix(cron:session): session closed for user root
+Jul 19 00:03:24 labserver CRON[9100]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 19 00:03:25 labserver CRON[9100]: pam_unix(cron:session): session closed for user root
+Jul 19 01:03:22 labserver CRON[9101]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 19 01:03:23 labserver CRON[9101]: pam_unix(cron:session): session closed for user root
+Jul 19 02:04:38 labserver CRON[9102]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 19 02:04:39 labserver CRON[9102]: pam_unix(cron:session): session closed for user root
+Jul 19 03:04:51 labserver CRON[9103]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 19 03:04:52 labserver CRON[9103]: pam_unix(cron:session): session closed for user root
+Jul 19 03:14:02 labserver sshd[18342]: Failed password for invalid user admin from 203.0.113.77 port 40000 ssh2
+Jul 19 03:14:09 labserver sshd[18343]: Failed password for invalid user root from 203.0.113.77 port 40001 ssh2
+Jul 19 03:14:16 labserver sshd[18344]: Failed password for invalid user test from 203.0.113.77 port 40002 ssh2
+Jul 19 03:14:23 labserver sshd[18345]: Failed password for invalid user oracle from 203.0.113.77 port 40003 ssh2
+Jul 19 03:14:30 labserver sshd[18346]: Failed password for invalid user ubuntu from 203.0.113.77 port 40004 ssh2
+Jul 19 03:14:37 labserver sshd[18347]: Failed password for invalid user administrator from 203.0.113.77 port 40005 ssh2
+Jul 19 03:14:44 labserver sshd[18348]: Failed password for invalid user guest from 203.0.113.77 port 40006 ssh2
+Jul 19 03:14:51 labserver sshd[18349]: Failed password for invalid user user from 203.0.113.77 port 40007 ssh2
+Jul 19 03:14:58 labserver sshd[18350]: Failed password for invalid user postgres from 203.0.113.77 port 40008 ssh2
+Jul 19 03:15:05 labserver sshd[18351]: Failed password for invalid user backup from 203.0.113.77 port 40009 ssh2
+Jul 19 03:15:12 labserver sshd[18352]: Failed password for root from 203.0.113.77 port 40100 ssh2
+Jul 19 03:15:18 labserver sshd[18353]: Failed password for root from 203.0.113.77 port 40101 ssh2
+Jul 19 03:15:24 labserver sshd[18354]: Failed password for root from 203.0.113.77 port 40102 ssh2
+Jul 19 03:15:30 labserver sshd[18355]: Disconnecting authenticating user root 203.0.113.77 port 40200: Too many authentication failures [preauth]
+Jul 19 03:17:30 labserver sshd[41777]: Failed password for invalid user pi from 198.51.100.9 port 44510 ssh2
+Jul 19 04:03:46 labserver CRON[9104]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 19 04:03:47 labserver CRON[9104]: pam_unix(cron:session): session closed for user root
+Jul 19 05:04:34 labserver CRON[9105]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 19 05:04:35 labserver CRON[9105]: pam_unix(cron:session): session closed for user root
+Jul 19 06:03:59 labserver CRON[9106]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 19 06:04:00 labserver CRON[9106]: pam_unix(cron:session): session closed for user root
+Jul 19 07:04:05 labserver CRON[9107]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 19 07:04:06 labserver CRON[9107]: pam_unix(cron:session): session closed for user root
+Jul 19 08:05:18 labserver CRON[9108]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 19 08:05:19 labserver CRON[9108]: pam_unix(cron:session): session closed for user root
+Jul 19 09:05:39 labserver CRON[9109]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 19 09:05:40 labserver CRON[9109]: pam_unix(cron:session): session closed for user root
+Jul 19 09:08:46 labserver sshd[32060]: Accepted password for hexx from 10.0.0.22 port 58727 ssh2
+Jul 19 09:08:47 labserver sshd[32060]: pam_unix(sshd:session): session opened for user hexx by (uid=0)
+Jul 19 09:21:46 labserver sshd[32060]: pam_unix(sshd:session): session closed for user hexx
+Jul 19 10:04:36 labserver CRON[9110]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 19 10:04:37 labserver CRON[9110]: pam_unix(cron:session): session closed for user root
+Jul 19 10:15:04 labserver sshd[41210]: Failed password for hexx from 10.0.0.15 port 52344 ssh2
+Jul 19 10:15:07 labserver sshd[41210]: Accepted password for hexx from 10.0.0.15 port 52344 ssh2
+Jul 19 10:43:00 labserver sudo: hexx : TTY=pts/0 ; PWD=/home/hexx ; USER=root ; COMMAND=/usr/bin/apt update
+Jul 19 10:43:01 labserver sudo: pam_unix(sudo:session): session opened for user root by hexx(uid=1000)
+Jul 19 10:43:04 labserver sudo: pam_unix(sudo:session): session closed for user root
+Jul 19 11:03:45 labserver CRON[9111]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 19 11:03:46 labserver CRON[9111]: pam_unix(cron:session): session closed for user root
+Jul 19 12:03:02 labserver CRON[9112]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 19 12:03:03 labserver CRON[9112]: pam_unix(cron:session): session closed for user root
+Jul 19 13:05:14 labserver CRON[9113]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 19 13:05:15 labserver CRON[9113]: pam_unix(cron:session): session closed for user root
+Jul 19 13:48:19 labserver sshd[37177]: Accepted password for deploy from 10.0.0.22 port 56118 ssh2
+Jul 19 13:48:20 labserver sshd[37177]: pam_unix(sshd:session): session opened for user deploy by (uid=0)
+Jul 19 14:04:05 labserver CRON[9114]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 19 14:04:06 labserver CRON[9114]: pam_unix(cron:session): session closed for user root
+Jul 19 14:26:19 labserver sshd[37177]: pam_unix(sshd:session): session closed for user deploy
+Jul 19 14:40:14 labserver sshd[33750]: Accepted password for hexx from 10.0.0.15 port 50964 ssh2
+Jul 19 14:40:15 labserver sshd[33750]: pam_unix(sshd:session): session opened for user hexx by (uid=0)
+Jul 19 14:49:14 labserver sshd[33750]: pam_unix(sshd:session): session closed for user hexx
+Jul 19 15:03:55 labserver CRON[9115]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 19 15:03:56 labserver CRON[9115]: pam_unix(cron:session): session closed for user root
+Jul 19 16:03:24 labserver CRON[9116]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 19 16:03:25 labserver CRON[9116]: pam_unix(cron:session): session closed for user root
+Jul 19 17:04:29 labserver CRON[9117]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 19 17:04:30 labserver CRON[9117]: pam_unix(cron:session): session closed for user root
+Jul 19 18:05:53 labserver CRON[9118]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 19 18:05:54 labserver CRON[9118]: pam_unix(cron:session): session closed for user root
+Jul 19 18:30:00 labserver sudo: hexx : TTY=pts/0 ; PWD=/home/hexx ; USER=root ; COMMAND=/usr/bin/apt update
+Jul 19 18:30:01 labserver sudo: pam_unix(sudo:session): session opened for user root by hexx(uid=1000)
+Jul 19 18:30:04 labserver sudo: pam_unix(sudo:session): session closed for user root
+Jul 19 19:04:10 labserver CRON[9119]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 19 19:04:11 labserver CRON[9119]: pam_unix(cron:session): session closed for user root
+Jul 19 20:04:22 labserver CRON[9120]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 19 20:04:23 labserver CRON[9120]: pam_unix(cron:session): session closed for user root
+Jul 19 21:03:42 labserver CRON[9121]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 19 21:03:43 labserver CRON[9121]: pam_unix(cron:session): session closed for user root
+Jul 19 21:10:15 labserver sshd[30344]: Accepted password for hexx from 10.0.0.15 port 55539 ssh2
+Jul 19 21:10:16 labserver sshd[30344]: pam_unix(sshd:session): session opened for user hexx by (uid=0)
+Jul 19 21:50:15 labserver sshd[30344]: pam_unix(sshd:session): session closed for user hexx
+Jul 19 22:04:44 labserver CRON[9122]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 19 22:04:45 labserver CRON[9122]: pam_unix(cron:session): session closed for user root
+Jul 19 22:38:10 labserver sshd[36932]: Accepted password for deploy from 10.0.0.22 port 59938 ssh2
+Jul 19 22:38:11 labserver sshd[36932]: pam_unix(sshd:session): session opened for user deploy by (uid=0)
+Jul 19 22:56:10 labserver sshd[36932]: pam_unix(sshd:session): session closed for user deploy
+Jul 19 23:05:41 labserver CRON[9123]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 19 23:05:42 labserver CRON[9123]: pam_unix(cron:session): session closed for user root
+Jul 20 00:03:38 labserver CRON[9200]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 20 00:03:39 labserver CRON[9200]: pam_unix(cron:session): session closed for user root
+Jul 20 01:05:10 labserver CRON[9201]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 20 01:05:11 labserver CRON[9201]: pam_unix(cron:session): session closed for user root
+Jul 20 02:05:46 labserver CRON[9202]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 20 02:05:47 labserver CRON[9202]: pam_unix(cron:session): session closed for user root
+Jul 20 03:03:10 labserver CRON[9203]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 20 03:03:11 labserver CRON[9203]: pam_unix(cron:session): session closed for user root
+Jul 20 04:04:24 labserver CRON[9204]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 20 04:04:25 labserver CRON[9204]: pam_unix(cron:session): session closed for user root
+Jul 20 05:04:59 labserver CRON[9205]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 20 05:05:00 labserver CRON[9205]: pam_unix(cron:session): session closed for user root
+Jul 20 06:05:44 labserver CRON[9206]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 20 06:05:45 labserver CRON[9206]: pam_unix(cron:session): session closed for user root
+Jul 20 07:05:14 labserver CRON[9207]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 20 07:05:15 labserver CRON[9207]: pam_unix(cron:session): session closed for user root
+Jul 20 08:05:20 labserver CRON[9208]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 20 08:05:21 labserver CRON[9208]: pam_unix(cron:session): session closed for user root
+Jul 20 09:03:14 labserver CRON[9209]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 20 09:03:15 labserver CRON[9209]: pam_unix(cron:session): session closed for user root
+Jul 20 10:03:51 labserver CRON[9210]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 20 10:03:52 labserver CRON[9210]: pam_unix(cron:session): session closed for user root
+Jul 20 11:04:25 labserver CRON[9211]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 20 11:04:26 labserver CRON[9211]: pam_unix(cron:session): session closed for user root
+Jul 20 11:49:59 labserver sshd[33981]: Accepted password for deploy from 10.0.0.8 port 57744 ssh2
+Jul 20 11:50:00 labserver sshd[33981]: pam_unix(sshd:session): session opened for user deploy by (uid=0)
+Jul 20 12:04:04 labserver CRON[9212]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 20 12:04:05 labserver CRON[9212]: pam_unix(cron:session): session closed for user root
+Jul 20 12:24:59 labserver sshd[33981]: pam_unix(sshd:session): session closed for user deploy
+Jul 20 13:03:58 labserver CRON[9213]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 20 13:03:59 labserver CRON[9213]: pam_unix(cron:session): session closed for user root
+Jul 20 14:05:56 labserver CRON[9214]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 20 14:05:57 labserver CRON[9214]: pam_unix(cron:session): session closed for user root
+Jul 20 14:41:00 labserver sudo: hexx : TTY=pts/0 ; PWD=/home/hexx ; USER=root ; COMMAND=/usr/bin/apt update
+Jul 20 14:41:01 labserver sudo: pam_unix(sudo:session): session opened for user root by hexx(uid=1000)
+Jul 20 14:41:04 labserver sudo: pam_unix(sudo:session): session closed for user root
+Jul 20 15:05:20 labserver CRON[9215]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 20 15:05:21 labserver CRON[9215]: pam_unix(cron:session): session closed for user root
+Jul 20 16:03:41 labserver CRON[9216]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 20 16:03:42 labserver CRON[9216]: pam_unix(cron:session): session closed for user root
+Jul 20 16:19:00 labserver sudo: hexx : TTY=pts/0 ; PWD=/home/hexx ; USER=root ; COMMAND=/usr/bin/apt update
+Jul 20 16:19:01 labserver sudo: pam_unix(sudo:session): session opened for user root by hexx(uid=1000)
+Jul 20 16:19:04 labserver sudo: pam_unix(sudo:session): session closed for user root
+Jul 20 17:04:25 labserver CRON[9217]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 20 17:04:26 labserver CRON[9217]: pam_unix(cron:session): session closed for user root
+Jul 20 17:07:32 labserver sshd[33510]: Accepted password for sysadmin from 10.0.0.15 port 57953 ssh2
+Jul 20 17:07:33 labserver sshd[33510]: pam_unix(sshd:session): session opened for user sysadmin by (uid=0)
+Jul 20 17:46:32 labserver sshd[33510]: pam_unix(sshd:session): session closed for user sysadmin
+Jul 20 18:05:29 labserver CRON[9218]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 20 18:05:30 labserver CRON[9218]: pam_unix(cron:session): session closed for user root
+Jul 20 18:49:00 labserver sudo: hexx : TTY=pts/0 ; PWD=/home/hexx ; USER=root ; COMMAND=/usr/bin/apt update
+Jul 20 18:49:01 labserver sudo: pam_unix(sudo:session): session opened for user root by hexx(uid=1000)
+Jul 20 18:49:04 labserver sudo: pam_unix(sudo:session): session closed for user root
+Jul 20 19:03:16 labserver CRON[9219]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 20 19:03:17 labserver CRON[9219]: pam_unix(cron:session): session closed for user root
+Jul 20 20:03:15 labserver CRON[9220]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 20 20:03:16 labserver CRON[9220]: pam_unix(cron:session): session closed for user root
+Jul 20 20:15:06 labserver sshd[35804]: Accepted password for deploy from 10.0.0.15 port 57062 ssh2
+Jul 20 20:15:07 labserver sshd[35804]: pam_unix(sshd:session): session opened for user deploy by (uid=0)
+Jul 20 20:47:06 labserver sshd[35804]: pam_unix(sshd:session): session closed for user deploy
+Jul 20 21:05:35 labserver CRON[9221]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 20 21:05:36 labserver CRON[9221]: pam_unix(cron:session): session closed for user root
+Jul 20 22:05:16 labserver CRON[9222]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 20 22:05:17 labserver CRON[9222]: pam_unix(cron:session): session closed for user root
+Jul 20 23:05:37 labserver CRON[9223]: pam_unix(cron:session): session opened for user root by (uid=0)
+Jul 20 23:05:38 labserver CRON[9223]: pam_unix(cron:session): session closed for user root

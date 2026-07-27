@@ -1,0 +1,208 @@
+{
+  "main": {
+    "id": "44b3d088b1b9dcbb",
+    "type": "split",
+    "children": [
+      {
+        "id": "e41df0ba967fb913",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "1de54f30eb1f1e40",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Digital-Forensics-Viva-QA.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Digital-Forensics-Viva-QA"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "7c29800436350a89",
+    "type": "split",
+    "children": [
+      {
+        "id": "95b2523ad4ac0669",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "b8aaf8aec76fbb9b",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "fa7630c33f83faf1",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "c6c2f79be1f05b63",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "4c373c0d26f011de",
+    "type": "split",
+    "children": [
+      {
+        "id": "9fa7800348c87669",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "ed8efca8bdc764e3",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Exam-Answer-Key.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for Exam-Answer-Key"
+            }
+          },
+          {
+            "id": "8892fa6ce9bdd531",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Exam-Answer-Key.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from Exam-Answer-Key"
+            }
+          },
+          {
+            "id": "5745b4b1b037fcc5",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "b8a76fc037a58528",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "414a28a6a19e5b7f",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Exam-Answer-Key.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of Exam-Answer-Key"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "1de54f30eb1f1e40",
+  "lastOpenFiles": [
+    "IoT_Security_Viva_QA.md",
+    "Digital-Forensics-Viva-QA.md",
+    "Exam-Answer-Key.md.tmp.8136.9cf54335e2c3",
+    "Exam-Answer-Key.md.tmp.8136.3452d87c8323",
+    "Exam-Answer-Key.md.tmp.8136.dde07a9942c9",
+    "Exam-Answer-Key.md.tmp.8136.dd9f167b09f4",
+    "Exam-Answer-Key.md.tmp.8136.83622fc099a7",
+    "Exam-Answer-Key.md.tmp.8136.28fe9e5b83fe",
+    "Exam-Answer-Key.md.tmp.8136.45d2aa7a156f",
+    "Exam-Answer-Key.md.tmp.8136.f2474faa8d1a",
+    "Exam-Files/Set4_Access_Log_and_Secret_File.zip",
+    "Exam-Files/Set3_IT_Event_Photo_and_SSH_Log.zip",
+    "IoT_Security_Viva_QA_Simple.md",
+    "Exam-Answer-Key.md",
+    "Exam-Files/Set 4 - Access Log and Secret File/secret_file.png",
+    "Exam-Files/Set 3 - IT Event Photo and SSH Log/IT_Event.jpg",
+    "Exam-Files/Set 2 - Deleted File Recovery and Vacation Photo/vacation_photo.jpg",
+    "Exam-Files/photos/IT_Event.jpg",
+    "Exam-Files/photos/vacation_photo.jpg"
+  ]
+}
